@@ -17,8 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Debugger {
-    public Process process;
-
+    private Process process;
     private final Logger logger = Logger.getLogger("Debugger");
 
     public VirtualMachine launchVMAndJunit() {
@@ -97,5 +96,9 @@ public class Debugger {
         } catch (Exception e) {
             // ignore
         }
+    }
+
+    public Process getProcess() {
+        return process;
     }
 }

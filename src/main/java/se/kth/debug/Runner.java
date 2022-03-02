@@ -27,7 +27,7 @@ public class Runner {
             while ((eventSet = vm.eventQueue().remove()) != null) {
                 for (Event event: eventSet) {
                     if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
-                        debugger.process.destroy();
+                        debugger.getProcess().destroy();;
                     }
                     if (event instanceof ClassPrepareEvent) {
                         logger.log(Level.INFO, "Classes are prepared!");
