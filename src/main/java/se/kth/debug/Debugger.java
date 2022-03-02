@@ -23,7 +23,7 @@ public class Debugger {
 
     public VirtualMachine launchVMAndJunit() {
         String requiredClasspath = "";
-        String testList = "se.kth.debug.AppTest#testAdd";
+        String testList = "se.kth.debug.AppTest";
         try {
             String classpath = JavaUtils.getFullClasspath(requiredClasspath);
             ProcessBuilder processBuilder = new ProcessBuilder("java",

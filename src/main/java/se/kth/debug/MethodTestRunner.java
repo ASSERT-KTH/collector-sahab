@@ -3,7 +3,6 @@ package se.kth.debug;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
-import org.junit.runner.Result;
 
 import java.util.concurrent.*;
 
@@ -34,11 +33,10 @@ public class MethodTestRunner {
 
     private static void runTest(String test) {
         try {
-            String[] classAndMethod = test.split("#");
-            Request request = Request.method(Class.forName(classAndMethod[0]), classAndMethod[1]);
+            Request request = Request.classes(Class.forName(test));
             JUnitCore junit = new JUnitCore();
             junit.addListener(new TextListener(System.out));
-            Result result = junit.run(request);
+            junit.run(request);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
