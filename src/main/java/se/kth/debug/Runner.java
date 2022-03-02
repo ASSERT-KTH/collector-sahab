@@ -31,7 +31,7 @@ public class Runner {
                     }
                     if (event instanceof ClassPrepareEvent) {
                         logger.log(Level.INFO, "Classes are prepared!");
-                        debugger.setBreakpoints(vm);
+                        debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
                         logger.log(Level.INFO, "Breakpoint event is reached!");

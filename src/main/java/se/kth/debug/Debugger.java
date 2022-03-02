@@ -2,6 +2,7 @@ package se.kth.debug;
 
 import com.sun.jdi.*;
 import com.sun.jdi.event.BreakpointEvent;
+import com.sun.jdi.event.ClassPrepareEvent;
 import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequestManager;
@@ -20,9 +21,12 @@ public class Debugger {
     private Process process;
     private final Logger logger = Logger.getLogger("Debugger");
 
+    private String classToBeDebugged = "se.kth.debug.App";
+    private String tests = "se.kth.debug.AppTest";
+    private int[] breakpoints = new int[]{5};
+
     public VirtualMachine launchVMAndJunit() {
         String requiredClasspath = "";
-        String testList = "se.kth.debug.AppTest";
         try {
             String classpath = JavaUtils.getFullClasspath(requiredClasspath);
             ProcessBuilder processBuilder = new ProcessBuilder("java",
@@ -30,9 +34,9 @@ public class Debugger {
                     "-cp",
                     classpath,
                     MethodTestRunner.class.getCanonicalName(),
-                    testList
+                    tests
             );
-            logger.log(Level.INFO, "java -cp " + classpath + " " + MethodTestRunner.class.getCanonicalName() + " " + testList);
+            logger.log(Level.INFO, "java -cp " + classpath + " " + MethodTestRunner.class.getCanonicalName() + " " + tests);
 
             process = processBuilder.start();
 
@@ -64,17 +68,22 @@ public class Debugger {
     public void addClassPrepareEvent(VirtualMachine vm) {
         EventRequestManager erm = vm.eventRequestManager();
         ClassPrepareRequest cpr = erm.createClassPrepareRequest();
-        cpr.addClassFilter("se.kth.debug.App");
+        cpr.addClassFilter(classToBeDebugged);
         cpr.setEnabled(true);
         vm.resume();
     }
 
-    public void setBreakpoints(VirtualMachine vm) throws AbsentInformationException {
+    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent cpe) throws AbsentInformationException {
         EventRequestManager erm = vm.eventRequestManager();
-        List<ReferenceType> referenceTypes = vm.classesByName("se.kth.debug.App");
-        List<Location> locations = referenceTypes.get(0).locationsOfLine(5);
-        BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
-        br.setEnabled(true);
+
+        ClassType classType = (ClassType) cpe.referenceType();
+
+        for (int lineNumber: breakpoints) {
+            List<Location> locations = classType.locationsOfLine(lineNumber);
+            BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
+            br.setEnabled(true);
+        }
+
     }
 
     public void processBreakpoints(VirtualMachine vm, BreakpointEvent bpe) throws IncompatibleThreadStateException, AbsentInformationException {
