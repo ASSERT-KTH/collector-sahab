@@ -1,0 +1,6 @@
+# IntelliJ files
+.idea
+
+# Build files
+classpath.txt
+target
