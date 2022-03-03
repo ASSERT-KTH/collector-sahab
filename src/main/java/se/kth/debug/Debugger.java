@@ -80,6 +80,7 @@ public class Debugger {
             ClassPrepareRequest cpr = erm.createClassPrepareRequest();
             cpr.addClassFilter(classToBeDebugged.getFileName());
             cpr.setEnabled(true);
+            logger.log(Level.INFO, classToBeDebugged.getFileName() + " added!");
             vm.resume();
         }
     }
@@ -126,6 +127,8 @@ public class Debugger {
         Map<String, Map<String, String>> m2 = new HashMap<>();
         m2.put("Fields", fieldsAsResults);
         results.add(m2);
+
+        logger.log(Level.INFO, bpe.location().toString());
 
         return results;
     }
