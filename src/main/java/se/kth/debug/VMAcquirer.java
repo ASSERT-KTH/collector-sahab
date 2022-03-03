@@ -6,17 +6,13 @@ import com.sun.jdi.VirtualMachineManager;
 import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
-
 import java.io.IOException;
 import java.util.Map;
 
 public class VMAcquirer {
 
-    /**
-     * Call this with the localhost port to connect to.
-     */
-    public VirtualMachine connect(int port)
-            throws IOException {
+    /** Call this with the localhost port to connect to. */
+    public VirtualMachine connect(int port) throws IOException {
         String strPort = Integer.toString(port);
         AttachingConnector connector = getConnector();
         try {
@@ -37,11 +33,9 @@ public class VMAcquirer {
     }
 
     private VirtualMachine connect(AttachingConnector connector, String port)
-            throws IllegalConnectorArgumentsException,
-            IOException {
+            throws IllegalConnectorArgumentsException, IOException {
         Map<String, Connector.Argument> args = connector.defaultArguments();
         Connector.Argument pidArgument = args.get("port");
-//        args.get("hostname").setValue("localhost");
         if (pidArgument == null) {
             throw new IllegalStateException();
         }
@@ -49,5 +43,4 @@ public class VMAcquirer {
 
         return connector.attach(args);
     }
-
 }

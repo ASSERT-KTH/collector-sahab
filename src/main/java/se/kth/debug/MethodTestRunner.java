@@ -1,10 +1,9 @@
 package se.kth.debug;
 
+import java.util.concurrent.*;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
-
-import java.util.concurrent.*;
 
 public class MethodTestRunner {
     public static void main(String... args) {
@@ -12,12 +11,13 @@ public class MethodTestRunner {
         for (int i = 0; i < tests.length; i++) {
             final String test = tests[i];
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            Callable<Object> task = new Callable<Object>() {
-                public Object call() {
-                    runTest(test);
-                    return null;
-                }
-            };
+            Callable<Object> task =
+                    new Callable<Object>() {
+                        public Object call() {
+                            runTest(test);
+                            return null;
+                        }
+                    };
             Future<Object> future = executor.submit(task);
             try {
                 executor.shutdown();
@@ -42,4 +42,3 @@ public class MethodTestRunner {
         }
     }
 }
-

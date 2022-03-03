@@ -1,5 +1,7 @@
 package se.kth.debug;
 
+import static java.lang.reflect.Modifier.TRANSIENT;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.jdi.*;
@@ -9,19 +11,15 @@ import com.sun.jdi.event.Event;
 import com.sun.jdi.event.EventSet;
 import com.sun.jdi.event.VMDeathEvent;
 import com.sun.jdi.event.VMDisconnectEvent;
-import picocli.CommandLine;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
+import picocli.CommandLine;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.Result;
-
-import static java.lang.reflect.Modifier.TRANSIENT;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
@@ -35,17 +33,24 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(names = "-t", description = "Path to test directory")
     private String pathToTestDirectory;
 
-    @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints", defaultValue = "input.txt")
+    @CommandLine.Option(
+            names = "-i",
+            description = "File containing class names and breakpoints",
+            defaultValue = "input.txt")
     private File classesAndBreakpoints;
 
     private List<FileAndBreakpoint> parseFileAndBreakpoints() {
-        try(BufferedReader br = new BufferedReader(new FileReader(classesAndBreakpoints))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(classesAndBreakpoints))) {
             List<FileAndBreakpoint> parsedFileAndBreakpoints = new ArrayList<>();
-            for (String line; (line = br.readLine()) != null;) {
+            for (String line; (line = br.readLine()) != null; ) {
                 String[] fileAndBreakpoints = line.split("=");
                 String[] breakpoints = fileAndBreakpoints[1].split(",");
-                List<Integer> parsedBreakpoints = Arrays.stream(breakpoints).map(Integer::parseInt).collect(Collectors.toList());
-                FileAndBreakpoint fNB = new FileAndBreakpoint(fileAndBreakpoints[0], parsedBreakpoints);
+                List<Integer> parsedBreakpoints =
+                        Arrays.stream(breakpoints)
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toList());
+                FileAndBreakpoint fNB =
+                        new FileAndBreakpoint(fileAndBreakpoints[0], parsedBreakpoints);
                 parsedFileAndBreakpoints.add(fNB);
             }
             return parsedFileAndBreakpoints;
@@ -59,14 +64,15 @@ public class Collector implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        Debugger debugger = new Debugger(pathToBuiltProject, pathToTestDirectory, parseFileAndBreakpoints());
+        Debugger debugger =
+                new Debugger(pathToBuiltProject, pathToTestDirectory, parseFileAndBreakpoints());
         VirtualMachine vm = debugger.launchVMAndJunit();
         debugger.addClassPrepareEvent(vm);
         vm.resume();
         try {
             EventSet eventSet = null;
             while ((eventSet = vm.eventQueue().remove()) != null) {
-                for (Event event: eventSet) {
+                for (Event event : eventSet) {
                     if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
                         debugger.getProcess().destroy();
                     }
@@ -74,24 +80,29 @@ public class Collector implements Callable<Integer> {
                         debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
-                        List<Object> result = debugger.processBreakpoints(vm, (BreakpointEvent) event);
+                        List<Object> result =
+                                debugger.processBreakpoints(vm, (BreakpointEvent) event);
                         Location location = ((BreakpointEvent) event).location();
-                        results.add(new Result(location.sourcePath(), location.lineNumber(), result));
+                        results.add(
+                                new Result(location.sourcePath(), location.lineNumber(), result));
                     }
                 }
                 vm.resume();
             }
-        } catch (VMDisconnectedException | AbsentInformationException | IncompatibleThreadStateException e) {
+        } catch (VMDisconnectedException
+                | AbsentInformationException
+                | IncompatibleThreadStateException e) {
             logger.log(Level.WARNING, e.toString());
         } catch (InterruptedException e) {
             logger.log(Level.WARNING, e.toString());
             Thread.currentThread().interrupt();
         } finally {
-            final Gson gson = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .excludeFieldsWithoutExposeAnnotation()
-                    .excludeFieldsWithModifiers(TRANSIENT)
-                    .create();
+            final Gson gson =
+                    new GsonBuilder()
+                            .setPrettyPrinting()
+                            .excludeFieldsWithoutExposeAnnotation()
+                            .excludeFieldsWithModifiers(TRANSIENT)
+                            .create();
             FileWriter file = new FileWriter("output.json");
             file.write(gson.toJson(results));
             file.flush();

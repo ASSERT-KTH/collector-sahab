@@ -6,20 +6,18 @@ import com.sun.jdi.event.ClassPrepareEvent;
 import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequestManager;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import se.kth.debug.struct.FileAndBreakpoint;
 
 public class Debugger {
@@ -30,7 +28,10 @@ public class Debugger {
     private final String pathToTestDirectory;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
 
-    public Debugger(String pathToBuiltProject, String pathToTestDirectory, List<FileAndBreakpoint> classesAndBreakpoints) {
+    public Debugger(
+            String pathToBuiltProject,
+            String pathToTestDirectory,
+            List<FileAndBreakpoint> classesAndBreakpoints) {
         this.pathToBuiltProject = pathToBuiltProject;
         this.pathToTestDirectory = pathToTestDirectory;
         this.classesAndBreakpoints = classesAndBreakpoints;
@@ -40,14 +41,22 @@ public class Debugger {
         try {
             String classpath = Utility.getFullClasspath(pathToBuiltProject);
             String testsSeparatedBySpace = Utility.getAllTests(pathToTestDirectory);
-            ProcessBuilder processBuilder = new ProcessBuilder("java",
-                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y",
-                    "-cp",
-                    classpath,
-                    MethodTestRunner.class.getCanonicalName(),
-                    testsSeparatedBySpace
-            );
-            logger.log(Level.INFO, "java -cp " + classpath + " " + MethodTestRunner.class.getCanonicalName() + " " + testsSeparatedBySpace);
+            ProcessBuilder processBuilder =
+                    new ProcessBuilder(
+                            "java",
+                            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y",
+                            "-cp",
+                            classpath,
+                            MethodTestRunner.class.getCanonicalName(),
+                            testsSeparatedBySpace);
+            logger.log(
+                    Level.INFO,
+                    "java -cp "
+                            + classpath
+                            + " "
+                            + MethodTestRunner.class.getCanonicalName()
+                            + " "
+                            + testsSeparatedBySpace);
 
             process = processBuilder.start();
 
@@ -62,11 +71,13 @@ public class Debugger {
             final VirtualMachine vm = new VMAcquirer().connect(port);
             logger.log(Level.INFO, "Connected to port: " + port);
             // kill process when the program exit
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                public void run() {
-                    shutdown(vm);
-                }
-            });
+            Runtime.getRuntime()
+                    .addShutdownHook(
+                            new Thread() {
+                                public void run() {
+                                    shutdown(vm);
+                                }
+                            });
             return vm;
         } catch (MalformedURLException e) {
             logger.log(Level.SEVERE, "Wrong URL: " + e.toString());
@@ -78,7 +89,7 @@ public class Debugger {
 
     public void addClassPrepareEvent(VirtualMachine vm) {
         EventRequestManager erm = vm.eventRequestManager();
-        for (FileAndBreakpoint classToBeDebugged: classesAndBreakpoints) {
+        for (FileAndBreakpoint classToBeDebugged : classesAndBreakpoints) {
             ClassPrepareRequest cpr = erm.createClassPrepareRequest();
             cpr.addClassFilter(classToBeDebugged.getFileName());
             cpr.setEnabled(true);
@@ -87,19 +98,26 @@ public class Debugger {
         }
     }
 
-    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
+    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent event)
+            throws AbsentInformationException {
         EventRequestManager erm = vm.eventRequestManager();
 
-        List<Integer> breakpoints = classesAndBreakpoints.stream().filter(cb -> cb.getFileName().equals(event.referenceType().name())).findFirst().get().getBreakpoints();
+        List<Integer> breakpoints =
+                classesAndBreakpoints.stream()
+                        .filter(cb -> cb.getFileName().equals(event.referenceType().name()))
+                        .findFirst()
+                        .get()
+                        .getBreakpoints();
 
-        for (int lineNumber: breakpoints) {
+        for (int lineNumber : breakpoints) {
             List<Location> locations = event.referenceType().locationsOfLine(lineNumber);
             BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
             br.setEnabled(true);
         }
     }
 
-    public List<Object> processBreakpoints(VirtualMachine vm, BreakpointEvent bpe) throws IncompatibleThreadStateException, AbsentInformationException {
+    public List<Object> processBreakpoints(VirtualMachine vm, BreakpointEvent bpe)
+            throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
         StackFrame stackFrame = threadReference.frame(0);
 
@@ -107,7 +125,7 @@ public class Debugger {
 
         Map<String, String> localVariablesAsResults = new HashMap<>();
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
-        for (LocalVariable localVariable: localVariables) {
+        for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
             localVariablesAsResults.put(localVariable.name(), value.toString());
         }
