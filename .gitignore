@@ -5,5 +5,8 @@
 classpath.txt
 target
 
+# Input
+input.txt
+
 # Output
 output.json

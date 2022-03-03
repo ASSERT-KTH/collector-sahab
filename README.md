@@ -4,33 +4,36 @@ CLI to collect runtime context of a Java class.
 
 ### Execution
 
-1. Build classpath.
+1. Build classpath of the project you want to collect runtime information of.
     ```bash
    $ mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
     ```
-2. Compile files with debugging information attached.
+2. Build the project with debugging information attached.
+   1. Since `javac` does not compile recursively through directories, we need
+      to create a list of files we want to compile.
+      ```bash
+      $ find src/ -name "*.java" > sources.txt
+      ```
+   2. Compile the project by running the following command.
+      ```bash
+      $ javac -g -cp $(cat classpath.txt) @sources.txt -d target
+      ```
+      > NOTE: Test resources are not compiled as of now.
+3. Make an executable of "collector-sahab"
     ```bash
    $ javac -g  -cp $(cat classpath.txt)  src/main/java/se/kth/debug/*.java -d target
     ```
-3. Run the process.
-    ```bash
-   $ java -cp target/:$(cat classpath.txt) se.kth.debug.Runner
-    ```
-
-### Sample output
-```bash
-Mar 02, 2022 4:58:55 PM se.kth.debug.Debugger launchVMAndJunit
-INFO: java -cp /home/assert/Desktop/testrepos/debugger/target:/home/assert/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/assert/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/assert/Desktop/testrepos/debugger: se.kth.debug.MethodTestRunner se.kth.debug.AppTest#testAdd
-Mar 02, 2022 4:58:55 PM se.kth.debug.Debugger launchVMAndJunit
-INFO: Connected to port: 57505
-Mar 02, 2022 4:58:55 PM se.kth.debug.Runner main
-INFO: Classes are prepared!
-Mar 02, 2022 4:58:55 PM se.kth.debug.Runner main
-INFO: Breakpoint event is reached!
-Mar 02, 2022 4:58:55 PM se.kth.debug.Debugger processBreakpoints
-INFO: x::1
-Mar 02, 2022 4:58:55 PM se.kth.debug.Debugger processBreakpoints
-INFO: y::2
-Mar 02, 2022 4:58:55 PM se.kth.debug.Runner main
-WARNING: com.sun.jdi.VMDisconnectedException
-```
+4. Prepare for execution of `collector sahab`.
+   1. Create an `input` file containing a map of class names and breakpoints.
+      Example:
+      ```text
+      ch.hsr.geohash.BoundingBox=210
+      ch.hsr.geohash.util.DoubleUtil=12,15
+      ```
+   2. Run the process
+      ```bash
+      $ java -cp target/:$(cat classpath.txt) se.kth.debug.Collector \
+           -p </path/to/project>
+           -t </path/to/project/test/directory>
+           -i <path/to/input/file> (default="input.txt")
+      ```

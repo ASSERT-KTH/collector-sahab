@@ -11,6 +11,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,22 +24,28 @@ public class Debugger {
     private Process process;
     private final Logger logger = Logger.getLogger("Debugger");
 
-    private String classToBeDebugged = "se.kth.debug.App";
-    private String tests = "se.kth.debug.AppTest";
-    private int[] breakpoints = new int[]{5};
+    private final String pathToBuiltProject;
+    private final String pathToTestDirectory;
+    private final List<FileAndBreakpoint> classesAndBreakpoints;
+
+    public Debugger(String pathToBuiltProject, String pathToTestDirectory, List<FileAndBreakpoint> classesAndBreakpoints) {
+        this.pathToBuiltProject = pathToBuiltProject;
+        this.pathToTestDirectory = pathToTestDirectory;
+        this.classesAndBreakpoints = classesAndBreakpoints;
+    }
 
     public VirtualMachine launchVMAndJunit() {
-        String requiredClasspath = "";
         try {
-            String classpath = JavaUtils.getFullClasspath(requiredClasspath);
+            String classpath = Utility.getFullClasspath(pathToBuiltProject);
+            String testsSeparatedBySpace = Utility.getAllTests(pathToTestDirectory);
             ProcessBuilder processBuilder = new ProcessBuilder("java",
                     "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y",
                     "-cp",
                     classpath,
                     MethodTestRunner.class.getCanonicalName(),
-                    tests
+                    testsSeparatedBySpace
             );
-            logger.log(Level.INFO, "java -cp " + classpath + " " + MethodTestRunner.class.getCanonicalName() + " " + tests);
+            logger.log(Level.INFO, "java -cp " + classpath + " " + MethodTestRunner.class.getCanonicalName() + " " + testsSeparatedBySpace);
 
             process = processBuilder.start();
 
@@ -67,40 +76,63 @@ public class Debugger {
 
     public void addClassPrepareEvent(VirtualMachine vm) {
         EventRequestManager erm = vm.eventRequestManager();
-        ClassPrepareRequest cpr = erm.createClassPrepareRequest();
-        cpr.addClassFilter(classToBeDebugged);
-        cpr.setEnabled(true);
-        vm.resume();
+        for (FileAndBreakpoint classToBeDebugged: classesAndBreakpoints) {
+            ClassPrepareRequest cpr = erm.createClassPrepareRequest();
+            cpr.addClassFilter(classToBeDebugged.getFileName());
+            cpr.setEnabled(true);
+            vm.resume();
+        }
     }
 
-    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent cpe) throws AbsentInformationException {
+    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
         EventRequestManager erm = vm.eventRequestManager();
 
-        ClassType classType = (ClassType) cpe.referenceType();
+        List<Integer> breakpoints = classesAndBreakpoints.stream().filter(cb -> cb.getFileName().equals(event.referenceType().name())).findFirst().get().getBreakpoints();
 
         for (int lineNumber: breakpoints) {
-            List<Location> locations = classType.locationsOfLine(lineNumber);
+            List<Location> locations = event.referenceType().locationsOfLine(lineNumber);
             BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
             br.setEnabled(true);
         }
-
     }
 
-    public void processBreakpoints(VirtualMachine vm, BreakpointEvent bpe) throws IncompatibleThreadStateException, AbsentInformationException {
+    public List<Object> processBreakpoints(VirtualMachine vm, BreakpointEvent bpe) throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
         StackFrame stackFrame = threadReference.frame(0);
 
+        List<Object> results = new ArrayList<>();
+
+        Map<String, String> localVariablesAsResults = new HashMap<>();
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable: localVariables) {
             Value value = stackFrame.getValue(localVariable);
-            logger.log(Level.INFO, localVariable.name() + "::" + value.toString());
+            localVariablesAsResults.put(localVariable.name(), value.toString());
         }
+        Map<String, Map<String, String>> m1 = new HashMap<>();
+        m1.put("Local Variables", localVariablesAsResults);
+        results.add(m1);
+
+        Map<String, String> fieldsAsResults = new HashMap<>();
+        List<Field> fields = stackFrame.location().declaringType().visibleFields();
+        for (Field field : fields) {
+            Value value;
+            if (field.isStatic()) {
+                value = stackFrame.location().declaringType().getValue(field);
+            } else {
+                value = stackFrame.thisObject().getValue(field);
+            }
+            fieldsAsResults.put(field.name(), value.toString());
+        }
+        Map<String, Map<String, String>> m2 = new HashMap<>();
+        m2.put("Fields", fieldsAsResults);
+        results.add(m2);
+
+        return results;
     }
 
     public void shutdown(VirtualMachine vm) {
         try {
             process.destroy();
-            // process.waitFor();
             vm.exit(0);
         } catch (Exception e) {
             // ignore
