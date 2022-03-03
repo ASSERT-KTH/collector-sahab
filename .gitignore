@@ -4,3 +4,6 @@
 # Build files
 classpath.txt
 target
+
+# Output
+output.json
