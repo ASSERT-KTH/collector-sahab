@@ -18,6 +18,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.Result;
+
 import static java.lang.reflect.Modifier.TRANSIENT;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)

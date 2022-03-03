@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import se.kth.debug.struct.FileAndBreakpoint;
+
 public class Debugger {
     private Process process;
     private final Logger logger = Logger.getLogger("Debugger");

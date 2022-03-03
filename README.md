@@ -21,7 +21,7 @@ CLI to collect runtime context of a Java class.
       > NOTE: Test resources are not compiled as of now.
 3. Make an executable of "collector-sahab"
     ```bash
-   $ javac -g  -cp $(cat classpath.txt)  src/main/java/se/kth/debug/*.java -d target
+   $ ./build.sh
     ```
 4. Prepare for execution of `collector sahab`.
    1. Create an `input` file containing a map of class names and breakpoints.

@@ -1,4 +1,4 @@
-package se.kth.debug;
+package se.kth.debug.struct;
 
 import com.google.gson.annotations.Expose;
 
