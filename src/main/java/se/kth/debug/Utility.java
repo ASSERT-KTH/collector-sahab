@@ -14,6 +14,13 @@ import java.util.stream.Collectors;
 public class Utility {
     private Utility() { }
 
+    /**
+     * Concatenates provided classpath with the system set classpath.
+     *
+     * @param classpath this classpath is usually the classpath of the
+     *                  compiled project
+     * @return concatenated string of classpath
+     */
     public static String getFullClasspath(String classpath) throws MalformedURLException {
         String[] pathElements = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
         String[] providedClasspath = classpath.split(File.pathSeparator);
@@ -44,6 +51,13 @@ public class Utility {
         return strClasspath.toString();
     }
 
+    /**
+     * Uses spoon to return fully-qualified names of all test classes.
+     *
+     * @param pathToTestDirectory test directory of project whose runtime
+     *                            context needs to be collected
+     * @return a string of test classes separated by " "
+     */
     public static String getAllTests(String pathToTestDirectory) {
         Launcher launcher = new Launcher();
         launcher.addInputResource(pathToTestDirectory);
