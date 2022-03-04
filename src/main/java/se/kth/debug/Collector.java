@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import picocli.CommandLine;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.result.Result;
+import se.kth.debug.struct.result.BreakPointContext;
 import se.kth.debug.struct.result.RuntimeValueTypeChunk;
 import se.kth.debug.struct.result.StackFrameContext;
 
@@ -25,7 +25,7 @@ import se.kth.debug.struct.result.StackFrameContext;
 public class Collector implements Callable<Integer> {
     private static final Logger logger = Logger.getLogger("Runner");
 
-    private static final List<Result> runtimeValues = new ArrayList<>();
+    private static final List<BreakPointContext> breakpointContexts = new ArrayList<>();
 
     @CommandLine.Option(names = "-p", description = "Path to the the compiled project")
     private String pathToBuiltProject;
@@ -83,8 +83,9 @@ public class Collector implements Callable<Integer> {
                         List<StackFrameContext> result =
                                 debugger.processBreakpoints((BreakpointEvent) event);
                         Location location = ((BreakpointEvent) event).location();
-                        runtimeValues.add(
-                                new Result(location.sourcePath(), location.lineNumber(), result));
+                        breakpointContexts.add(
+                                new BreakPointContext(
+                                        location.sourcePath(), location.lineNumber(), result));
                     }
                 }
                 vm.resume();
@@ -104,7 +105,7 @@ public class Collector implements Callable<Integer> {
                                     RuntimeValueTypeChunk.class, new StatisticsTypeAdapter())
                             .create();
             FileWriter file = new FileWriter("output.json");
-            file.write(gson.toJson(runtimeValues));
+            file.write(gson.toJson(breakpointContexts));
             file.flush();
             file.close();
         }
