@@ -10,15 +10,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.result.FieldList;
+import se.kth.debug.struct.result.LocalVariableList;
+import se.kth.debug.struct.result.Statistics;
 
 public class Debugger {
     private Process process;
@@ -116,24 +116,33 @@ public class Debugger {
         }
     }
 
-    public List<Object> processBreakpoints(VirtualMachine vm, BreakpointEvent bpe)
+    public List<Statistics> processBreakpoints(BreakpointEvent bpe)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
         StackFrame stackFrame = threadReference.frame(0);
 
-        List<Object> results = new ArrayList<>();
+        LocalVariableList localVariables = collectLocalVariable(stackFrame);
+        FieldList fields = collectFields(stackFrame);
 
-        Map<String, String> localVariablesAsResults = new HashMap<>();
+        return List.of(localVariables, fields);
+    }
+
+    private LocalVariableList collectLocalVariable(StackFrame stackFrame)
+            throws AbsentInformationException {
+        LocalVariableList visibleVariables = new LocalVariableList();
+
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
-            localVariablesAsResults.put(localVariable.name(), value.toString());
+            visibleVariables.addData(localVariable.name(), value.toString());
         }
-        Map<String, Map<String, String>> m1 = new HashMap<>();
-        m1.put("Local Variables", localVariablesAsResults);
-        results.add(m1);
 
-        Map<String, String> fieldsAsResults = new HashMap<>();
+        return visibleVariables;
+    }
+
+    private FieldList collectFields(StackFrame stackFrame) {
+        FieldList visibleFields = new FieldList();
+
         List<Field> fields = stackFrame.location().declaringType().visibleFields();
         for (Field field : fields) {
             Value value;
@@ -142,15 +151,9 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            fieldsAsResults.put(field.name(), value.toString());
+            visibleFields.addData(field.name(), value.toString());
         }
-        Map<String, Map<String, String>> m2 = new HashMap<>();
-        m2.put("Fields", fieldsAsResults);
-        results.add(m2);
-
-        logger.log(Level.INFO, bpe.location().toString());
-
-        return results;
+        return visibleFields;
     }
 
     public void shutdown(VirtualMachine vm) {

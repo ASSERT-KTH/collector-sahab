@@ -1,7 +1,5 @@
 package se.kth.debug;
 
-import static java.lang.reflect.Modifier.TRANSIENT;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.jdi.*;
@@ -19,13 +17,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import picocli.CommandLine;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.Result;
+import se.kth.debug.struct.result.Result;
+import se.kth.debug.struct.result.Statistics;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
     private static final Logger logger = Logger.getLogger("Runner");
 
-    private static final List<Result> results = new ArrayList<>();
+    private static final List<Result> runtimeValues = new ArrayList<>();
 
     @CommandLine.Option(names = "-p", description = "Path to the the compiled project")
     private String pathToBuiltProject;
@@ -80,10 +79,10 @@ public class Collector implements Callable<Integer> {
                         debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
-                        List<Object> result =
-                                debugger.processBreakpoints(vm, (BreakpointEvent) event);
+                        List<Statistics> result =
+                                debugger.processBreakpoints((BreakpointEvent) event);
                         Location location = ((BreakpointEvent) event).location();
-                        results.add(
+                        runtimeValues.add(
                                 new Result(location.sourcePath(), location.lineNumber(), result));
                     }
                 }
@@ -97,14 +96,9 @@ public class Collector implements Callable<Integer> {
             logger.log(Level.WARNING, e.toString());
             Thread.currentThread().interrupt();
         } finally {
-            final Gson gson =
-                    new GsonBuilder()
-                            .setPrettyPrinting()
-                            .excludeFieldsWithoutExposeAnnotation()
-                            .excludeFieldsWithModifiers(TRANSIENT)
-                            .create();
+            final Gson gson = new GsonBuilder().setPrettyPrinting().create();
             FileWriter file = new FileWriter("output.json");
-            file.write(gson.toJson(results));
+            file.write(gson.toJson(runtimeValues));
             file.flush();
             file.close();
         }
