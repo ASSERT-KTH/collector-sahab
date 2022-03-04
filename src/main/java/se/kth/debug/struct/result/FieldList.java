@@ -23,7 +23,7 @@ public class FieldList implements Statistics<Field> {
     }
 }
 
-class Field {
+class Field implements RuntimeValue {
     private final String name;
     private final String value;
 

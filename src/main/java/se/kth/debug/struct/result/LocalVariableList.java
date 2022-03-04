@@ -23,7 +23,7 @@ public class LocalVariableList implements Statistics<LocalVariable> {
     }
 }
 
-class LocalVariable {
+class LocalVariable implements RuntimeValue {
     private final String name;
     private final String value;
 
