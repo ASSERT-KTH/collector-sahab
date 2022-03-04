@@ -166,7 +166,7 @@ public class Debugger {
         return visibleVariables;
     }
 
-    private void traverseUntilPrimitiveTypes( FieldList result, ObjectReference object) {
+    private void traverseUntilPrimitiveTypes(FieldList result, ObjectReference object) {
         List<Field> nestedFields = object.referenceType().visibleFields();
 
         for (Field field : nestedFields) {

@@ -102,7 +102,8 @@ public class Collector implements Callable<Integer> {
                     new GsonBuilder()
                             .setPrettyPrinting()
                             .registerTypeHierarchyAdapter(
-                                    RuntimeValueCollection.class, new RuntimeValueCollectionTypeAdapter())
+                                    RuntimeValueCollection.class,
+                                    new RuntimeValueCollectionTypeAdapter())
                             .create();
             FileWriter file = new FileWriter("output.json");
             file.write(gson.toJson(breakpointContexts));

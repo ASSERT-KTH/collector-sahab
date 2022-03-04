@@ -1,9 +1,8 @@
 package se.kth.debug.struct.result.field;
 
-import se.kth.debug.struct.result.RuntimeValue;
-
 import java.util.ArrayList;
 import java.util.List;
+import se.kth.debug.struct.result.RuntimeValue;
 
 public class FieldListImpl implements FieldList {
     private static final String IDENTIFIER = "Fields";

@@ -1,9 +1,8 @@
 package se.kth.debug.struct.result.localVariable;
 
-import se.kth.debug.struct.result.RuntimeValue;
-
 import java.util.ArrayList;
 import java.util.List;
+import se.kth.debug.struct.result.RuntimeValue;
 
 public class LocalVariableListImpl implements LocalVariableList {
     private static final String IDENTIFIER = "Local variables";
@@ -27,7 +26,6 @@ public class LocalVariableListImpl implements LocalVariableList {
     public List<RuntimeValue> getCollection() {
         return localVariables;
     }
-
 }
 
 class LocalVariable implements RuntimeValue {
