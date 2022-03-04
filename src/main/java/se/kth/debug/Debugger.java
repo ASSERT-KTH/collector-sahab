@@ -153,10 +153,33 @@ public class Debugger {
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
-            visibleVariables.addData(localVariable.name(), value.toString());
-        }
 
+            visibleVariables.addData(localVariable.name(), value.toString());
+            if (value instanceof ObjectReference) {
+                FieldList fieldList = new FieldList();
+                visibleVariables.addData(fieldList);
+                traverseUntilPrimitiveTypes(fieldList, (ObjectReference) value);
+            }
+        }
         return visibleVariables;
+    }
+
+    private void traverseUntilPrimitiveTypes( FieldList result, ObjectReference object) {
+        List<Field> nestedFields = object.referenceType().visibleFields();
+
+        for (Field field : nestedFields) {
+            Value value;
+            if (field.isStatic()) {
+                value = object.referenceType().getValue(field);
+            } else {
+                value = object.getValue(field);
+            }
+            result.addData(field.name(), String.valueOf(value));
+            if (value instanceof ObjectReference) {
+                result.addData(result);
+                traverseUntilPrimitiveTypes(result, (ObjectReference) value);
+            }
+        }
     }
 
     private FieldList collectFields(StackFrame stackFrame) {

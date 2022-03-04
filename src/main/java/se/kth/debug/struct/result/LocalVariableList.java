@@ -5,7 +5,7 @@ import java.util.List;
 
 public class LocalVariableList implements RuntimeValueTypeChunk<LocalVariable> {
     private static final String IDENTIFIER = "Local variables";
-    private final List<LocalVariable> localVariables = new ArrayList<>();
+    private final List<Object> localVariables = new ArrayList<>();
 
     @Override
     public String getIdentifier() {
@@ -17,10 +17,15 @@ public class LocalVariableList implements RuntimeValueTypeChunk<LocalVariable> {
         localVariables.add(new LocalVariable(name, value));
     }
 
+    public void addData(FieldList fieldList) {
+        localVariables.add(fieldList);
+    }
+
     @Override
-    public List<LocalVariable> getCollection() {
+    public List<Object> getCollection() {
         return localVariables;
     }
+
 }
 
 class LocalVariable implements RuntimeValue {

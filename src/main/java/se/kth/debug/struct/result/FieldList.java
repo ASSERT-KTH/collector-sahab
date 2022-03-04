@@ -5,11 +5,15 @@ import java.util.List;
 
 public class FieldList implements RuntimeValueTypeChunk<Field> {
     private static final String IDENTIFIER = "Fields";
-    private final List<Field> fields = new ArrayList<>();
+    private final List<Object> fields = new ArrayList<>();
 
     @Override
     public void addData(String name, String value) {
         fields.add(new Field(name, value));
+    }
+
+    public void addData(FieldList fieldList) {
+        fields.add(fieldList);
     }
 
     @Override
@@ -18,7 +22,7 @@ public class FieldList implements RuntimeValueTypeChunk<Field> {
     }
 
     @Override
-    public List<Field> getCollection() {
+    public List<Object> getCollection() {
         return fields;
     }
 }
