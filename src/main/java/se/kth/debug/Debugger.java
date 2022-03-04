@@ -17,9 +17,11 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.result.FieldList;
-import se.kth.debug.struct.result.LocalVariableList;
-import se.kth.debug.struct.result.StackFrameContext;
+import se.kth.debug.struct.result.*;
+import se.kth.debug.struct.result.field.FieldList;
+import se.kth.debug.struct.result.field.FieldListImpl;
+import se.kth.debug.struct.result.localVariable.LocalVariableList;
+import se.kth.debug.struct.result.localVariable.LocalVariableListImpl;
 
 public class Debugger {
     private Process process;
@@ -148,7 +150,7 @@ public class Debugger {
 
     private LocalVariableList collectLocalVariable(StackFrame stackFrame)
             throws AbsentInformationException {
-        LocalVariableList visibleVariables = new LocalVariableList();
+        LocalVariableList visibleVariables = new LocalVariableListImpl();
 
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable : localVariables) {
@@ -156,7 +158,7 @@ public class Debugger {
 
             visibleVariables.addData(localVariable.name(), value.toString());
             if (value instanceof ObjectReference) {
-                FieldList fieldList = new FieldList();
+                FieldList fieldList = new FieldListImpl();
                 visibleVariables.addData(fieldList);
                 traverseUntilPrimitiveTypes(fieldList, (ObjectReference) value);
             }
@@ -183,7 +185,7 @@ public class Debugger {
     }
 
     private FieldList collectFields(StackFrame stackFrame) {
-        FieldList visibleFields = new FieldList();
+        FieldList visibleFields = new FieldListImpl();
 
         List<Field> fields = stackFrame.location().declaringType().visibleFields();
         for (Field field : fields) {

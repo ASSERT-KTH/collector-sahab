@@ -1,11 +1,13 @@
-package se.kth.debug.struct.result;
+package se.kth.debug.struct.result.localVariable;
+
+import se.kth.debug.struct.result.RuntimeValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalVariableList implements RuntimeValueTypeChunk<LocalVariable> {
+public class LocalVariableListImpl implements LocalVariableList {
     private static final String IDENTIFIER = "Local variables";
-    private final List<Object> localVariables = new ArrayList<>();
+    private final List<RuntimeValue> localVariables = new ArrayList<>();
 
     @Override
     public String getIdentifier() {
@@ -17,12 +19,12 @@ public class LocalVariableList implements RuntimeValueTypeChunk<LocalVariable> {
         localVariables.add(new LocalVariable(name, value));
     }
 
-    public void addData(FieldList fieldList) {
-        localVariables.add(fieldList);
+    public void addData(RuntimeValue runtimeValue) {
+        localVariables.add(runtimeValue);
     }
 
     @Override
-    public List<Object> getCollection() {
+    public List<RuntimeValue> getCollection() {
         return localVariables;
     }
 
