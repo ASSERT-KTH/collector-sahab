@@ -3,7 +3,7 @@ package se.kth.debug.struct.result;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FieldList implements Statistics<Field> {
+public class FieldList implements RuntimeValueTypeChunk<Field> {
     private static final String IDENTIFIER = "Fields";
     private final List<Field> fields = new ArrayList<>();
 
@@ -30,13 +30,5 @@ class Field implements RuntimeValue {
     Field(String name, String value) {
         this.name = name;
         this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
     }
 }

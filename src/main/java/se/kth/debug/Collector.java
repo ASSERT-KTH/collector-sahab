@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 import picocli.CommandLine;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.Result;
-import se.kth.debug.struct.result.Statistics;
+import se.kth.debug.struct.result.RuntimeValueTypeChunk;
+import se.kth.debug.struct.result.StackFrameContext;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
@@ -79,7 +80,7 @@ public class Collector implements Callable<Integer> {
                         debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
-                        List<Statistics> result =
+                        List<StackFrameContext> result =
                                 debugger.processBreakpoints((BreakpointEvent) event);
                         Location location = ((BreakpointEvent) event).location();
                         runtimeValues.add(
@@ -96,7 +97,12 @@ public class Collector implements Callable<Integer> {
             logger.log(Level.WARNING, e.toString());
             Thread.currentThread().interrupt();
         } finally {
-            final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            final Gson gson =
+                    new GsonBuilder()
+                            .setPrettyPrinting()
+                            .registerTypeHierarchyAdapter(
+                                    RuntimeValueTypeChunk.class, new StatisticsTypeAdapter())
+                            .create();
             FileWriter file = new FileWriter("output.json");
             file.write(gson.toJson(runtimeValues));
             file.flush();

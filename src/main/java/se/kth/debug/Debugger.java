@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.FieldList;
 import se.kth.debug.struct.result.LocalVariableList;
-import se.kth.debug.struct.result.Statistics;
+import se.kth.debug.struct.result.StackFrameContext;
 
 public class Debugger {
     private Process process;
@@ -116,15 +117,33 @@ public class Debugger {
         }
     }
 
-    public List<Statistics> processBreakpoints(BreakpointEvent bpe)
+    public List<StackFrameContext> processBreakpoints(BreakpointEvent bpe)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
-        StackFrame stackFrame = threadReference.frame(0);
 
-        LocalVariableList localVariables = collectLocalVariable(stackFrame);
-        FieldList fields = collectFields(stackFrame);
+        int totalFrames = threadReference.frameCount();
 
-        return List.of(localVariables, fields);
+        List<StackFrameContext> stackFrameContexts = new ArrayList<>();
+        for (int i = 0; i < totalFrames; ++i) {
+            StackFrame stackFrame = threadReference.frame(i);
+            StackFrameContext stackFrameContext =
+                    new StackFrameContext(i + 1, stackFrame.location().toString());
+            try {
+                LocalVariableList localVariables = collectLocalVariable(stackFrame);
+                FieldList fields = collectFields(stackFrame);
+
+                stackFrameContext.addRuntimeValue(localVariables);
+                stackFrameContext.addRuntimeValue(fields);
+
+                stackFrameContexts.add(stackFrameContext);
+            } catch (AbsentInformationException e) {
+                logger.warning(
+                        "Information does not exist for " + stackFrame + " and frames later on");
+                return stackFrameContexts;
+            }
+        }
+
+        return stackFrameContexts;
     }
 
     private LocalVariableList collectLocalVariable(StackFrame stackFrame)
@@ -151,7 +170,7 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            visibleFields.addData(field.name(), value.toString());
+            visibleFields.addData(field.name(), value == null ? "null" : value.toString());
         }
         return visibleFields;
     }

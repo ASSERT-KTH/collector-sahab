@@ -5,11 +5,11 @@ import java.util.List;
 public class Result {
     private final String file;
     private final int lineNumber;
-    private final List<Statistics> runtimeValues;
+    private final List<StackFrameContext> stackFrameContexts;
 
-    public Result(String file, int lineNumber, List<Statistics> runtimeValues) {
+    public Result(String file, int lineNumber, List<StackFrameContext> stackFrameContexts) {
         this.file = file;
         this.lineNumber = lineNumber;
-        this.runtimeValues = runtimeValues;
+        this.stackFrameContexts = stackFrameContexts;
     }
 }
