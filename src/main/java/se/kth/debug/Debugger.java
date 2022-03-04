@@ -170,7 +170,7 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            visibleFields.addData(field.name(), value == null ? "null" : value.toString());
+            visibleFields.addData(field.name(), String.valueOf(value));
         }
         return visibleFields;
     }
