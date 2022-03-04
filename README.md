@@ -2,8 +2,9 @@
 
 CLI to collect runtime context of a Java class.
 
-### Execution
+## Execution
 
+### Setup project for collecting runtime statistics
 1. Build classpath of the project you want to collect runtime information of.
     ```bash
    $ mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
@@ -19,11 +20,14 @@ CLI to collect runtime context of a Java class.
       $ javac -g -cp $(cat classpath.txt) @sources.txt -d target
       ```
       > NOTE: Test resources are not compiled as of now.
-3. Make an executable of "collector-sahab"
+
+### Build `collector-sahab`
+
+1. Package the app
     ```bash
-   $ ./build.sh
+   $ mvn package
     ```
-4. Prepare for execution of `collector sahab`.
+2. Prepare for execution of `collector sahab`.
    1. Create an `input` file containing a map of class names and breakpoints.
       Example:
       ```text
@@ -32,7 +36,7 @@ CLI to collect runtime context of a Java class.
       ```
    2. Run the process
       ```bash
-      $ java -cp target/:$(cat classpath.txt) se.kth.debug.Collector \
+      $ java -jar/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar \
            -p </path/to/project>
            -t </path/to/project/test/directory>
            -i <path/to/input/file> (default="input.txt")

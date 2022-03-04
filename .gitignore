@@ -2,7 +2,6 @@
 .idea
 
 # Build files
-classpath.txt
 target
 
 # Input
