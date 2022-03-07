@@ -33,6 +33,9 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(names = "-t", description = "Path to test directory")
     private String pathToTestDirectory;
 
+    @CommandLine.Option(names = "-o", description = "Path to output file (JSON)")
+    private String pathToOutputJson = "output.json";
+
     @CommandLine.Option(
             names = "-i",
             description = "File containing class names and breakpoints",
@@ -105,7 +108,7 @@ public class Collector implements Callable<Integer> {
                                     RuntimeValueCollection.class,
                                     new RuntimeValueCollectionTypeAdapter())
                             .create();
-            FileWriter file = new FileWriter("output.json");
+            FileWriter file = new FileWriter(pathToOutputJson);
             file.write(gson.toJson(breakpointContexts));
             file.flush();
             file.close();
