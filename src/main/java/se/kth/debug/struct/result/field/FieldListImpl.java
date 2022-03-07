@@ -1,15 +1,16 @@
-package se.kth.debug.struct.result;
+package se.kth.debug.struct.result.field;
 
 import java.util.ArrayList;
 import java.util.List;
+import se.kth.debug.struct.result.RuntimeValue;
 
-public class FieldList implements RuntimeValueTypeChunk<Field> {
+public class FieldListImpl implements FieldList {
     private static final String IDENTIFIER = "Fields";
-    private final List<Field> fields = new ArrayList<>();
+    private final List<RuntimeValue> fields = new ArrayList<>();
 
     @Override
-    public void addData(String name, String value) {
-        fields.add(new Field(name, value));
+    public void addData(RuntimeValue runtimeValue) {
+        fields.add(runtimeValue);
     }
 
     @Override
@@ -18,8 +19,13 @@ public class FieldList implements RuntimeValueTypeChunk<Field> {
     }
 
     @Override
-    public List<Field> getCollection() {
+    public List<RuntimeValue> getCollection() {
         return fields;
+    }
+
+    @Override
+    public void addData(String name, String value) {
+        fields.add(new Field(name, value));
     }
 }
 

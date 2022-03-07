@@ -17,9 +17,11 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.result.FieldList;
-import se.kth.debug.struct.result.LocalVariableList;
-import se.kth.debug.struct.result.StackFrameContext;
+import se.kth.debug.struct.result.*;
+import se.kth.debug.struct.result.field.FieldList;
+import se.kth.debug.struct.result.field.FieldListImpl;
+import se.kth.debug.struct.result.localVariable.LocalVariableList;
+import se.kth.debug.struct.result.localVariable.LocalVariableListImpl;
 
 public class Debugger {
     private Process process;
@@ -130,7 +132,14 @@ public class Debugger {
                     new StackFrameContext(i + 1, stackFrame.location().toString());
             try {
                 LocalVariableList localVariables = collectLocalVariable(stackFrame);
-                FieldList fields = collectFields(stackFrame);
+                FieldList fields;
+                if (stackFrame.thisObject() == null) {
+                    fields =
+                            traverseUntilPrimitiveTypes(
+                                    stackFrame.location().declaringType().classObject());
+                } else {
+                    fields = traverseUntilPrimitiveTypes(stackFrame.thisObject());
+                }
 
                 stackFrameContext.addRuntimeValue(localVariables);
                 stackFrameContext.addRuntimeValue(fields);
@@ -148,31 +157,37 @@ public class Debugger {
 
     private LocalVariableList collectLocalVariable(StackFrame stackFrame)
             throws AbsentInformationException {
-        LocalVariableList visibleVariables = new LocalVariableList();
+        LocalVariableList visibleVariables = new LocalVariableListImpl();
 
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
-            visibleVariables.addData(localVariable.name(), value.toString());
-        }
 
+            visibleVariables.addData(localVariable.name(), value.toString());
+            if (value instanceof ObjectReference) {
+                visibleVariables.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
+            }
+        }
         return visibleVariables;
     }
 
-    private FieldList collectFields(StackFrame stackFrame) {
-        FieldList visibleFields = new FieldList();
+    private FieldList traverseUntilPrimitiveTypes(ObjectReference object) {
+        List<Field> nestedFields = object.referenceType().visibleFields();
 
-        List<Field> fields = stackFrame.location().declaringType().visibleFields();
-        for (Field field : fields) {
+        FieldList result = new FieldListImpl();
+        for (Field field : nestedFields) {
             Value value;
             if (field.isStatic()) {
-                value = stackFrame.location().declaringType().getValue(field);
+                value = object.referenceType().getValue(field);
             } else {
-                value = stackFrame.thisObject().getValue(field);
+                value = object.getValue(field);
             }
-            visibleFields.addData(field.name(), String.valueOf(value));
+            result.addData(field.name(), String.valueOf(value));
+            if (value instanceof ClassObjectReference) {
+                result.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
+            }
         }
-        return visibleFields;
+        return result;
     }
 
     public void shutdown(VirtualMachine vm) {
