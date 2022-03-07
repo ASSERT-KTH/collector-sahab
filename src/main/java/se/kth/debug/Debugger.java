@@ -132,7 +132,14 @@ public class Debugger {
                     new StackFrameContext(i + 1, stackFrame.location().toString());
             try {
                 LocalVariableList localVariables = collectLocalVariable(stackFrame);
-                FieldList fields = collectFields(stackFrame);
+                FieldList fields;
+                if (stackFrame.thisObject() == null) {
+                    fields =
+                            traverseUntilPrimitiveTypes(
+                                    stackFrame.location().declaringType().classObject());
+                } else {
+                    fields = traverseUntilPrimitiveTypes(stackFrame.thisObject());
+                }
 
                 stackFrameContext.addRuntimeValue(localVariables);
                 stackFrameContext.addRuntimeValue(fields);
@@ -158,17 +165,16 @@ public class Debugger {
 
             visibleVariables.addData(localVariable.name(), value.toString());
             if (value instanceof ObjectReference) {
-                FieldList fieldList = new FieldListImpl();
-                visibleVariables.addData(fieldList);
-                traverseUntilPrimitiveTypes(fieldList, (ObjectReference) value);
+                visibleVariables.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
             }
         }
         return visibleVariables;
     }
 
-    private void traverseUntilPrimitiveTypes(FieldList result, ObjectReference object) {
+    private FieldList traverseUntilPrimitiveTypes(ObjectReference object) {
         List<Field> nestedFields = object.referenceType().visibleFields();
 
+        FieldList result = new FieldListImpl();
         for (Field field : nestedFields) {
             Value value;
             if (field.isStatic()) {
@@ -177,27 +183,11 @@ public class Debugger {
                 value = object.getValue(field);
             }
             result.addData(field.name(), String.valueOf(value));
-            if (value instanceof ObjectReference) {
-                result.addData(result);
-                traverseUntilPrimitiveTypes(result, (ObjectReference) value);
+            if (value instanceof ClassObjectReference) {
+                result.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
             }
         }
-    }
-
-    private FieldList collectFields(StackFrame stackFrame) {
-        FieldList visibleFields = new FieldListImpl();
-
-        List<Field> fields = stackFrame.location().declaringType().visibleFields();
-        for (Field field : fields) {
-            Value value;
-            if (field.isStatic()) {
-                value = stackFrame.location().declaringType().getValue(field);
-            } else {
-                value = stackFrame.thisObject().getValue(field);
-            }
-            visibleFields.addData(field.name(), String.valueOf(value));
-        }
-        return visibleFields;
+        return result;
     }
 
     public void shutdown(VirtualMachine vm) {
