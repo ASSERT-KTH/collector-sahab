@@ -164,7 +164,7 @@ public class Debugger {
             Value value = stackFrame.getValue(localVariable);
 
             visibleVariables.addData(localVariable.name(), value.toString());
-            if (value instanceof ObjectReference) {
+            if (value instanceof ClassObjectReference) {
                 visibleVariables.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
             }
         }
