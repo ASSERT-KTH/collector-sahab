@@ -17,9 +17,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import picocli.CommandLine;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.result.BreakPointContext;
-import se.kth.debug.struct.result.RuntimeValueCollection;
-import se.kth.debug.struct.result.StackFrameContext;
+import se.kth.debug.struct.result.*;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
@@ -104,9 +102,7 @@ public class Collector implements Callable<Integer> {
             final Gson gson =
                     new GsonBuilder()
                             .setPrettyPrinting()
-                            .registerTypeHierarchyAdapter(
-                                    RuntimeValueCollection.class,
-                                    new RuntimeValueCollectionTypeAdapter())
+                            .serializeNulls()
                             .create();
             FileWriter file = new FileWriter(pathToOutputJson);
             file.write(gson.toJson(breakpointContexts));

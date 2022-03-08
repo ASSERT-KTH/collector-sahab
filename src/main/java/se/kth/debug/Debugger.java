@@ -18,10 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.*;
-import se.kth.debug.struct.result.field.FieldList;
-import se.kth.debug.struct.result.field.FieldListImpl;
-import se.kth.debug.struct.result.localVariable.LocalVariableList;
-import se.kth.debug.struct.result.localVariable.LocalVariableListImpl;
 
 public class Debugger {
     private Process process;
@@ -131,18 +127,11 @@ public class Debugger {
             StackFrameContext stackFrameContext =
                     new StackFrameContext(i + 1, stackFrame.location().toString());
             try {
-                LocalVariableList localVariables = collectLocalVariable(stackFrame);
-                FieldList fields;
-                if (stackFrame.thisObject() == null) {
-                    fields =
-                            traverseUntilPrimitiveTypes(
-                                    stackFrame.location().declaringType().classObject());
-                } else {
-                    fields = traverseUntilPrimitiveTypes(stackFrame.thisObject());
-                }
+                List<LocalVariableData> localVariables = collectLocalVariable(stackFrame);
+                stackFrameContext.addRuntimeValueCollection(localVariables);
 
-                stackFrameContext.addRuntimeValue(localVariables);
-                stackFrameContext.addRuntimeValue(fields);
+                List<FieldData> fields = collectFields(stackFrame);
+                stackFrameContext.addRuntimeValueCollection(fields);
 
                 stackFrameContexts.add(stackFrameContext);
             } catch (AbsentInformationException e) {
@@ -155,37 +144,32 @@ public class Debugger {
         return stackFrameContexts;
     }
 
-    private LocalVariableList collectLocalVariable(StackFrame stackFrame)
+    private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame)
             throws AbsentInformationException {
-        LocalVariableList visibleVariables = new LocalVariableListImpl();
+        List<LocalVariableData> result = new ArrayList<>();
 
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
-
-            visibleVariables.addData(localVariable.name(), value.toString());
-            if (value instanceof ClassObjectReference) {
-                visibleVariables.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
-            }
+            LocalVariableData localVariableData = new LocalVariableData(localVariable.name(), String.valueOf(value));
+            result.add(localVariableData);
         }
-        return visibleVariables;
+        return result;
     }
 
-    private FieldList traverseUntilPrimitiveTypes(ObjectReference object) {
-        List<Field> nestedFields = object.referenceType().visibleFields();
+    private List<FieldData> collectFields(StackFrame stackFrame) {
+        List<FieldData> result = new ArrayList<>();
 
-        FieldList result = new FieldListImpl();
-        for (Field field : nestedFields) {
+        List<Field> visibleFields = stackFrame.location().declaringType().visibleFields();
+        for (Field field: visibleFields) {
             Value value;
             if (field.isStatic()) {
-                value = object.referenceType().getValue(field);
+                value = stackFrame.location().declaringType().getValue(field);
             } else {
-                value = object.getValue(field);
+                value = stackFrame.thisObject().getValue(field);
             }
-            result.addData(field.name(), String.valueOf(value));
-            if (value instanceof ClassObjectReference) {
-                result.addData(traverseUntilPrimitiveTypes((ObjectReference) value));
-            }
+            FieldData fieldData = new FieldData(field.name(), String.valueOf(value));
+            result.add(fieldData);
         }
         return result;
     }
