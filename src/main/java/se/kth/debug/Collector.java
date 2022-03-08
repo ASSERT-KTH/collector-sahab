@@ -99,11 +99,7 @@ public class Collector implements Callable<Integer> {
             logger.log(Level.WARNING, e.toString());
             Thread.currentThread().interrupt();
         } finally {
-            final Gson gson =
-                    new GsonBuilder()
-                            .setPrettyPrinting()
-                            .serializeNulls()
-                            .create();
+            final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
             FileWriter file = new FileWriter(pathToOutputJson);
             file.write(gson.toJson(breakpointContexts));
             file.flush();

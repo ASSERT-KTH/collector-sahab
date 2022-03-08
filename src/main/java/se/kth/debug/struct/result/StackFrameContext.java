@@ -1,10 +1,9 @@
 package se.kth.debug.struct.result;
 
 import com.google.gson.annotations.JsonAdapter;
-import se.kth.debug.RuntimeValueAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
+import se.kth.debug.RuntimeValueAdapter;
 
 public class StackFrameContext {
     private int positionFromTopInStackTrace;

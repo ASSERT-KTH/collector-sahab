@@ -151,7 +151,8 @@ public class Debugger {
         List<LocalVariable> localVariables = stackFrame.visibleVariables();
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
-            LocalVariableData localVariableData = new LocalVariableData(localVariable.name(), String.valueOf(value));
+            LocalVariableData localVariableData =
+                    new LocalVariableData(localVariable.name(), String.valueOf(value));
             result.add(localVariableData);
         }
         return result;
@@ -161,7 +162,7 @@ public class Debugger {
         List<FieldData> result = new ArrayList<>();
 
         List<Field> visibleFields = stackFrame.location().declaringType().visibleFields();
-        for (Field field: visibleFields) {
+        for (Field field : visibleFields) {
             Value value;
             if (field.isStatic()) {
                 value = stackFrame.location().declaringType().getValue(field);

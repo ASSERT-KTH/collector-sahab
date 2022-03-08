@@ -16,5 +16,4 @@ public class FieldData implements RuntimeValue {
     public void setNestedTypes(List<FieldData> nestedTypes) {
         this.nestedTypes = nestedTypes;
     }
-
 }
