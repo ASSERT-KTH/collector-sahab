@@ -154,6 +154,9 @@ public class Debugger {
             LocalVariableData localVariableData =
                     new LocalVariableData(localVariable.name(), getStringRepresentation(value));
             result.add(localVariableData);
+            if (value instanceof ObjectReference) {
+                localVariableData.setNestedTypes(getNestedFields((ObjectReference) value));
+            }
         }
         return result;
     }
@@ -171,6 +174,23 @@ public class Debugger {
             }
             FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
             result.add(fieldData);
+            if (value instanceof ObjectReference) {
+                fieldData.setNestedTypes(getNestedFields((ObjectReference) value));
+            }
+        }
+        return result;
+    }
+
+    private List<FieldData> getNestedFields(ObjectReference object) {
+        List<FieldData> result = new ArrayList<>();
+        List<Field> fields = object.referenceType().visibleFields();
+        for (Field field : fields) {
+            Value value = object.getValue(field);
+            FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
+            result.add(fieldData);
+            if (value instanceof ObjectReference) {
+                fieldData.setNestedTypes(getNestedFields((ObjectReference) value));
+            }
         }
         return result;
     }
