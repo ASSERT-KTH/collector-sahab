@@ -22,6 +22,7 @@ import se.kth.debug.struct.result.*;
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
     private static final Logger logger = Logger.getLogger("Runner");
+    private static final int DEBUGGER_TIMEOUT = 5000; // milliseconds
 
     private static final List<BreakPointContext> breakpointContexts = new ArrayList<>();
 
@@ -75,7 +76,7 @@ public class Collector implements Callable<Integer> {
         vm.resume();
         try {
             EventSet eventSet = null;
-            while ((eventSet = vm.eventQueue().remove()) != null) {
+            while ((eventSet = vm.eventQueue().remove(DEBUGGER_TIMEOUT)) != null) {
                 for (Event event : eventSet) {
                     if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
                         debugger.getProcess().destroy();
