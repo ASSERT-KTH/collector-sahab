@@ -37,7 +37,8 @@ CLI to collect runtime context of a Java class.
    2. Run the process
       ```bash
       $ java -jar/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar \
-           -p </path/to/project>
+           -p [path/to/all/classes/required ...]
            -t </path/to/project/test/directory>
            -i <path/to/input/file> (default="input.txt")
+           -o <path/to/output/file> (default="output.json")
       ```
