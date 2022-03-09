@@ -6,14 +6,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import se.kth.debug.Utility;
 
 public class UtilityTest {
     @Test
-    void getClasspathForRunningJUnit_providedClasspathIsAppendedToSystemClasspath(@TempDir Path tempDir) throws IOException {
+    void getClasspathForRunningJUnit_providedClasspathIsAppendedToSystemClasspath(
+            @TempDir Path tempDir) throws IOException {
         Path pathToDebuggerExecutable = Files.createFile(tempDir.resolve("debugger.jar"));
         Path pathToProjectClasspath = Files.createFile(tempDir.resolve("classpath.txt"));
         Path pathToProjectClasses = Files.createDirectories(tempDir.resolve("target/classes"));
@@ -41,8 +41,10 @@ public class UtilityTest {
     }
 
     @Test
-    void getAllTests_shouldReturnFullyQualifiedNamesOfTestCasesWhichHaveAtLeastOneJunitTestMethod() {
-        String fullyQualifiedNames = Utility.getAllJUnitTestClasses("src/test/resources/junitTests");
+    void
+            getAllTests_shouldReturnFullyQualifiedNamesOfTestCasesWhichHaveAtLeastOneJunitTestMethod() {
+        String fullyQualifiedNames =
+                Utility.getAllJUnitTestClasses("src/test/resources/junitTests");
         String[] testCases = fullyQualifiedNames.split(" ");
 
         assertThat(testCases.length, equalTo(1));

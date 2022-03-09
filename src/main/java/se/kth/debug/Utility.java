@@ -81,15 +81,19 @@ public class Utility {
     /** Checks if at least one method has `@Test` annotation. */
     private static boolean hasAtLeastOneJUnitTestMethod(CtType<?> testCase) {
         Set<CtMethod<?>> testMethods = testCase.getMethods();
-        List<CtMethod<?>> annotatedTestMethods = testMethods.stream().filter(ctMethod -> {
-            List<CtAnnotation<?>> annotations = ctMethod.getAnnotations();
-            for (CtAnnotation<?> annotation: annotations) {
-                if (annotation.getName().contains("Test")) {
-                    return true;
-                }
-            }
-            return false;
-        }).collect(Collectors.toList());
+        List<CtMethod<?>> annotatedTestMethods =
+                testMethods.stream()
+                        .filter(
+                                ctMethod -> {
+                                    List<CtAnnotation<?>> annotations = ctMethod.getAnnotations();
+                                    for (CtAnnotation<?> annotation : annotations) {
+                                        if (annotation.getName().contains("Test")) {
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                })
+                        .collect(Collectors.toList());
 
         return annotatedTestMethods.size() > 0;
     }
