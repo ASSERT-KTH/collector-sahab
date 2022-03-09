@@ -23,12 +23,12 @@ public class Debugger {
     private Process process;
     private final Logger logger = Logger.getLogger("Debugger");
 
-    private final String pathToBuiltProject;
+    private final String[] pathToBuiltProject;
     private final String pathToTestDirectory;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
 
     public Debugger(
-            String pathToBuiltProject,
+            String[] pathToBuiltProject,
             String pathToTestDirectory,
             List<FileAndBreakpoint> classesAndBreakpoints) {
         this.pathToBuiltProject = pathToBuiltProject;
@@ -38,7 +38,7 @@ public class Debugger {
 
     public VirtualMachine launchVMAndJunit() {
         try {
-            String classpath = Utility.getFullClasspath(pathToBuiltProject);
+            String classpath = Utility.getClasspathForRunningJUnit(pathToBuiltProject);
             String testsSeparatedBySpace = Utility.getAllTests(pathToTestDirectory);
             ProcessBuilder processBuilder =
                     new ProcessBuilder(

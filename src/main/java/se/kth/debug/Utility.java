@@ -12,19 +12,31 @@ import spoon.Launcher;
 import spoon.reflect.CtModel;
 
 public class Utility {
-    private static Logger logger = Logger.getLogger("Utility");
+    private static final Logger logger = Logger.getLogger("Utility");
 
     private Utility() {}
 
     /**
-     * Concatenates provided classpath.
+     * Concatenates provided classpath with the system set classpath.
      *
-     * @param classpath this classpath is usually the classpath of the compiled project
+     * @param providedClasspath usually the classpath of the compiled project, its tests, and
+     *     dependencies
      * @return concatenated string of classpath
      */
-    public static String getFullClasspath(String... classpath) {
+    public static String getClasspathForRunningJUnit(String[] providedClasspath) {
         Set<String> classpathCollection = new HashSet<>();
 
+        String[] pathElements =
+                System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+
+        classpathCollection.addAll(verifyAndGetClasspath(pathElements));
+        classpathCollection.addAll(verifyAndGetClasspath(providedClasspath));
+
+        return String.join(":", classpathCollection);
+    }
+
+    private static Set<String> verifyAndGetClasspath(String[] classpath) {
+        Set<String> classpathCollection = new HashSet<>();
         for (String cp : classpath) {
             URI uri = new File(cp).toURI();
             try {
@@ -36,7 +48,7 @@ public class Utility {
                 logger.warning(cp + " is not a valid path");
             }
         }
-        return String.join(":", classpathCollection);
+        return classpathCollection;
     }
 
     /**

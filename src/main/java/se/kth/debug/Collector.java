@@ -25,8 +25,11 @@ public class Collector implements Callable<Integer> {
 
     private static final List<BreakPointContext> breakpointContexts = new ArrayList<>();
 
-    @CommandLine.Option(names = "-p", description = "Path to classpaths required separated by space.")
-    private String pathToBuiltProject;
+    @CommandLine.Option(
+            names = "-p",
+            arity = "0..*",
+            description = "Classpath required to run JUnit")
+    private String[] providedClasspath;
 
     @CommandLine.Option(names = "-t", description = "Path to test directory")
     private String pathToTestDirectory;
@@ -66,7 +69,7 @@ public class Collector implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Debugger debugger =
-                new Debugger(pathToBuiltProject, pathToTestDirectory, parseFileAndBreakpoints());
+                new Debugger(providedClasspath, pathToTestDirectory, parseFileAndBreakpoints());
         VirtualMachine vm = debugger.launchVMAndJunit();
         debugger.addClassPrepareEvent(vm);
         vm.resume();
