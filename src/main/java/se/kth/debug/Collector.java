@@ -25,7 +25,7 @@ public class Collector implements Callable<Integer> {
 
     private static final List<BreakPointContext> breakpointContexts = new ArrayList<>();
 
-    @CommandLine.Option(names = "-p", description = "Path to the the compiled project")
+    @CommandLine.Option(names = "-p", description = "Path to classpaths required separated by space.")
     private String pathToBuiltProject;
 
     @CommandLine.Option(names = "-t", description = "Path to test directory")
