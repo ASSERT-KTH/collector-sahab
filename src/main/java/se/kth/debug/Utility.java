@@ -6,48 +6,37 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 
 public class Utility {
+    private static Logger logger = Logger.getLogger("Utility");
+
     private Utility() {}
 
     /**
-     * Concatenates provided classpath with the system set classpath.
+     * Concatenates provided classpath.
      *
      * @param classpath this classpath is usually the classpath of the compiled project
      * @return concatenated string of classpath
      */
-    public static String getFullClasspath(String classpath) throws MalformedURLException {
-        String[] pathElements =
-                System.getProperty("java.class.path").split(System.getProperty("path.separator"));
-        String[] providedClasspath = classpath.split(File.pathSeparator);
+    public static String getFullClasspath(String... classpath) {
+        Set<String> classpathCollection = new HashSet<>();
 
-        Set<URI> classpathCollection = new HashSet<>();
-
-        for (String s : providedClasspath) {
-            URI uri = new File(s).toURI();
-            classpathCollection.add(uri);
-        }
-
-        for (String pathElement : pathElements) {
-            URI uri = new File(pathElement).toURI();
-            classpathCollection.add(uri);
-        }
-
-        StringBuilder strClasspath = new StringBuilder();
-        for (URI uri : classpathCollection) {
-            if (uri == null) {
-                continue;
-            }
-            File file = new File(uri.toURL().getFile());
-            if (file.exists()) {
-                strClasspath.append(file.getAbsolutePath()).append(File.pathSeparatorChar);
+        for (String cp : classpath) {
+            URI uri = new File(cp).toURI();
+            try {
+                File file = new File(uri.toURL().getFile());
+                if (file.exists()) {
+                    classpathCollection.add(file.getAbsolutePath());
+                }
+            } catch (MalformedURLException e) {
+                logger.warning(cp + " is not a valid path");
             }
         }
-
-        return strClasspath.toString();
+        return String.join(":", classpathCollection);
     }
 
     /**
