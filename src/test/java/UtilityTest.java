@@ -38,4 +38,13 @@ public class UtilityTest {
                 Arrays.asList(actualClasspath.split(File.pathSeparator)),
                 hasItems(expectedClasspath.split(File.pathSeparator)));
     }
+
+    @Test
+    void shouldReturnOnlyOneTestCase() {
+        String fullyQualifiedNames = Utility.getAllTests("src/test/resources/junitTests");
+        String[] testCases = fullyQualifiedNames.split(" ");
+
+        assertThat(testCases.length, equalTo(1));
+        assertThat(testCases[0], equalTo("junitTests.SomeAreJunitTest"));
+    }
 }
