@@ -10,6 +10,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
+import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 
 public class Utility {
     private static final Logger logger = Logger.getLogger("Utility");
@@ -65,6 +68,7 @@ public class Utility {
 
         List<String> fullyQualifiedNames =
                 model.getAllTypes().stream()
+                        .filter(Utility::hasAtLeastOneJunitTest)
                         .map(
                                 type ->
                                         String.format(
@@ -72,5 +76,21 @@ public class Utility {
                                                 type.getPackage().toString(), type.getSimpleName()))
                         .collect(Collectors.toList());
         return String.join(" ", fullyQualifiedNames);
+    }
+
+    /** Checks if at least one method has `@Test` annotation. */
+    private static boolean hasAtLeastOneJunitTest(CtType<?> testCase) {
+        Set<CtMethod<?>> testMethods = testCase.getMethods();
+        List<CtMethod<?>> annotatedTestMethods = testMethods.stream().filter(ctMethod -> {
+            List<CtAnnotation<?>> annotations = ctMethod.getAnnotations();
+            for (CtAnnotation<?> annotation: annotations) {
+                if (annotation.getName().contains("Test")) {
+                    return true;
+                }
+            }
+            return false;
+        }).collect(Collectors.toList());
+
+        return annotatedTestMethods.size() > 0;
     }
 }
