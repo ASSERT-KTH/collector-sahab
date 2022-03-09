@@ -55,20 +55,20 @@ public class Utility {
     }
 
     /**
-     * Uses spoon to return fully-qualified names of all test classes.
+     * Uses spoon to return fully-qualified names of all JUnit test classes.
      *
      * @param pathToTestDirectory test directory of project whose runtime context needs to be
      *     collected
      * @return a string of test classes separated by " "
      */
-    public static String getAllTests(String pathToTestDirectory) {
+    public static String getAllJUnitTestClasses(String pathToTestDirectory) {
         Launcher launcher = new Launcher();
         launcher.addInputResource(pathToTestDirectory);
         CtModel model = launcher.buildModel();
 
         List<String> fullyQualifiedNames =
                 model.getAllTypes().stream()
-                        .filter(Utility::hasAtLeastOneJunitTest)
+                        .filter(Utility::hasAtLeastOneJUnitTestMethod)
                         .map(
                                 type ->
                                         String.format(
@@ -79,7 +79,7 @@ public class Utility {
     }
 
     /** Checks if at least one method has `@Test` annotation. */
-    private static boolean hasAtLeastOneJunitTest(CtType<?> testCase) {
+    private static boolean hasAtLeastOneJUnitTestMethod(CtType<?> testCase) {
         Set<CtMethod<?>> testMethods = testCase.getMethods();
         List<CtMethod<?>> annotatedTestMethods = testMethods.stream().filter(ctMethod -> {
             List<CtAnnotation<?>> annotations = ctMethod.getAnnotations();

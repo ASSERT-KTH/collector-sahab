@@ -39,7 +39,7 @@ public class Debugger {
     public VirtualMachine launchVMAndJunit() {
         try {
             String classpath = Utility.getClasspathForRunningJUnit(pathToBuiltProject);
-            String testsSeparatedBySpace = Utility.getAllTests(pathToTestDirectory);
+            String testsSeparatedBySpace = Utility.getAllJUnitTestClasses(pathToTestDirectory);
             ProcessBuilder processBuilder =
                     new ProcessBuilder(
                             "java",
