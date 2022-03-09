@@ -12,7 +12,8 @@ import se.kth.debug.Utility;
 
 public class UtilityTest {
     @Test
-    void correct_classpath_is_returned(@TempDir Path tempDir) throws IOException {
+    void getClasspathForRunningJUnit_providedClasspathIsAppendedToSystemClasspath(
+            @TempDir Path tempDir) throws IOException {
         Path pathToDebuggerExecutable = Files.createFile(tempDir.resolve("debugger.jar"));
         Path pathToProjectClasspath = Files.createFile(tempDir.resolve("classpath.txt"));
         Path pathToProjectClasses = Files.createDirectories(tempDir.resolve("target/classes"));
@@ -37,5 +38,16 @@ public class UtilityTest {
         assertThat(
                 Arrays.asList(actualClasspath.split(File.pathSeparator)),
                 hasItems(expectedClasspath.split(File.pathSeparator)));
+    }
+
+    @Test
+    void
+            getAllTests_shouldReturnFullyQualifiedNamesOfTestCasesWhichHaveAtLeastOneJunitTestMethod() {
+        String fullyQualifiedNames =
+                Utility.getAllJUnitTestClasses("src/test/resources/junitTests");
+        String[] testCases = fullyQualifiedNames.split(" ");
+
+        assertThat(testCases.length, equalTo(1));
+        assertThat(testCases[0], equalTo("junitTests.SomeAreJunitTest"));
     }
 }

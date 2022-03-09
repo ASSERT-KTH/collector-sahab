@@ -10,6 +10,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
+import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 
 public class Utility {
     private static final Logger logger = Logger.getLogger("Utility");
@@ -52,19 +55,20 @@ public class Utility {
     }
 
     /**
-     * Uses spoon to return fully-qualified names of all test classes.
+     * Uses spoon to return fully-qualified names of all JUnit test classes.
      *
      * @param pathToTestDirectory test directory of project whose runtime context needs to be
      *     collected
      * @return a string of test classes separated by " "
      */
-    public static String getAllTests(String pathToTestDirectory) {
+    public static String getAllJUnitTestClasses(String pathToTestDirectory) {
         Launcher launcher = new Launcher();
         launcher.addInputResource(pathToTestDirectory);
         CtModel model = launcher.buildModel();
 
         List<String> fullyQualifiedNames =
                 model.getAllTypes().stream()
+                        .filter(Utility::hasAtLeastOneJUnitTestMethod)
                         .map(
                                 type ->
                                         String.format(
@@ -72,5 +76,25 @@ public class Utility {
                                                 type.getPackage().toString(), type.getSimpleName()))
                         .collect(Collectors.toList());
         return String.join(" ", fullyQualifiedNames);
+    }
+
+    /** Checks if at least one method has `@Test` annotation. */
+    private static boolean hasAtLeastOneJUnitTestMethod(CtType<?> testCase) {
+        Set<CtMethod<?>> testMethods = testCase.getMethods();
+        List<CtMethod<?>> annotatedTestMethods =
+                testMethods.stream()
+                        .filter(
+                                ctMethod -> {
+                                    List<CtAnnotation<?>> annotations = ctMethod.getAnnotations();
+                                    for (CtAnnotation<?> annotation : annotations) {
+                                        if (annotation.getName().contains("Test")) {
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                })
+                        .collect(Collectors.toList());
+
+        return annotatedTestMethods.size() > 0;
     }
 }
