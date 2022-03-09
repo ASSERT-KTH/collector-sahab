@@ -5,21 +5,24 @@ CLI to collect runtime context of a Java class.
 ## Execution
 
 ### Setup project for collecting runtime statistics
-1. Build classpath of the project you want to collect runtime information of.
-    ```bash
-   $ mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
-    ```
-2. Build the project with debugging information attached.
-   1. Since `javac` does not compile recursively through directories, we need
-      to create a list of files we want to compile.
-      ```bash
-      $ find src/ -name "*.java" > sources.txt
-      ```
-   2. Compile the project by running the following command.
-      ```bash
-      $ javac -g -cp $(cat classpath.txt) @sources.txt -d target
-      ```
-      > NOTE: Test resources are not compiled as of now.
+
+The exact steps varies for each project because of multiple development
+pipelines possible. However, the output from this step is same. In other
+words, you need the following things to proceed to next step. It does not
+matter how you get them.
+
+1. Compiled classes of the project with debug (`-g`) set to `true`.
+2. Compiled test classes and its resources bundled. Debugging can be on or off
+   depending upon how much data you want.
+3. Dependencies of the project as compiled classes. It is recommended to keep
+   debugging off for this because you will get a lot of data otherwise!
+
+There are two ways to achieve this:
+1. Create JAR-with-dependencies of the project with test classes bundled too.
+2. Use commands provided by maven plugins.
+   1. `mvn compile`: for compiling classes
+   2. `mvn test-compile`: for compiling test classes.
+   3. `mvn dependency:copy-dependencies`: for copying dependencies in build folder.
 
 ### Build `collector-sahab`
 
