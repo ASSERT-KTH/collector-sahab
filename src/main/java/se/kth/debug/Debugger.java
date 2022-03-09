@@ -152,7 +152,7 @@ public class Debugger {
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
             LocalVariableData localVariableData =
-                    new LocalVariableData(localVariable.name(), String.valueOf(value));
+                    new LocalVariableData(localVariable.name(), getStringRepresentation(value));
             result.add(localVariableData);
         }
         return result;
@@ -169,10 +169,17 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            FieldData fieldData = new FieldData(field.name(), String.valueOf(value));
+            FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
             result.add(fieldData);
         }
         return result;
+    }
+
+    private String getStringRepresentation(Value value) {
+        if (value instanceof ArrayReference) {
+            return String.valueOf(((ArrayReference) value).getValues());
+        }
+        return String.valueOf(value);
     }
 
     public void shutdown(VirtualMachine vm) {
