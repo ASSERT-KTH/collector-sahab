@@ -12,7 +12,6 @@ import com.sun.jdi.event.VMDisconnectEvent;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import picocli.CommandLine;
@@ -88,15 +87,18 @@ public class Collector implements Callable<Integer> {
                                 new BreakPointContext(
                                         location.sourcePath(), location.lineNumber(), result));
                     }
+//                    if (event instanceof MethodExitEvent) {
+//                        logger.info(String.valueOf(((MethodExitEvent) event).returnValue()));
+//                    }
                 }
                 vm.resume();
             }
         } catch (VMDisconnectedException
                 | AbsentInformationException
                 | IncompatibleThreadStateException e) {
-            logger.log(Level.WARNING, e.toString());
+            logger.info(e.toString());
         } catch (InterruptedException e) {
-            logger.log(Level.WARNING, e.toString());
+            logger.info(e.toString());
             Thread.currentThread().interrupt();
         } finally {
             final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();

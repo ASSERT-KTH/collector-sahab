@@ -3,9 +3,8 @@ package se.kth.debug;
 import com.sun.jdi.*;
 import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.ClassPrepareEvent;
-import com.sun.jdi.request.BreakpointRequest;
-import com.sun.jdi.request.ClassPrepareRequest;
-import com.sun.jdi.request.EventRequestManager;
+import com.sun.jdi.request.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.*;
 
@@ -48,8 +48,7 @@ public class Debugger {
                             classpath,
                             MethodTestRunner.class.getCanonicalName(),
                             testsSeparatedBySpace);
-            logger.log(
-                    Level.INFO,
+            logger.info(
                     "java -cp "
                             + classpath
                             + " "
@@ -126,6 +125,15 @@ public class Debugger {
             StackFrame stackFrame = threadReference.frame(i);
             StackFrameContext stackFrameContext =
                     new StackFrameContext(i + 1, stackFrame.location().toString());
+
+            EventRequestManager erm = bpe.virtualMachine().eventRequestManager();
+            MethodExitRequest mer = erm.createMethodExitRequest();
+            mer.addThreadFilter(threadReference);
+            mer.addClassExclusionFilter("java.nio.charset.*");
+            mer.addClassExclusionFilter("java.*");
+            mer.addClassExclusionFilter("jdk.*");
+            mer.enable();
+
             try {
                 List<LocalVariableData> localVariables = collectLocalVariable(stackFrame);
                 stackFrameContext.addRuntimeValueCollection(localVariables);
