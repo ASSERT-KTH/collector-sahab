@@ -16,7 +16,8 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(
             names = "-p",
             arity = "0..*",
-            description = "Classpath required to run JUnit")
+            description = "Classpath required to run JUnit",
+            split = " ")
     private String[] providedClasspath;
 
     @CommandLine.Option(names = "-t", description = "Path to test directory")
