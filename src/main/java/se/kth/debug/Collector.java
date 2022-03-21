@@ -2,6 +2,7 @@ package se.kth.debug;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sun.jdi.AbsentInformationException;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -38,7 +39,7 @@ public class Collector implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws IOException {
+    public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, pathToTestDirectory, classesAndBreakpoints);
         eventProcessor.startEventProcessor();

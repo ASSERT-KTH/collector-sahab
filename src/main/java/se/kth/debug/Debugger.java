@@ -135,6 +135,10 @@ public class Debugger {
 
                 stackFrameContexts.add(stackFrameContext);
             } catch (AbsentInformationException e) {
+                if (i == 0) {
+                    throw new AbsentInformationException(
+                            "The files corresponding to provided breakpoints are not compiled.");
+                }
                 logger.warning(
                         "Information does not exist for " + stackFrame + " and frames later on");
                 return stackFrameContexts;
