@@ -5,8 +5,10 @@ build () {
   mvn dependency:copy-dependencies -DbuildDirectory="$2"
 }
 
+SCRIPT_DIR=$(dirname "$0")
+
 # Setup build directory with compilation information
-build true with-debug
+(cd "$SCRIPT_DIR" && build true with-debug)
 
 # Setup build directory without compilation information
-build false without-debug
+(cd "$SCRIPT_DIR" && build false without-debug)

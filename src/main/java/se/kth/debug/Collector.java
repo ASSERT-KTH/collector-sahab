@@ -43,7 +43,9 @@ public class Collector implements Callable<Integer> {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, pathToTestDirectory, classesAndBreakpoints);
         eventProcessor.startEventProcessor();
-        writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
+        if (!eventProcessor.getBreakpointContexts().isEmpty()) {
+            writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
+        }
         return 0;
     }
 

@@ -80,6 +80,7 @@ public class CollectorTest {
         ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
         assertEquals(0, exit.status);
 
+        assertThat(outputJson.toFile(), anExistingFile());
         Reader reader = new FileReader(outputJson.toFile());
         int fileSize = reader.read();
         assertNotEquals(-1, fileSize);
