@@ -30,7 +30,7 @@ public class EventProcessor {
     }
 
     /** Monitor events triggered by JDB. */
-    public void startEventProcessor() {
+    public void startEventProcessor() throws AbsentInformationException {
         VirtualMachine vm = debugger.launchVMAndJunit();
         debugger.addClassPrepareEvent(vm);
         vm.resume();
@@ -55,9 +55,7 @@ public class EventProcessor {
                 }
                 vm.resume();
             }
-        } catch (VMDisconnectedException
-                | AbsentInformationException
-                | IncompatibleThreadStateException e) {
+        } catch (VMDisconnectedException | IncompatibleThreadStateException e) {
             logger.warning(e.toString());
         } catch (InterruptedException e) {
             logger.warning(e.toString());
