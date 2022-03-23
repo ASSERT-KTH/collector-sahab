@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.*;
 
@@ -204,9 +205,17 @@ public class Debugger {
         return result;
     }
 
-    private String getStringRepresentation(Value value) {
+    private static String getStringRepresentation(Value value) {
         if (value instanceof ArrayReference) {
-            return String.valueOf(((ArrayReference) value).getValues());
+            List<String> itemsToString =
+                    ((ArrayReference) value)
+                            .getValues().stream()
+                                    .map(Debugger::getStringRepresentation)
+                                    .collect(Collectors.toList());
+            return String.valueOf(itemsToString);
+        }
+        if (value instanceof ObjectReference) {
+            return String.valueOf(((ObjectReference) value).referenceType().name());
         }
         return String.valueOf(value);
     }
