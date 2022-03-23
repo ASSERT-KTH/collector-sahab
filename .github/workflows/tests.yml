@@ -19,5 +19,5 @@ jobs:
         run: 'mvn spotless:check'
       - name: Run test phase
         run: |
-          bash src/test/resources/sample-maven-project/setup-build-files.sh
+          ./src/test/resources/sample-maven-project/setup-build-files.sh
           mvn test

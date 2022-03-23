@@ -44,4 +44,5 @@ There are two ways to achieve this:
            -t </path/to/project/test/directory>
            -i <path/to/input/file> (default="input.txt")
            -o <path/to/output/file> (default="output.json")
+           --object-depth (default=1)
       ```

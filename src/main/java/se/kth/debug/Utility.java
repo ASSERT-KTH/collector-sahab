@@ -68,7 +68,9 @@ public class Utility {
 
         List<String> fullyQualifiedNames =
                 model.getAllTypes().stream()
-                        .filter(Utility::hasAtLeastOneJUnitTestMethod)
+                        // ToDo: Add method to accept any version of JUnit Test
+                        // Commenting this because Junit3 did not use @Test annotation
+                        //                        .filter(Utility::hasAtLeastOneJUnitTestMethod)
                         .map(
                                 type ->
                                         String.format(
