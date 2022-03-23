@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import se.kth.debug.Utility;
@@ -40,6 +41,8 @@ public class UtilityTest {
                 hasItems(expectedClasspath.split(File.pathSeparator)));
     }
 
+    @Disabled(
+            "It is not necessary every JUnit test has an annotation. JUnit3 did not use annotations.")
     @Test
     void
             getAllTests_shouldReturnFullyQualifiedNamesOfTestCasesWhichHaveAtLeastOneJunitTestMethod() {

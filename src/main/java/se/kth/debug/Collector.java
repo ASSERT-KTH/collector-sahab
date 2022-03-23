@@ -33,6 +33,11 @@ public class Collector implements Callable<Integer> {
             defaultValue = "input.txt")
     private File classesAndBreakpoints;
 
+    @CommandLine.Option(
+            names = "--object-depth",
+            description = "Nesting level of object required (default: ${DEFAULT-VALUE}).")
+    private int objectDepth = 1;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Collector()).execute(args);
         System.exit(exitCode);
@@ -42,7 +47,7 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, pathToTestDirectory, classesAndBreakpoints);
-        eventProcessor.startEventProcessor();
+        eventProcessor.startEventProcessor(objectDepth);
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
         }

@@ -115,7 +115,7 @@ public class Debugger {
         }
     }
 
-    public List<StackFrameContext> processBreakpoints(BreakpointEvent bpe)
+    public List<StackFrameContext> processBreakpoints(BreakpointEvent bpe, int objectDepth)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
 
@@ -127,10 +127,11 @@ public class Debugger {
             StackFrameContext stackFrameContext =
                     new StackFrameContext(i + 1, stackFrame.location().toString());
             try {
-                List<LocalVariableData> localVariables = collectLocalVariable(stackFrame);
+                List<LocalVariableData> localVariables =
+                        collectLocalVariable(stackFrame, objectDepth);
                 stackFrameContext.addRuntimeValueCollection(localVariables);
 
-                List<FieldData> fields = collectFields(stackFrame);
+                List<FieldData> fields = collectFields(stackFrame, objectDepth);
                 stackFrameContext.addRuntimeValueCollection(fields);
 
                 stackFrameContexts.add(stackFrameContext);
@@ -148,7 +149,7 @@ public class Debugger {
         return stackFrameContexts;
     }
 
-    private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame)
+    private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame, int objectDepth)
             throws AbsentInformationException {
         List<LocalVariableData> result = new ArrayList<>();
 
@@ -159,13 +160,14 @@ public class Debugger {
                     new LocalVariableData(localVariable.name(), getStringRepresentation(value));
             result.add(localVariableData);
             if (value instanceof ObjectReference) {
-                localVariableData.setNestedTypes(getNestedFields((ObjectReference) value));
+                localVariableData.setNestedTypes(
+                        getNestedFields((ObjectReference) value, objectDepth));
             }
         }
         return result;
     }
 
-    private List<FieldData> collectFields(StackFrame stackFrame) {
+    private List<FieldData> collectFields(StackFrame stackFrame, int objectDepth) {
         List<FieldData> result = new ArrayList<>();
 
         List<Field> visibleFields = stackFrame.location().declaringType().visibleFields();
@@ -179,13 +181,16 @@ public class Debugger {
             FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
             result.add(fieldData);
             if (value instanceof ObjectReference) {
-                fieldData.setNestedTypes(getNestedFields((ObjectReference) value));
+                fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth));
             }
         }
         return result;
     }
 
-    private List<FieldData> getNestedFields(ObjectReference object) {
+    private List<FieldData> getNestedFields(ObjectReference object, int objectDepth) {
+        if (objectDepth == 0) {
+            return null;
+        }
         List<FieldData> result = new ArrayList<>();
         List<Field> fields = object.referenceType().visibleFields();
         for (Field field : fields) {
@@ -193,7 +198,7 @@ public class Debugger {
             FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
             result.add(fieldData);
             if (value instanceof ObjectReference) {
-                fieldData.setNestedTypes(getNestedFields((ObjectReference) value));
+                fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth - 1));
             }
         }
         return result;
