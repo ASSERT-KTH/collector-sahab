@@ -138,7 +138,7 @@ public class Debugger {
             } catch (AbsentInformationException e) {
                 if (i == 0) {
                     throw new AbsentInformationException(
-                            "The files corresponding to provided breakpoints are not compiled.");
+                            "The files corresponding to provided breakpoints are not compiled with debugging information.");
                 }
                 logger.warning(
                         "Information does not exist for " + stackFrame + " and frames later on");
