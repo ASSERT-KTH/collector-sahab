@@ -50,6 +50,9 @@ public class Collector implements Callable<Integer> {
         eventProcessor.startEventProcessor(objectDepth);
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
+            logger.info("Output file generated!");
+        } else {
+            logger.info("Output file was not generated as breakpoints were not visited.");
         }
         return 0;
     }
