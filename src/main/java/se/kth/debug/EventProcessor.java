@@ -21,6 +21,7 @@ public class EventProcessor {
     private final List<BreakPointContext> breakpointContexts = new ArrayList<>();
     private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
+    private String methodName = null;
 
     EventProcessor(String[] providedClasspath, String[] tests, File classesAndBreakpoints) {
         debugger =
@@ -45,6 +46,7 @@ public class EventProcessor {
                         debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
+                        methodName = ((BreakpointEvent) event).location().method().name();
                         List<StackFrameContext> result =
                                 debugger.processBreakpoints((BreakpointEvent) event, objectDepth);
                         Location location = ((BreakpointEvent) event).location();
@@ -53,6 +55,7 @@ public class EventProcessor {
                                         location.sourcePath(), location.lineNumber(), result));
                     }
                     if (event instanceof MethodExitEvent) {
+                        if (((MethodExitEvent) event).method().name().equals(methodName))
                         returnValues.add(debugger.processMethodExit((MethodExitEvent) event));
                     }
                 }
