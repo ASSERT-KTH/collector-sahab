@@ -41,8 +41,9 @@ There are two ways to achieve this:
       ```bash
       $ java -jar/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar \
            -p [path/to/all/classes/required ...]
-           -t </path/to/project/test/directory>
-           -i <path/to/input/file> (default="input.txt")
-           -o <path/to/output/file> (default="output.json")
+           -t [classname::testMethod ...]
+           -i <path/to/input/file>
+           -b <path/to/breakpoint/file>
+           -r <path/to/return/file>
            --object-depth (default=1)
       ```

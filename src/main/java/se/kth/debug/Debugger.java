@@ -27,22 +27,22 @@ public class Debugger {
     private final Logger logger = Logger.getLogger("Debugger");
 
     private final String[] pathToBuiltProject;
-    private final String pathToTestDirectory;
+    private final String[] tests;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
 
     public Debugger(
             String[] pathToBuiltProject,
-            String pathToTestDirectory,
+            String[] tests,
             List<FileAndBreakpoint> classesAndBreakpoints) {
         this.pathToBuiltProject = pathToBuiltProject;
-        this.pathToTestDirectory = pathToTestDirectory;
+        this.tests = tests;
         this.classesAndBreakpoints = classesAndBreakpoints;
     }
 
     public VirtualMachine launchVMAndJunit() {
         try {
             String classpath = Utility.getClasspathForRunningJUnit(pathToBuiltProject);
-            String testsSeparatedBySpace = Utility.getAllJUnitTestClasses(pathToTestDirectory);
+            String testsSeparatedBySpace = Utility.parseTests(tests);
             ProcessBuilder processBuilder =
                     new ProcessBuilder(
                             "java",

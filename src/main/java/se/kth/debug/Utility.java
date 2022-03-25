@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import spoon.Launcher;
-import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
@@ -55,29 +53,14 @@ public class Utility {
     }
 
     /**
-     * Uses spoon to return fully-qualified names of all JUnit test classes.
+     * Returns test separated by space. This is done so that split function can be called correctly.
      *
-     * @param pathToTestDirectory test directory of project whose runtime context needs to be
-     *     collected
+     * @param tests array of tests
      * @return a string of test classes separated by " "
      */
-    public static String getAllJUnitTestClasses(String pathToTestDirectory) {
-        Launcher launcher = new Launcher();
-        launcher.addInputResource(pathToTestDirectory);
-        CtModel model = launcher.buildModel();
+    public static String parseTests(String[] tests) {
 
-        List<String> fullyQualifiedNames =
-                model.getAllTypes().stream()
-                        // ToDo: Add method to accept any version of JUnit Test
-                        // Commenting this because Junit3 did not use @Test annotation
-                        //                        .filter(Utility::hasAtLeastOneJUnitTestMethod)
-                        .map(
-                                type ->
-                                        String.format(
-                                                "%s.%s",
-                                                type.getPackage().toString(), type.getSimpleName()))
-                        .collect(Collectors.toList());
-        return String.join(" ", fullyQualifiedNames);
+        return String.join(" ", tests);
     }
 
     /** Checks if at least one method has `@Test` annotation. */

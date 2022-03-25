@@ -22,13 +22,10 @@ public class EventProcessor {
     private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
 
-    EventProcessor(
-            String[] providedClasspath, String pathToTestDirectory, File classesAndBreakpoints) {
+    EventProcessor(String[] providedClasspath, String[] tests, File classesAndBreakpoints) {
         debugger =
                 new Debugger(
-                        providedClasspath,
-                        pathToTestDirectory,
-                        parseFileAndBreakpoints(classesAndBreakpoints));
+                        providedClasspath, tests, parseFileAndBreakpoints(classesAndBreakpoints));
     }
 
     /** Monitor events triggered by JDB. */

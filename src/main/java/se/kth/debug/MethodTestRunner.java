@@ -30,8 +30,12 @@ public class MethodTestRunner {
     }
 
     private static void runTest(String test) throws Exception {
+        String[] classAndMethod = test.split("::");
+        String clazz = classAndMethod[0];
+        String method = classAndMethod[1];
+
         CommandLineOptions options = new CommandLineOptions();
-        options.setSelectedClasses(Collections.singletonList(test));
+        options.setSelectedMethods(Collections.singletonList(clazz + "#" + method));
         options.setFailIfNoTests(true);
         new ConsoleTestExecutor(options).execute(new PrintWriter(System.out));
     }

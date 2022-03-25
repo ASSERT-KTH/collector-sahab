@@ -61,7 +61,8 @@ public class CollectorTest {
     @Test
     void should_exitWithZero_withNonEmptyOutput(@TempDir Path tempDir) throws IOException {
         // arrange
-        Path outputJson = tempDir.resolve("output.json");
+        Path breakpointJson = tempDir.resolve("output.json");
+        Path returnValueJson = tempDir.resolve("return.json");
         String classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
@@ -71,17 +72,24 @@ public class CollectorTest {
             "-p",
             classpath,
             "-t",
-            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("src/test/").toString(),
-            "-o",
-            outputJson.toString(),
+            "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
+            "-b",
+            breakpointJson.toString(),
+            "-r",
+            returnValueJson.toString()
         };
 
         // assert
         ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
         assertEquals(0, exit.status);
 
-        assertThat(outputJson.toFile(), anExistingFile());
-        Reader reader = new FileReader(outputJson.toFile());
+        assertNonEmptyFile(breakpointJson);
+        assertNonEmptyFile(returnValueJson);
+    }
+
+    private static void assertNonEmptyFile(Path pathToFile) throws IOException {
+        assertThat(pathToFile.toFile(), anExistingFile());
+        Reader reader = new FileReader(pathToFile.toFile());
         int fileSize = reader.read();
         assertNotEquals(-1, fileSize);
     }
@@ -89,7 +97,8 @@ public class CollectorTest {
     @Test
     void should_exitWithNonZeroCode(@TempDir Path tempDir) {
         // arrange
-        Path outputJson = tempDir.resolve("output.json");
+        Path breakpointJson = tempDir.resolve("output.json");
+        Path returnValueJson = tempDir.resolve("return.json");
         String classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("without-debug"));
@@ -99,15 +108,18 @@ public class CollectorTest {
             "-p",
             classpath,
             "-t",
-            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("src/test/").toString(),
-            "-o",
-            outputJson.toString(),
+            "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
+            "-b",
+            breakpointJson.toString(),
+            "-r",
+            returnValueJson.toString()
         };
 
         // assert
         ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
         assertNotEquals(0, exit.status);
 
-        assertThat(outputJson.toFile(), not(anExistingFile()));
+        assertThat(breakpointJson.toFile(), not(anExistingFile()));
+        assertThat(returnValueJson.toFile(), not(anExistingFile()));
     }
 }

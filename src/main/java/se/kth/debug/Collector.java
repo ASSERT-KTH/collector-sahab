@@ -21,16 +21,20 @@ public class Collector implements Callable<Integer> {
             split = " ")
     private String[] providedClasspath;
 
-    @CommandLine.Option(names = "-t", description = "Path to test directory")
-    private String pathToTestDirectory;
+    @CommandLine.Option(
+            names = "-t",
+            arity = "1..*",
+            description = "List of test methods",
+            split = " ")
+    private String[] tests;
 
-    @CommandLine.Option(names = "-o", description = "Path to output file (JSON)")
-    private static String pathToOutputJson = "output.json";
+    @CommandLine.Option(names = "-b", description = "Path to output file (JSON)")
+    private static String breakpointJson;
 
     @CommandLine.Option(
-            names = "--return-value-file",
+            names = "-r",
             description = "File containing all return values of methods in the provided class.")
-    private static String returnValueJson = "return.json";
+    private static String returnValueJson;
 
     @CommandLine.Option(
             names = "-i",
@@ -41,7 +45,7 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(
             names = "--object-depth",
             description = "Nesting level of object required (default: ${DEFAULT-VALUE}).")
-    private int objectDepth = 1;
+    private int objectDepth = 0;
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Collector()).execute(args);
@@ -51,7 +55,7 @@ public class Collector implements Callable<Integer> {
     @Override
     public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(providedClasspath, pathToTestDirectory, classesAndBreakpoints);
+                new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
         eventProcessor.startEventProcessor(objectDepth);
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
@@ -71,15 +75,23 @@ public class Collector implements Callable<Integer> {
     private static void writeBreakpointsToFile(List<BreakPointContext> breakPointContext)
             throws IOException {
         final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-        try (FileWriter file = new FileWriter(pathToOutputJson)) {
-            file.write(gson.toJson(breakPointContext));
+        File file = new File(breakpointJson);
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+        try (FileWriter writer = new FileWriter(breakpointJson)) {
+            writer.write(gson.toJson(breakPointContext));
         }
     }
 
     private static void writeReturnValuesToFile(List<ReturnData> returnValues) throws IOException {
         final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-        try (FileWriter file = new FileWriter(returnValueJson)) {
-            file.write(gson.toJson(returnValues));
+        File file = new File(returnValueJson);
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+        try (FileWriter writer = new FileWriter(returnValueJson)) {
+            writer.write(gson.toJson(returnValues));
         }
     }
 }
