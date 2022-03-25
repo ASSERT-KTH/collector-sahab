@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.BreakPointContext;
+import se.kth.debug.struct.result.ReturnData;
 import se.kth.debug.struct.result.StackFrameContext;
 
 /** For managing events triggered by JDB. */
@@ -18,6 +19,7 @@ public class EventProcessor {
 
     private static final int TIMEOUT = 5000; // milliseconds;
     private final List<BreakPointContext> breakpointContexts = new ArrayList<>();
+    private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
 
     EventProcessor(
@@ -36,13 +38,14 @@ public class EventProcessor {
         vm.resume();
         try {
             EventSet eventSet = null;
-            while ((eventSet = vm.eventQueue().remove(TIMEOUT)) != null) {
+            while ((eventSet = vm.eventQueue().remove()) != null) {
                 for (Event event : eventSet) {
                     if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
                         debugger.getProcess().destroy();
                     }
                     if (event instanceof ClassPrepareEvent) {
                         debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
+                        debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
                         List<StackFrameContext> result =
@@ -51,6 +54,9 @@ public class EventProcessor {
                         breakpointContexts.add(
                                 new BreakPointContext(
                                         location.sourcePath(), location.lineNumber(), result));
+                    }
+                    if (event instanceof MethodExitEvent) {
+                        returnValues.add(debugger.processMethodExit((MethodExitEvent) event));
                     }
                 }
                 vm.resume();
@@ -86,5 +92,9 @@ public class EventProcessor {
     /** Returns the values corresponding to each breakpoint. */
     public List<BreakPointContext> getBreakpointContexts() {
         return breakpointContexts;
+    }
+
+    public List<ReturnData> getReturnValues() {
+        return returnValues;
     }
 }

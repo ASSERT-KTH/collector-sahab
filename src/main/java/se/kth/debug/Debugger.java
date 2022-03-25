@@ -3,9 +3,11 @@ package se.kth.debug;
 import com.sun.jdi.*;
 import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.ClassPrepareEvent;
+import com.sun.jdi.event.MethodExitEvent;
 import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequestManager;
+import com.sun.jdi.request.MethodExitRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -116,6 +118,13 @@ public class Debugger {
         }
     }
 
+    public void registerMethodExits(VirtualMachine vm, ClassPrepareEvent event) {
+        EventRequestManager erm = vm.eventRequestManager();
+        MethodExitRequest mer = erm.createMethodExitRequest();
+        mer.addClassFilter(event.referenceType());
+        mer.setEnabled(true);
+    }
+
     public List<StackFrameContext> processBreakpoints(BreakpointEvent bpe, int objectDepth)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
@@ -148,6 +157,14 @@ public class Debugger {
         }
 
         return stackFrameContexts;
+    }
+
+    public ReturnData processMethodExit(MethodExitEvent mee) {
+        String methodName = mee.method().name();
+        String returnValue = getStringRepresentation(mee.returnValue());
+        String location = mee.location().toString();
+
+        return new ReturnData(methodName, returnValue, location);
     }
 
     private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame, int objectDepth)

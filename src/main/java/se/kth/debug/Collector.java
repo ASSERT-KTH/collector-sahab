@@ -28,6 +28,11 @@ public class Collector implements Callable<Integer> {
     private static String pathToOutputJson = "output.json";
 
     @CommandLine.Option(
+            names = "--return-value-file",
+            description = "File containing all return values of methods in the provided class.")
+    private static String returnValueJson = "return.json";
+
+    @CommandLine.Option(
             names = "-i",
             description = "File containing class names and breakpoints",
             defaultValue = "input.txt")
@@ -54,6 +59,12 @@ public class Collector implements Callable<Integer> {
         } else {
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
+        if (!eventProcessor.getBreakpointContexts().isEmpty()) {
+            writeReturnValuesToFile(eventProcessor.getReturnValues());
+            logger.info("Return values are output to the file!");
+        } else {
+            logger.info("No method exits were encountered.");
+        }
         return 0;
     }
 
@@ -62,6 +73,13 @@ public class Collector implements Callable<Integer> {
         final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
         try (FileWriter file = new FileWriter(pathToOutputJson)) {
             file.write(gson.toJson(breakPointContext));
+        }
+    }
+
+    private static void writeReturnValuesToFile(List<ReturnData> returnValues) throws IOException {
+        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        try (FileWriter file = new FileWriter(returnValueJson)) {
+            file.write(gson.toJson(returnValues));
         }
     }
 }
