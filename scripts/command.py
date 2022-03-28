@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 class Command:
@@ -12,6 +13,7 @@ class Command:
 
 
   def mvn_test_compile(self):
+    self._replace_plugin_properties()
     subprocess.run([
       "mvn",
       "test-compile",
@@ -32,4 +34,22 @@ class Command:
       "mv",
       "target",
       renamed_directory.value,
+    ], cwd=self.cwd)
+
+
+  def _replace_plugin_properties(self):
+    # We replace them to empty strings because we are using user properties
+    # above to set these properties.
+    self._run_sed(r"<source>1\.5<\/source>", r"")
+    self._run_sed(r"<target>1\.5<\/target>", r"")
+    self._run_sed(r"<debug>false<\/debug>", r"")
+    self._run_sed(r"<debuglevel>.*<\/debuglevel>", r"")
+
+
+  def _run_sed(self, original, substitution):
+    subprocess.run([
+      "sed",
+      "-i",
+      f"s/{original}/{substitution}/",
+      f"{os.path.join(self.cwd, 'pom.xml')}"
     ], cwd=self.cwd)
