@@ -56,7 +56,9 @@ public class EventProcessor {
                     }
                     if (event instanceof MethodExitEvent) {
                         if (((MethodExitEvent) event).method().name().equals(methodName))
-                        returnValues.add(debugger.processMethodExit((MethodExitEvent) event));
+                            returnValues.add(
+                                    debugger.processMethodExit(
+                                            (MethodExitEvent) event, objectDepth));
                     }
                 }
                 vm.resume();

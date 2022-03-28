@@ -159,12 +159,17 @@ public class Debugger {
         return stackFrameContexts;
     }
 
-    public ReturnData processMethodExit(MethodExitEvent mee) {
+    public ReturnData processMethodExit(MethodExitEvent mee, int objectDepth) {
         String methodName = mee.method().name();
         String returnValue = getStringRepresentation(mee.returnValue());
         String location = mee.location().toString();
 
-        return new ReturnData(methodName, returnValue, location);
+        ReturnData returnData = new ReturnData(methodName, returnValue, location);
+        if (mee.returnValue() instanceof ObjectReference) {
+            returnData.setNestedTypes(
+                    getNestedFields((ObjectReference) mee.returnValue(), objectDepth));
+        }
+        return returnData;
     }
 
     private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame, int objectDepth)
