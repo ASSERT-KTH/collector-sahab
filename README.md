@@ -47,3 +47,20 @@ There are two ways to achieve this:
            -r <path/to/return/file>
            --object-depth (default=1)
       ```
+
+## Scripts
+
+### MatchedLineFinder
+
+It takes in exactly four arguments in the specified order:
+1. **Absolute path to project** whose runtime data needs to be collected.
+2. **Filename** of the class where the patch is.
+3. **Left** commit, or any reference acceptable by `git checkout`.
+4. **Right** commit, or any reference acceptable by `git checkout`.
+
+> "or any reference acceptable by `git checkout`" is not tested for.
+
+**Example execution**
+```bash
+java -cp target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar se.kth.debug.MatchedLineFinder /home/assert/Desktop/experiments/drr-as-pr/Time-11 DateTimeZoneBuilder.java e5d67a8162aebb7dbd5df8cdc21442ef111d2ba1 1c04679173a46faa59e73f68def33f60843f8beb
+```
