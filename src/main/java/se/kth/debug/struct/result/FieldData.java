@@ -5,11 +5,13 @@ import java.util.List;
 public class FieldData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.FIELD;
     private final String name;
+    private final String type;
     private final String value;
     private List<FieldData> nestedTypes = null;
 
-    public FieldData(String name, String value) {
+    public FieldData(String name, String type, String value) {
         this.name = name;
+        this.type = type;
         this.value = value;
     }
 

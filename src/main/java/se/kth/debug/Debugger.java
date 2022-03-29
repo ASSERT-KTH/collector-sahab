@@ -161,10 +161,11 @@ public class Debugger {
 
     public ReturnData processMethodExit(MethodExitEvent mee, int objectDepth) {
         String methodName = mee.method().name();
+        String returnType = mee.method().returnTypeName();
         String returnValue = getStringRepresentation(mee.returnValue());
         String location = mee.location().toString();
 
-        ReturnData returnData = new ReturnData(methodName, returnValue, location);
+        ReturnData returnData = new ReturnData(methodName, returnType, returnValue, location);
         if (mee.returnValue() instanceof ObjectReference) {
             returnData.setNestedTypes(
                     getNestedFields((ObjectReference) mee.returnValue(), objectDepth));
@@ -180,7 +181,10 @@ public class Debugger {
         for (LocalVariable localVariable : localVariables) {
             Value value = stackFrame.getValue(localVariable);
             LocalVariableData localVariableData =
-                    new LocalVariableData(localVariable.name(), getStringRepresentation(value));
+                    new LocalVariableData(
+                            localVariable.name(),
+                            localVariable.typeName(),
+                            getStringRepresentation(value));
             result.add(localVariableData);
             if (value instanceof ObjectReference) {
                 localVariableData.setNestedTypes(
@@ -204,7 +208,8 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
+            FieldData fieldData =
+                    new FieldData(field.name(), field.typeName(), getStringRepresentation(value));
             result.add(fieldData);
             if (value instanceof ObjectReference) {
                 fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth));
@@ -221,7 +226,8 @@ public class Debugger {
         List<Field> fields = object.referenceType().visibleFields();
         for (Field field : fields) {
             Value value = object.getValue(field);
-            FieldData fieldData = new FieldData(field.name(), getStringRepresentation(value));
+            FieldData fieldData =
+                    new FieldData(field.name(), field.typeName(), getStringRepresentation(value));
             result.add(fieldData);
             if (value instanceof ObjectReference) {
                 fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth - 1));
