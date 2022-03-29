@@ -64,3 +64,28 @@ It takes in exactly four arguments in the specified order:
 ```bash
 java -cp target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar se.kth.debug.MatchedLineFinder /home/assert/Desktop/experiments/drr-as-pr/Time-11 DateTimeZoneBuilder.java e5d67a8162aebb7dbd5df8cdc21442ef111d2ba1 1c04679173a46faa59e73f68def33f60843f8beb
 ```
+
+> Runs as a part of `script/bribe-sahab.py`
+
+### scripts/bribe-sahab.py
+
+It does three things:
+1. Compiles target project for both revisions
+2. Find the matched lines
+3. Run collector-sahab over the project to collect runtime context
+
+```bash
+usage: Bribe sahab [-h] -p PROJECT -l LEFT -r RIGHT -c CLASS_FILENAME -t TESTS [TESTS ...]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PROJECT, --project PROJECT
+                        Path to project
+  -l LEFT, --left LEFT  Left revision
+  -r RIGHT, --right RIGHT
+                        Right revision
+  -c CLASS_FILENAME, --class-filename CLASS_FILENAME
+                        Name of the file which contains the patch
+  -t TESTS [TESTS ...], --tests TESTS [TESTS ...]
+                        Tests executed by collector sahab
+```
