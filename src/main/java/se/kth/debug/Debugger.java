@@ -125,17 +125,28 @@ public class Debugger {
         mer.setEnabled(true);
     }
 
-    public List<StackFrameContext> processBreakpoints(BreakpointEvent bpe, int objectDepth)
+    public List<StackFrameContext> processBreakpoints(
+            BreakpointEvent bpe, int objectDepth, int stackTraceDepth)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
 
-        int totalFrames = threadReference.frameCount();
+        int framesToBeProcessed = stackTraceDepth;
+        if (stackTraceDepth > threadReference.frameCount()) {
+            framesToBeProcessed = threadReference.frameCount();
+            logger.warning(
+                    String.format(
+                            "Stack trace depth cannot be larger than actual. Processing %d frames instead.",
+                            framesToBeProcessed));
+        }
 
         List<StackFrameContext> stackFrameContexts = new ArrayList<>();
-        for (int i = 0; i < totalFrames; ++i) {
+        for (int i = 0; i < framesToBeProcessed; ++i) {
             StackFrame stackFrame = threadReference.frame(i);
             StackFrameContext stackFrameContext =
-                    new StackFrameContext(i + 1, stackFrame.location().toString());
+                    new StackFrameContext(
+                            i + 1,
+                            stackFrame.location().toString(),
+                            computeStackTrace(threadReference));
             try {
                 List<LocalVariableData> localVariables =
                         collectLocalVariable(stackFrame, objectDepth);
@@ -159,13 +170,39 @@ public class Debugger {
         return stackFrameContexts;
     }
 
-    public ReturnData processMethodExit(MethodExitEvent mee, int objectDepth) {
+    private List<String> computeStackTrace(ThreadReference threadReference)
+            throws IncompatibleThreadStateException {
+        List<String> result = new ArrayList<>();
+        List<String> excludedPackages =
+                List.of("java.lang", "java.util", "org.junit", "junit", "jdk");
+        for (StackFrame stackFrame : threadReference.frames()) {
+            Location location = stackFrame.location();
+            String declaringTypeName = location.declaringType().name();
+            if (excludedPackages.stream().filter(declaringTypeName::contains).findAny().isEmpty()) {
+                String output =
+                        String.format(
+                                "%s:%d, %s",
+                                location.method().name(), location.lineNumber(), declaringTypeName);
+                result.add(output);
+            }
+        }
+        return result;
+    }
+
+    public ReturnData processMethodExit(MethodExitEvent mee, int objectDepth)
+            throws IncompatibleThreadStateException {
         String methodName = mee.method().name();
         String returnType = mee.method().returnTypeName();
         String returnValue = getStringRepresentation(mee.returnValue());
         String location = mee.location().toString();
 
-        ReturnData returnData = new ReturnData(methodName, returnType, returnValue, location);
+        ReturnData returnData =
+                new ReturnData(
+                        methodName,
+                        returnType,
+                        returnValue,
+                        location,
+                        computeStackTrace(mee.thread()));
         if (mee.returnValue() instanceof ObjectReference) {
             returnData.setNestedTypes(
                     getNestedFields((ObjectReference) mee.returnValue(), objectDepth));

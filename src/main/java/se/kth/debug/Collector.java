@@ -47,6 +47,12 @@ public class Collector implements Callable<Integer> {
             description = "Nesting level of object required (default: ${DEFAULT-VALUE}).")
     private int objectDepth = 0;
 
+    @CommandLine.Option(
+            names = "--stack-frame-depth",
+            description =
+                    "The depth of stack trace the data needs to be collected from (default: ${DEFAULT-VALUE}).")
+    private int stackTraceDepth = 1;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Collector()).execute(args);
         System.exit(exitCode);
@@ -56,7 +62,7 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
-        eventProcessor.startEventProcessor(objectDepth);
+        eventProcessor.startEventProcessor(objectDepth, stackTraceDepth);
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
             logger.info("Output file generated!");

@@ -30,12 +30,13 @@ public class EventProcessor {
     }
 
     /** Monitor events triggered by JDB. */
-    public void startEventProcessor(int objectDepth) throws AbsentInformationException {
+    public void startEventProcessor(int objectDepth, int stackTraceDepth)
+            throws AbsentInformationException {
         VirtualMachine vm = debugger.launchVMAndJunit();
         debugger.addClassPrepareEvent(vm);
         vm.resume();
         try {
-            EventSet eventSet = null;
+            EventSet eventSet;
             while ((eventSet = vm.eventQueue().remove()) != null) {
                 for (Event event : eventSet) {
                     if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
@@ -48,7 +49,8 @@ public class EventProcessor {
                     if (event instanceof BreakpointEvent) {
                         methodName = ((BreakpointEvent) event).location().method().name();
                         List<StackFrameContext> result =
-                                debugger.processBreakpoints((BreakpointEvent) event, objectDepth);
+                                debugger.processBreakpoints(
+                                        (BreakpointEvent) event, objectDepth, stackTraceDepth);
                         Location location = ((BreakpointEvent) event).location();
                         breakpointContexts.add(
                                 new BreakPointContext(
