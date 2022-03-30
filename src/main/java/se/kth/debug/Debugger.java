@@ -190,11 +190,12 @@ public class Debugger {
     }
 
     public ReturnData processMethodExit(MethodExitEvent mee, int objectDepth)
-            throws IncompatibleThreadStateException {
+            throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
         String returnType = mee.method().returnTypeName();
         String returnValue = getStringRepresentation(mee.returnValue());
         String location = mee.location().toString();
+        List<LocalVariable> arguments = mee.method().arguments();
 
         ReturnData returnData =
                 new ReturnData(
@@ -202,6 +203,9 @@ public class Debugger {
                         returnType,
                         returnValue,
                         location,
+                        // the method will be in the 0th stack frame when the method exit event is
+                        // triggered
+                        collectArguments(mee.thread().frame(0), arguments, objectDepth),
                         computeStackTrace(mee.thread()));
         if (mee.returnValue() instanceof ObjectReference) {
             returnData.setNestedTypes(
@@ -210,18 +214,24 @@ public class Debugger {
         return returnData;
     }
 
+    private List<LocalVariableData> collectArguments(
+            StackFrame stackFrame, List<LocalVariable> arguments, int objectDepth) {
+        return parseVariable(stackFrame, arguments, objectDepth);
+    }
+
     private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame, int objectDepth)
             throws AbsentInformationException {
-        List<LocalVariableData> result = new ArrayList<>();
+        return parseVariable(stackFrame, stackFrame.visibleVariables(), objectDepth);
+    }
 
-        List<LocalVariable> localVariables = stackFrame.visibleVariables();
-        for (LocalVariable localVariable : localVariables) {
-            Value value = stackFrame.getValue(localVariable);
+    private List<LocalVariableData> parseVariable(
+            StackFrame stackFrame, List<LocalVariable> variables, int objectDepth) {
+        List<LocalVariableData> result = new ArrayList<>();
+        for (LocalVariable variable : variables) {
+            Value value = stackFrame.getValue(variable);
             LocalVariableData localVariableData =
                     new LocalVariableData(
-                            localVariable.name(),
-                            localVariable.typeName(),
-                            getStringRepresentation(value));
+                            variable.name(), variable.typeName(), getStringRepresentation(value));
             result.add(localVariableData);
             if (value instanceof ObjectReference) {
                 localVariableData.setNestedTypes(
