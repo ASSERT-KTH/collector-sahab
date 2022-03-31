@@ -66,7 +66,7 @@ def _run_collector_sahab(project, tests, revision):
     f"-t {test_methods} "
     f"-b {breakpoint_output} "
     f"-r {return_output} "
-    f"--object-depth=2"
+    f"--object-depth=0"
   )
 
   subprocess.run(cmd, shell=True)
