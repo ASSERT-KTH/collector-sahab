@@ -126,7 +126,11 @@ public class Debugger {
     }
 
     public List<StackFrameContext> processBreakpoints(
-            BreakpointEvent bpe, int objectDepth, int stackTraceDepth, int numberOfArrayElements)
+            BreakpointEvent bpe,
+            int objectDepth,
+            int stackTraceDepth,
+            int numberOfArrayElements,
+            boolean skipPrintingField)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
 
@@ -152,9 +156,11 @@ public class Debugger {
                         collectLocalVariable(stackFrame, objectDepth, numberOfArrayElements);
                 stackFrameContext.addRuntimeValueCollection(localVariables);
 
-                List<FieldData> fields =
-                        collectFields(stackFrame, objectDepth, numberOfArrayElements);
-                stackFrameContext.addRuntimeValueCollection(fields);
+                if (!skipPrintingField) {
+                    List<FieldData> fields =
+                            collectFields(stackFrame, objectDepth, numberOfArrayElements);
+                    stackFrameContext.addRuntimeValueCollection(fields);
+                }
 
                 stackFrameContexts.add(stackFrameContext);
             } catch (AbsentInformationException e) {

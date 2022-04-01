@@ -55,8 +55,14 @@ public class Collector implements Callable<Integer> {
 
     @CommandLine.Option(
             names = "--number-of-array-elements",
-            description = "Number of elements that need to be printed inside an array (default: ${DEFAULT-VALUE}).")
+            description =
+                    "Number of elements that need to be printed inside an array (default: ${DEFAULT-VALUE}).")
     private int numberOfArrayElements = 10;
+
+    @CommandLine.Option(
+            names = "--skip-printing-field",
+            description = "Whether to collect field data or not")
+    private boolean skipPrintingField = false;
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Collector()).execute(args);
@@ -67,7 +73,8 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
-        eventProcessor.startEventProcessor(objectDepth, stackTraceDepth, numberOfArrayElements);
+        eventProcessor.startEventProcessor(
+                objectDepth, stackTraceDepth, numberOfArrayElements, skipPrintingField);
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
             logger.info("Output file generated!");

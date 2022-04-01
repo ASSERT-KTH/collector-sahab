@@ -30,7 +30,11 @@ public class EventProcessor {
     }
 
     /** Monitor events triggered by JDB. */
-    public void startEventProcessor(int objectDepth, int stackTraceDepth, int numberOfArrayElements)
+    public void startEventProcessor(
+            int objectDepth,
+            int stackTraceDepth,
+            int numberOfArrayElements,
+            boolean skipPrintingField)
             throws AbsentInformationException {
         VirtualMachine vm = debugger.launchVMAndJunit();
         debugger.addClassPrepareEvent(vm);
@@ -53,7 +57,8 @@ public class EventProcessor {
                                         (BreakpointEvent) event,
                                         objectDepth,
                                         stackTraceDepth,
-                                        numberOfArrayElements);
+                                        numberOfArrayElements,
+                                        skipPrintingField);
                         Location location = ((BreakpointEvent) event).location();
                         breakpointContexts.add(
                                 new BreakPointContext(
