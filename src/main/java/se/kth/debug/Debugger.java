@@ -126,7 +126,7 @@ public class Debugger {
     }
 
     public List<StackFrameContext> processBreakpoints(
-            BreakpointEvent bpe, int objectDepth, int stackTraceDepth)
+            BreakpointEvent bpe, int objectDepth, int stackTraceDepth, int numberOfArrayElements)
             throws IncompatibleThreadStateException, AbsentInformationException {
         ThreadReference threadReference = bpe.thread();
 
@@ -149,10 +149,11 @@ public class Debugger {
                             computeStackTrace(threadReference));
             try {
                 List<LocalVariableData> localVariables =
-                        collectLocalVariable(stackFrame, objectDepth);
+                        collectLocalVariable(stackFrame, objectDepth, numberOfArrayElements);
                 stackFrameContext.addRuntimeValueCollection(localVariables);
 
-                List<FieldData> fields = collectFields(stackFrame, objectDepth);
+                List<FieldData> fields =
+                        collectFields(stackFrame, objectDepth, numberOfArrayElements);
                 stackFrameContext.addRuntimeValueCollection(fields);
 
                 stackFrameContexts.add(stackFrameContext);
@@ -189,11 +190,12 @@ public class Debugger {
         return result;
     }
 
-    public ReturnData processMethodExit(MethodExitEvent mee, int objectDepth)
+    public ReturnData processMethodExit(
+            MethodExitEvent mee, int objectDepth, int numberOfArrayElements)
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
         String returnType = mee.method().returnTypeName();
-        String returnValue = getStringRepresentation(mee.returnValue());
+        String returnValue = getStringRepresentation(mee.returnValue(), numberOfArrayElements);
         String location = mee.location().toString();
         List<LocalVariable> arguments = mee.method().arguments();
 
@@ -205,43 +207,62 @@ public class Debugger {
                         location,
                         // the method will be in the 0th stack frame when the method exit event is
                         // triggered
-                        collectArguments(mee.thread().frame(0), arguments, objectDepth),
+                        collectArguments(
+                                mee.thread().frame(0),
+                                arguments,
+                                objectDepth,
+                                numberOfArrayElements),
                         computeStackTrace(mee.thread()));
         if (isAnObjectReference(mee.returnValue())) {
             returnData.setNestedTypes(
-                    getNestedFields((ObjectReference) mee.returnValue(), objectDepth));
+                    getNestedFields(
+                            (ObjectReference) mee.returnValue(),
+                            objectDepth,
+                            numberOfArrayElements));
         }
         return returnData;
     }
 
     private List<LocalVariableData> collectArguments(
-            StackFrame stackFrame, List<LocalVariable> arguments, int objectDepth) {
-        return parseVariable(stackFrame, arguments, objectDepth);
+            StackFrame stackFrame,
+            List<LocalVariable> arguments,
+            int objectDepth,
+            int numberOfArrayElements) {
+        return parseVariable(stackFrame, arguments, objectDepth, numberOfArrayElements);
     }
 
-    private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame, int objectDepth)
+    private List<LocalVariableData> collectLocalVariable(
+            StackFrame stackFrame, int objectDepth, int numberOfArrayElements)
             throws AbsentInformationException {
-        return parseVariable(stackFrame, stackFrame.visibleVariables(), objectDepth);
+        return parseVariable(
+                stackFrame, stackFrame.visibleVariables(), objectDepth, numberOfArrayElements);
     }
 
     private List<LocalVariableData> parseVariable(
-            StackFrame stackFrame, List<LocalVariable> variables, int objectDepth) {
+            StackFrame stackFrame,
+            List<LocalVariable> variables,
+            int objectDepth,
+            int numberOfArrayElements) {
         List<LocalVariableData> result = new ArrayList<>();
         for (LocalVariable variable : variables) {
             Value value = stackFrame.getValue(variable);
             LocalVariableData localVariableData =
                     new LocalVariableData(
-                            variable.name(), variable.typeName(), getStringRepresentation(value));
+                            variable.name(),
+                            variable.typeName(),
+                            getStringRepresentation(value, numberOfArrayElements));
             result.add(localVariableData);
             if (isAnObjectReference(value)) {
                 localVariableData.setNestedTypes(
-                        getNestedFields((ObjectReference) value, objectDepth));
+                        getNestedFields(
+                                (ObjectReference) value, objectDepth, numberOfArrayElements));
             }
         }
         return result;
     }
 
-    private List<FieldData> collectFields(StackFrame stackFrame, int objectDepth) {
+    private List<FieldData> collectFields(
+            StackFrame stackFrame, int objectDepth, int numberOfArrayElements) {
         List<FieldData> result = new ArrayList<>();
 
         List<Field> visibleFields = stackFrame.location().declaringType().visibleFields();
@@ -256,16 +277,22 @@ public class Debugger {
                 value = stackFrame.thisObject().getValue(field);
             }
             FieldData fieldData =
-                    new FieldData(field.name(), field.typeName(), getStringRepresentation(value));
+                    new FieldData(
+                            field.name(),
+                            field.typeName(),
+                            getStringRepresentation(value, numberOfArrayElements));
             result.add(fieldData);
             if (isAnObjectReference(value)) {
-                fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth));
+                fieldData.setNestedTypes(
+                        getNestedFields(
+                                (ObjectReference) value, objectDepth, numberOfArrayElements));
             }
         }
         return result;
     }
 
-    private List<FieldData> getNestedFields(ObjectReference object, int objectDepth) {
+    private List<FieldData> getNestedFields(
+            ObjectReference object, int objectDepth, int numberOfArrayElements) {
         if (objectDepth == 0) {
             return null;
         }
@@ -274,21 +301,30 @@ public class Debugger {
         for (Field field : fields) {
             Value value = object.getValue(field);
             FieldData fieldData =
-                    new FieldData(field.name(), field.typeName(), getStringRepresentation(value));
+                    new FieldData(
+                            field.name(),
+                            field.typeName(),
+                            getStringRepresentation(value, numberOfArrayElements));
             result.add(fieldData);
             if (isAnObjectReference(value)) {
-                fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth - 1));
+                fieldData.setNestedTypes(
+                        getNestedFields(
+                                (ObjectReference) value, objectDepth - 1, numberOfArrayElements));
             }
         }
         return result;
     }
 
-    private static String getStringRepresentation(Value value) {
+    private static String getStringRepresentation(Value value, int numberOfArrayElements) {
         if (value instanceof ArrayReference) {
             List<String> itemsToString =
                     ((ArrayReference) value)
                             .getValues().stream()
-                                    .map(Debugger::getStringRepresentation)
+                                    .limit(numberOfArrayElements)
+                                    .map(
+                                            v ->
+                                                    Debugger.getStringRepresentation(
+                                                            v, numberOfArrayElements))
                                     .collect(Collectors.toList());
             return String.valueOf(itemsToString);
         }

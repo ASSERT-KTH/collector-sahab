@@ -48,10 +48,15 @@ public class Collector implements Callable<Integer> {
     private int objectDepth = 0;
 
     @CommandLine.Option(
-            names = "--stack-frame-depth",
+            names = "--stack-trace-depth",
             description =
                     "The depth of stack trace the data needs to be collected from (default: ${DEFAULT-VALUE}).")
     private int stackTraceDepth = 1;
+
+    @CommandLine.Option(
+            names = "--number-of-array-elements",
+            description = "Number of elements that need to be printed inside an array (default: ${DEFAULT-VALUE}).")
+    private int numberOfArrayElements = 10;
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Collector()).execute(args);
@@ -62,7 +67,7 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
-        eventProcessor.startEventProcessor(objectDepth, stackTraceDepth);
+        eventProcessor.startEventProcessor(objectDepth, stackTraceDepth, numberOfArrayElements);
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
             logger.info("Output file generated!");
