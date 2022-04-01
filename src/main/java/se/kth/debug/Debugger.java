@@ -207,7 +207,7 @@ public class Debugger {
                         // triggered
                         collectArguments(mee.thread().frame(0), arguments, objectDepth),
                         computeStackTrace(mee.thread()));
-        if (mee.returnValue() instanceof ObjectReference) {
+        if (isAnObjectReference(mee.returnValue())) {
             returnData.setNestedTypes(
                     getNestedFields((ObjectReference) mee.returnValue(), objectDepth));
         }
@@ -233,7 +233,7 @@ public class Debugger {
                     new LocalVariableData(
                             variable.name(), variable.typeName(), getStringRepresentation(value));
             result.add(localVariableData);
-            if (value instanceof ObjectReference) {
+            if (isAnObjectReference(value)) {
                 localVariableData.setNestedTypes(
                         getNestedFields((ObjectReference) value, objectDepth));
             }
@@ -258,7 +258,7 @@ public class Debugger {
             FieldData fieldData =
                     new FieldData(field.name(), field.typeName(), getStringRepresentation(value));
             result.add(fieldData);
-            if (value instanceof ObjectReference) {
+            if (isAnObjectReference(value)) {
                 fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth));
             }
         }
@@ -276,7 +276,7 @@ public class Debugger {
             FieldData fieldData =
                     new FieldData(field.name(), field.typeName(), getStringRepresentation(value));
             result.add(fieldData);
-            if (value instanceof ObjectReference) {
+            if (isAnObjectReference(value)) {
                 fieldData.setNestedTypes(getNestedFields((ObjectReference) value, objectDepth - 1));
             }
         }
@@ -292,10 +292,34 @@ public class Debugger {
                                     .collect(Collectors.toList());
             return String.valueOf(itemsToString);
         }
-        if (value instanceof ObjectReference) {
+        if (isAnObjectReference(value)) {
+            // we print type for object references
             return String.valueOf(((ObjectReference) value).referenceType().name());
         }
         return String.valueOf(value);
+    }
+
+    private static boolean isAnObjectReference(Value value) {
+        if (value instanceof ObjectReference) {
+            List<Class<?>> excludedClasses =
+                    List.of(
+                            String.class,
+                            Integer.class,
+                            Long.class,
+                            Double.class,
+                            Float.class,
+                            Boolean.class,
+                            Character.class,
+                            Byte.class,
+                            Void.class,
+                            Short.class);
+            try {
+                return !excludedClasses.contains(Class.forName(value.type().name()));
+            } catch (ClassNotFoundException exception) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void shutdown(VirtualMachine vm) {
