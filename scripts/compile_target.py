@@ -20,18 +20,22 @@ parser.add_argument("-c", "--commits", nargs=2, required=True, help="Revisions o
 def compile(project, commit, revision):
   
   driver = Command(project)
+  driver.remove(os.path.join("/home/assert/Desktop/assert-achievements/collector-sahab", revision.value.get_input_file()))
+  driver.remove(revision.value.get_output_directory())
+
   driver.git_checkout(commit)
 
   driver.mvn_test_compile()
   driver.mvn_copy_dependencies()
 
-  driver.rename(revision)
+  driver.rename(revision.value.get_output_directory())
 
 
 def main():
   args = parser.parse_args()
   project_path = args.project
   commits = args.commits
+
   compile(project_path, commits[0], REVISION.LEFT)
   compile(project_path, commits[1], REVISION.RIGHT)
 

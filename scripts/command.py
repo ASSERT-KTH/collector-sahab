@@ -29,11 +29,18 @@ class Command:
       "dependency:copy-dependencies"
     ], cwd=self.cwd)
 
+  def remove(self, dir):
+    subprocess.run([
+      "rm",
+      "-rf",
+      dir,
+    ], cwd=self.cwd)
+
   def rename(self, renamed_directory):
     subprocess.run([
       "mv",
       "target",
-      renamed_directory.value,
+      renamed_directory,
     ], cwd=self.cwd)
 
 

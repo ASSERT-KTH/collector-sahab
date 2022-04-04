@@ -5,7 +5,8 @@ import subprocess
 from revision import REVISION
 from compile_target import compile
 
-COLLECTOR_JAR = "/home/assert/Desktop/testrepos/debugger/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar"
+COLLECTOR_JAR = "/home/assert/Desktop/assert-achievements/collector-sahab/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar"
+OUTPUT_DIRECTORY = "/home/assert/Desktop/experiments/drr-as-pr/"
 
 class VerifyDirectory(argparse.Action):
   def __call__(self, parser, namespace, directory, option_string=None):
@@ -42,26 +43,27 @@ def _find_matched_lines(project, filename, left, right):
   subprocess.run(cmd, shell=True)
 
 
-def _get_or_create_directory_for_creating_output_files(project):
-  output_directory = os.path.join(project, "runtime-data", "sahab")
+def _get_or_create_directory_for_creating_output_files(ref):
+  output_directory = os.path.join(OUTPUT_DIRECTORY, "sahab-reports", ref)
   if not os.path.exists(output_directory):
-    os.makedirs(os.path.join(project, "runtime-data", "sahab"))
+    os.makedirs(os.path.join(OUTPUT_DIRECTORY, "sahab-reports", ref))
   return output_directory
 
-def _run_collector_sahab(project, tests, revision):
+def _run_collector_sahab(project, tests, revision, ref):
   project_dependencies = [
-    os.path.join(project, revision.value, 'classes'),
-    os.path.join(project, revision.value, 'test-classes'),
-    os.path.join(project, revision.value, 'dependency'),
+    os.path.join(project, revision.value.get_output_directory(), 'classes'),
+    os.path.join(project, revision.value.get_output_directory(), 'test-classes'),
+    os.path.join(project, revision.value.get_output_directory(), 'dependency'),
   ]
   test_methods = " ".join(tests)
-  output_directory = _get_or_create_directory_for_creating_output_files(project)
+  output_directory = _get_or_create_directory_for_creating_output_files(ref)
   breakpoint_output = os.path.join(output_directory, "breakpoint", f"{revision.name.lower()}.json")
   return_output = os.path.join(output_directory, "return", f"{revision.name.lower()}.json")
 
   cmd = (
     "java "
     f"-jar {COLLECTOR_JAR} "
+    f"-i {revision.value.get_input_file()} "
     f"-p {' '.join(project_dependencies)} "
     f"-t {test_methods} "
     f"-b {breakpoint_output} "
@@ -84,8 +86,8 @@ def main():
 
   _compile_target(project, left_revision_ref, right_revision_ref)
   _find_matched_lines(project, classname, left_revision_ref, right_revision_ref)
-  _run_collector_sahab(project, tests, REVISION.LEFT)
-  _run_collector_sahab(project, tests, REVISION.RIGHT)
+  _run_collector_sahab(project, tests, REVISION.LEFT, right_revision_ref)
+  _run_collector_sahab(project, tests, REVISION.RIGHT, right_revision_ref)
 
 if __name__ == "__main__":
   main()
