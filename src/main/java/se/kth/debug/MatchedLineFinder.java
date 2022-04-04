@@ -3,11 +3,13 @@ package se.kth.debug;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
 import gumtree.spoon.diff.operations.Operation;
+import gumtree.spoon.diff.support.SpoonSupport;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import spoon.reflect.code.CtStatement;
@@ -32,18 +34,26 @@ public class MatchedLineFinder {
         Diff diff = new AstComparator().compare(leftJava, rightJava);
         Set<Integer> diffLines = getDiffLines(diff.getRootOperations());
 
-        CtMethod<?> method = findMethod(diff.getRootOperations());
-        Set<Integer> matchedLines = getMatchedLines(diffLines, method);
+        CtMethod<?> methodLeft = findMethod(diff.getRootOperations());
+        CtMethod<?> methodRight =
+                (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
+        Set<Integer> matchedLinesLeft = getMatchedLines(diffLines, methodLeft);
+        Set<Integer> matchedLinesRight = getMatchedLines(diffLines, methodRight);
         String fullyQualifiedNameOfContainerClass =
-                method.getParent(CtClass.class).getQualifiedName();
+                methodLeft.getParent(CtClass.class).getQualifiedName();
 
-        String output =
+        String outputLeft =
                 String.format(
                         "%s=%s%n",
-                        fullyQualifiedNameOfContainerClass, StringUtils.join(matchedLines, ","));
-        try (FileWriter writer = new FileWriter("input.txt")) {
-            writer.write(output);
-        }
+                        fullyQualifiedNameOfContainerClass,
+                        StringUtils.join(matchedLinesLeft, ","));
+        String outputRight =
+                String.format(
+                        "%s=%s%n",
+                        fullyQualifiedNameOfContainerClass,
+                        StringUtils.join(matchedLinesRight, ","));
+        writeToFile(outputLeft, "input-left.txt");
+        writeToFile(outputRight, "input-right.txt");
     }
 
     private static Set<Integer> getDiffLines(List<Operation> rootOperations) {
@@ -94,14 +104,18 @@ public class MatchedLineFinder {
     }
 
     private static File getAbsolutePathWithGivenBase(File base, String filename) {
-        Optional<File> absolutePath =
-                FileUtils.listFiles(base, new String[] {"java"}, true).stream()
+        List<File> absolutePath =
+                FileUtils.listFiles(new File(base, "src"), new String[] {"java"}, true).stream()
                         .filter(file -> file.getName().equals(filename))
-                        .findFirst();
+                        .collect(Collectors.toList());
+
         if (absolutePath.isEmpty()) {
             throw new RuntimeException(filename + " does not exist in " + base.getAbsolutePath());
         }
-        return absolutePath.get();
+        if (absolutePath.size() > 1) {
+            throw new RuntimeException("Use fully qualified names");
+        }
+        return absolutePath.get(0);
     }
 
     private static File prepareFileForGumtree(
@@ -137,8 +151,8 @@ public class MatchedLineFinder {
         return new File(revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
     }
 
-    private static void writeToFile(String content, File file) throws IOException {
-        try (FileWriter writer = new FileWriter(file)) {
+    private static void writeToFile(String content, String filename) throws IOException {
+        try (FileWriter writer = new FileWriter(filename)) {
             writer.write(content);
         }
     }
