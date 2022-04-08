@@ -84,7 +84,7 @@ public class CollectorTest {
         assertEquals(0, exit.status);
 
         assertNonEmptyFile(breakpointJson);
-        assertNonEmptyFile(returnValueJson);
+        assertThat(returnValueJson.toFile(), not(anExistingFile()));
     }
 
     private static void assertNonEmptyFile(Path pathToFile) throws IOException {

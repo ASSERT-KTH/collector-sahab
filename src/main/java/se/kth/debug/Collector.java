@@ -81,7 +81,7 @@ public class Collector implements Callable<Integer> {
         } else {
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
-        if (!eventProcessor.getBreakpointContexts().isEmpty()) {
+        if (!eventProcessor.getReturnValues().isEmpty()) {
             writeReturnValuesToFile(eventProcessor.getReturnValues());
             logger.info("Return values are output to the file!");
         } else {

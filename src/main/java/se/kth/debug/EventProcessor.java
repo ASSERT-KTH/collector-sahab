@@ -48,7 +48,7 @@ public class EventProcessor {
                     }
                     if (event instanceof ClassPrepareEvent) {
                         debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
-                        debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
+                        // debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
                     }
                     if (event instanceof BreakpointEvent) {
                         methodName = ((BreakpointEvent) event).location().method().name();
