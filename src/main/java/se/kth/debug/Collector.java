@@ -72,9 +72,36 @@ public class Collector implements Callable<Integer> {
     @Override
     public Integer call() throws IOException, AbsentInformationException {
         EventProcessor eventProcessor =
+                invoke(
+                        providedClasspath,
+                        tests,
+                        classesAndBreakpoints,
+                        objectDepth,
+                        stackTraceDepth,
+                        numberOfArrayElements,
+                        skipPrintingField);
+        write(eventProcessor);
+        return 0;
+    }
+
+    public static EventProcessor invoke(
+            String[] providedClasspath,
+            String[] tests,
+            File classesAndBreakpoints,
+            int objectDepth,
+            int stackTraceDepth,
+            int numberOfArrayElements,
+            boolean skipPrintingField)
+            throws AbsentInformationException {
+        EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
         eventProcessor.startEventProcessor(
                 objectDepth, stackTraceDepth, numberOfArrayElements, skipPrintingField);
+
+        return eventProcessor;
+    }
+
+    public static void write(EventProcessor eventProcessor) throws IOException {
         if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
             logger.info("Output file generated!");
@@ -87,7 +114,6 @@ public class Collector implements Callable<Integer> {
         } else {
             logger.info("No method exits were encountered.");
         }
-        return 0;
     }
 
     private static void writeBreakpointsToFile(List<BreakPointContext> breakPointContext)

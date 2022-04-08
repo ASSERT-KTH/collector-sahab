@@ -13,4 +13,12 @@ public class BreakPointContext {
         this.lineNumber = lineNumber;
         this.stackFrameContexts = stackFrameContexts;
     }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public List<StackFrameContext> getStackFrameContexts() {
+        return stackFrameContexts;
+    }
 }

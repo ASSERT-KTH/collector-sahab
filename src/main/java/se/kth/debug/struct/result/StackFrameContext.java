@@ -23,4 +23,8 @@ public class StackFrameContext {
     public void addRuntimeValueCollection(List<? extends RuntimeValue> runtimeValues) {
         this.runtimeValueCollection.addAll(runtimeValues);
     }
+
+    public List<RuntimeValue> getRuntimeValueCollection() {
+        return runtimeValueCollection;
+    }
 }

@@ -276,13 +276,11 @@ public class Debugger {
             Value value;
             if (field.isStatic()) {
                 value = stackFrame.location().declaringType().getValue(field);
-            } else if (stackFrame.location().declaringType().isStatic()) {
-                logger.warning(
-                        "Cannot get fields of static inner classes: "
-                                + field.declaringType().name()
-                                + ":"
-                                + field.name());
-                value = null;
+            } else if (stackFrame.location().method().isStatic()) {
+                // Since we are inside a static method, we don't have access to the non-static
+                // field.
+                // Hence, we are skipping its collection.
+                continue;
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }

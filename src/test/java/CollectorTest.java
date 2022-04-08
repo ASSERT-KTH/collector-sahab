@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.security.Permission;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -63,14 +64,14 @@ public class CollectorTest {
         // arrange
         Path breakpointJson = tempDir.resolve("output.json");
         Path returnValueJson = tempDir.resolve("return.json");
-        String classpath =
+        String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("input.txt").toString(),
             "-p",
-            classpath,
+            StringUtils.join(classpath, " "),
             "-t",
             "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
             "-b",
@@ -99,14 +100,14 @@ public class CollectorTest {
         // arrange
         Path breakpointJson = tempDir.resolve("output.json");
         Path returnValueJson = tempDir.resolve("return.json");
-        String classpath =
+        String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("without-debug"));
         String[] args = {
             "-i",
             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("input.txt").toString(),
             "-p",
-            classpath,
+            StringUtils.join(classpath, " "),
             "-t",
             "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
             "-b",
