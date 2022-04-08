@@ -12,9 +12,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.visitor.CtScanner;
 
 public class MatchedLineFinder {
     private static final Logger LOGGER = Logger.getLogger("MatchedLineFinder");
@@ -70,16 +72,41 @@ public class MatchedLineFinder {
         return Collections.unmodifiableSet(result);
     }
 
+    static class BlockFinder extends CtScanner {
+        private final Set<Integer> diffLines;
+        private final Set<Integer> lines = new HashSet<>();
+
+        private BlockFinder(Set<Integer> diffLines) {
+            this.diffLines = diffLines;
+        }
+
+        /**
+         * Get line numbers of statements, excluding diff lines, within a block.
+         *
+         * @param block element to be traversed
+         * @param <R> return type of block, if any
+         */
+        @Override
+        public <R> void visitCtBlock(CtBlock<R> block) {
+            List<CtStatement> statements = block.getStatements();
+            statements.forEach(
+                    statement -> {
+                        if (!diffLines.contains(statement.getPosition().getLine())) {
+                            lines.add(statement.getPosition().getLine());
+                        }
+                    });
+            super.visitCtBlock(block);
+        }
+
+        public Set<Integer> getLines() {
+            return lines;
+        }
+    }
+
     private static Set<Integer> getMatchedLines(Set<Integer> diffLines, CtMethod<?> method) {
-        Set<Integer> result = new HashSet<>();
-        List<CtStatement> statements = method.getBody().getStatements();
-        statements.forEach(
-                statement -> {
-                    if (!diffLines.contains(statement.getPosition().getLine())) {
-                        result.add(statement.getPosition().getLine());
-                    }
-                });
-        return result;
+        BlockFinder blockTraversal = new BlockFinder(diffLines);
+        blockTraversal.scan(method);
+        return blockTraversal.getLines();
     }
 
     private static CtMethod<?> findMethod(List<Operation> rootOperations) {
