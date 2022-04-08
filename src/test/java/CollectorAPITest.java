@@ -29,7 +29,7 @@ public class CollectorAPITest {
                 eventProcessor.getBreakpointContexts().stream()
                         .filter(bpc -> bpc.getLineNumber() == 24)
                         .findAny()
-                        .get();
+                        .orElseThrow();
         StackFrameContext sf = bp.getStackFrameContexts().get(0);
 
         // assert
