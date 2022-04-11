@@ -1,11 +1,16 @@
 package se.kth.debug;
 
+import com.sun.jdi.Method;
+import com.sun.jdi.ObjectReference;
+import com.sun.jdi.ThreadReference;
+import com.sun.jdi.Value;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import spoon.reflect.declaration.CtAnnotation;
@@ -81,5 +86,30 @@ public class Utility {
                         .collect(Collectors.toList());
 
         return annotatedTestMethods.size() > 0;
+    }
+
+    /**
+     * Overriding callable to retain the unique reference to the value so that it can be replaced
+     * later.
+     */
+    public static class CallableWithIDOfValue implements Callable<Value> {
+        private final ThreadReference thread;
+        private final Value value;
+
+        CallableWithIDOfValue(ThreadReference thread, Value value) {
+            this.thread = thread;
+            this.value = value;
+        }
+
+        @Override
+        public Value call() throws Exception {
+            Method toArray =
+                    ((ObjectReference) value).referenceType().methodsByName("toArray").get(0);
+            return ((ObjectReference) value).invokeMethod(thread, toArray, List.of(), 0);
+        }
+
+        public Long getId() {
+            return ((ObjectReference) value).uniqueID();
+        }
     }
 }
