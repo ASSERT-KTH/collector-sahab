@@ -9,7 +9,7 @@ public class ReturnData implements RuntimeValue {
     private final String location;
     private final List<LocalVariableData> arguments;
     private final List<String> stackTrace;
-    private transient final Long id;
+    private final transient Long id;
     private List<FieldData> nestedTypes = null;
     private String value;
 
