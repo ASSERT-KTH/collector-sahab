@@ -6,8 +6,8 @@ public class FieldData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.FIELD;
     private final String name;
     private final String type;
+    private transient Long id = null;
     private List<FieldData> nestedTypes = null;
-    private Long id = null;
     private String value;
 
     public FieldData(Long id, String name, String type, String value) {

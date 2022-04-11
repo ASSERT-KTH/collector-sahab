@@ -4,12 +4,12 @@ import java.util.List;
 
 public class ReturnData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.RETURN;
-    private final Long id;
     private final String methodName;
     private final String returnType;
     private final String location;
     private final List<LocalVariableData> arguments;
     private final List<String> stackTrace;
+    private transient final Long id;
     private List<FieldData> nestedTypes = null;
     private String value;
 

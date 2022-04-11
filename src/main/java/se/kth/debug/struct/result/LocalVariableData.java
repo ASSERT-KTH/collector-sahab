@@ -6,8 +6,8 @@ public class LocalVariableData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.LOCAL_VARIABLE;
     private final String name;
     private final String type;
+    private transient Long id = null;
     private List<FieldData> nestedTypes = null;
-    private Long id = null;
     private String value;
 
     public LocalVariableData(Long id, String name, String type, String value) {
