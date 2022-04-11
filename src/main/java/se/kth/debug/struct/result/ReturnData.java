@@ -34,8 +34,18 @@ public class ReturnData implements RuntimeValue {
         this.nestedTypes = nestedTypes;
     }
 
+    @Override
+    public RuntimeValueKind getKind() {
+        return kind;
+    }
+
     public Long getID() {
         return id;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
     }
 
     public void setValue(String newValue) {
