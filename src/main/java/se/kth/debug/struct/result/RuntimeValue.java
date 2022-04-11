@@ -1,3 +1,7 @@
 package se.kth.debug.struct.result;
 
-public interface RuntimeValue {}
+public interface RuntimeValue {
+    Long getID();
+
+    void setValue(String value);
+}

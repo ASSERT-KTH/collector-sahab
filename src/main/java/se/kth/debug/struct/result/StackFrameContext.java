@@ -3,6 +3,7 @@ package se.kth.debug.struct.result;
 import com.google.gson.annotations.JsonAdapter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import se.kth.debug.RuntimeValueAdapter;
 
 public class StackFrameContext {
@@ -26,5 +27,16 @@ public class StackFrameContext {
 
     public List<RuntimeValue> getRuntimeValueCollection() {
         return runtimeValueCollection;
+    }
+
+    public void replaceValue(Long id, String value) {
+        List<RuntimeValue> candidates =
+                runtimeValueCollection.stream()
+                        .filter(r -> r.getID().equals(id))
+                        .collect(Collectors.toList());
+        if (candidates.size() > 1) {
+            throw new RuntimeException("Object ID is not unique.");
+        }
+        candidates.get(0).setValue(value);
     }
 }

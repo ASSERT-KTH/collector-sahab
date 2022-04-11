@@ -4,12 +4,14 @@ import java.util.List;
 
 public class LocalVariableData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.LOCAL_VARIABLE;
+    private Long id;
     private final String name;
     private final String type;
-    private final String value;
     private List<FieldData> nestedTypes = null;
+    private String value;
 
-    public LocalVariableData(String name, String type, String value) {
+    public LocalVariableData(Long id, String name, String type, String value) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.value = value;
@@ -17,5 +19,13 @@ public class LocalVariableData implements RuntimeValue {
 
     public void setNestedTypes(List<FieldData> nestedTypes) {
         this.nestedTypes = nestedTypes;
+    }
+
+    public Long getID() {
+        return id;
+    }
+
+    public void setValue(String newValue) {
+        value = newValue;
     }
 }

@@ -1,34 +1,32 @@
 package se.kth.debug;
 
 import com.sun.jdi.*;
-import com.sun.jdi.event.BreakpointEvent;
-import com.sun.jdi.event.ClassPrepareEvent;
-import com.sun.jdi.event.MethodExitEvent;
-import com.sun.jdi.request.BreakpointRequest;
-import com.sun.jdi.request.ClassPrepareRequest;
-import com.sun.jdi.request.EventRequestManager;
-import com.sun.jdi.request.MethodExitRequest;
+import com.sun.jdi.event.*;
+import com.sun.jdi.request.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import se.kth.debug.Utility.CallableWithIDOfValue;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.*;
 
 public class Debugger {
     private Process process;
-    private final Logger logger = Logger.getLogger("Debugger");
+    private static final Logger logger = Logger.getLogger("Debugger");
 
     private final String[] pathToBuiltProject;
     private final String[] tests;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
+    private final List<CallableWithIDOfValue> callablesForCollection = new ArrayList<>();
 
     public Debugger(
             String[] pathToBuiltProject,
@@ -173,6 +171,22 @@ public class Debugger {
                 return stackFrameContexts;
             }
         }
+        try {
+            for (CallableWithIDOfValue c : callablesForCollection) {
+                String value =
+                        String.valueOf(
+                                ((ArrayReference) c.call())
+                                        .getValues().stream()
+                                                .map(
+                                                        v ->
+                                                                getStringRepresentation(
+                                                                        v, numberOfArrayElements))
+                                                .collect(Collectors.toList()));
+                stackFrameContexts.forEach(sfc -> sfc.replaceValue(c.getId(), value));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         return stackFrameContexts;
     }
@@ -207,6 +221,7 @@ public class Debugger {
 
         ReturnData returnData =
                 new ReturnData(
+                        ((ObjectReference) mee.returnValue()).uniqueID(),
                         methodName,
                         returnType,
                         returnValue,
@@ -254,10 +269,14 @@ public class Debugger {
             Value value = stackFrame.getValue(variable);
             LocalVariableData localVariableData =
                     new LocalVariableData(
+                            ((ObjectReference) value).uniqueID(),
                             variable.name(),
                             variable.typeName(),
                             getStringRepresentation(value, numberOfArrayElements));
             result.add(localVariableData);
+            if (isACollection(value)) {
+                convertToArrayReference(stackFrame.thread(), value);
+            }
             if (isAnObjectReference(value)) {
                 localVariableData.setNestedTypes(
                         getNestedFields(
@@ -286,10 +305,14 @@ public class Debugger {
             }
             FieldData fieldData =
                     new FieldData(
+                            ((ObjectReference) value).uniqueID(),
                             field.name(),
                             field.typeName(),
                             getStringRepresentation(value, numberOfArrayElements));
             result.add(fieldData);
+            if (isACollection(value)) {
+                convertToArrayReference(stackFrame.thread(), value);
+            }
             if (isAnObjectReference(value)) {
                 fieldData.setNestedTypes(
                         getNestedFields(
@@ -310,6 +333,7 @@ public class Debugger {
             Value value = object.getValue(field);
             FieldData fieldData =
                     new FieldData(
+                            ((ObjectReference) value).uniqueID(),
                             field.name(),
                             field.typeName(),
                             getStringRepresentation(value, numberOfArrayElements));
@@ -336,6 +360,17 @@ public class Debugger {
                                     .collect(Collectors.toList());
             return String.valueOf(itemsToString);
         }
+        if (value instanceof StringReference) {
+            // com.sun.jdi.SunReference contains the string representation, so we don't need to
+            // fetch its value from
+            // `value` field. Hence, the expression below is sufficient.
+            return String.valueOf(value);
+        }
+        if (isPrimitiveWrapper(value)) {
+            Field valueContainingField =
+                    ((ObjectReference) value).referenceType().fieldByName("value");
+            return String.valueOf(((ObjectReference) value).getValue(valueContainingField));
+        }
         if (isAnObjectReference(value)) {
             // we print type for object references
             return String.valueOf(((ObjectReference) value).referenceType().name());
@@ -343,25 +378,46 @@ public class Debugger {
         return String.valueOf(value);
     }
 
+    private static boolean isACollection(Value value) {
+        String className = ((ObjectReference) value).referenceType().name();
+        try {
+            return Collection.class.isAssignableFrom(Class.forName(className));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(className + " cannot be loaded");
+        }
+    }
+
+    private void convertToArrayReference(ThreadReference thread, Value value) {
+        CallableWithIDOfValue task = new CallableWithIDOfValue(thread, value);
+        callablesForCollection.add(task);
+    }
+
+    private static boolean isPrimitiveWrapper(Value value) {
+        // Void.class is not here because it does not matter as this function is supposed to decide
+        // how the object
+        // will be printed. Since void does not have any value, we do not need to determine how its
+        // printing will be handled.
+        List<Class<?>> included =
+                List.of(
+                        String.class,
+                        Integer.class,
+                        Long.class,
+                        Double.class,
+                        Float.class,
+                        Boolean.class,
+                        Character.class,
+                        Byte.class,
+                        Short.class);
+        try {
+            return included.contains(Class.forName(value.type().name()));
+        } catch (ClassNotFoundException exception) {
+            return false;
+        }
+    }
+
     private static boolean isAnObjectReference(Value value) {
         if (value instanceof ObjectReference) {
-            List<Class<?>> excludedClasses =
-                    List.of(
-                            String.class,
-                            Integer.class,
-                            Long.class,
-                            Double.class,
-                            Float.class,
-                            Boolean.class,
-                            Character.class,
-                            Byte.class,
-                            Void.class,
-                            Short.class);
-            try {
-                return !excludedClasses.contains(Class.forName(value.type().name()));
-            } catch (ClassNotFoundException exception) {
-                return true;
-            }
+            return !isPrimitiveWrapper(value);
         }
         return false;
     }
