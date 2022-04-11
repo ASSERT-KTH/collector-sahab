@@ -186,6 +186,8 @@ public class Debugger {
             }
         } catch (Exception e) {
             System.out.println(e);
+        } finally {
+            callablesForCollection.clear();
         }
 
         return stackFrameContexts;
@@ -345,23 +347,35 @@ public class Debugger {
         List<Field> fields = object.referenceType().visibleFields();
         for (Field field : fields) {
             Value value = object.getValue(field);
-            FieldData fieldData =
-                    new FieldData(
-                            ((ObjectReference) value).uniqueID(),
-                            field.name(),
-                            field.typeName(),
-                            getStringRepresentation(value, numberOfArrayElements));
-            result.add(fieldData);
+
+            FieldData fieldData;
             if (isAnObjectReference(value)) {
+                fieldData =
+                        new FieldData(
+                                ((ObjectReference) value).uniqueID(),
+                                field.name(),
+                                field.typeName(),
+                                getStringRepresentation(value, numberOfArrayElements));
                 fieldData.setNestedTypes(
                         getNestedFields(
                                 (ObjectReference) value, objectDepth - 1, numberOfArrayElements));
+
+            } else {
+                fieldData =
+                        new FieldData(
+                                field.name(),
+                                field.typeName(),
+                                getStringRepresentation(value, numberOfArrayElements));
             }
+            result.add(fieldData);
         }
         return result;
     }
 
     private static String getStringRepresentation(Value value, int numberOfArrayElements) {
+        if (value == null) {
+            return String.valueOf((Object) null);
+        }
         if (value instanceof ArrayReference) {
             List<String> itemsToString =
                     ((ArrayReference) value)
@@ -397,7 +411,7 @@ public class Debugger {
         try {
             return Collection.class.isAssignableFrom(Class.forName(className));
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(className + " cannot be loaded");
+            return false;
         }
     }
 
