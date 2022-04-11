@@ -185,7 +185,7 @@ public class Debugger {
                 stackFrameContexts.forEach(sfc -> sfc.replaceValue(c.getId(), value));
             }
         } catch (Exception e) {
-            System.out.println(e);
+            throw new RuntimeException(e);
         } finally {
             callablesForCollection.clear();
         }
