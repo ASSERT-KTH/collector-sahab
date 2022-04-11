@@ -267,21 +267,28 @@ public class Debugger {
         List<LocalVariableData> result = new ArrayList<>();
         for (LocalVariable variable : variables) {
             Value value = stackFrame.getValue(variable);
-            LocalVariableData localVariableData =
-                    new LocalVariableData(
-                            ((ObjectReference) value).uniqueID(),
-                            variable.name(),
-                            variable.typeName(),
-                            getStringRepresentation(value, numberOfArrayElements));
-            result.add(localVariableData);
-            if (isACollection(value)) {
-                convertToArrayReference(stackFrame.thread(), value);
-            }
+            LocalVariableData localVariableData;
             if (isAnObjectReference(value)) {
+                localVariableData =
+                        new LocalVariableData(
+                                ((ObjectReference) value).uniqueID(),
+                                variable.name(),
+                                variable.typeName(),
+                                getStringRepresentation(value, numberOfArrayElements));
+                if (isACollection(value)) {
+                    convertToArrayReference(stackFrame.thread(), value);
+                }
                 localVariableData.setNestedTypes(
                         getNestedFields(
                                 (ObjectReference) value, objectDepth, numberOfArrayElements));
+            } else {
+                localVariableData =
+                        new LocalVariableData(
+                                variable.name(),
+                                variable.typeName(),
+                                getStringRepresentation(value, numberOfArrayElements));
             }
+            result.add(localVariableData);
         }
         return result;
     }
@@ -303,21 +310,28 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            FieldData fieldData =
-                    new FieldData(
-                            ((ObjectReference) value).uniqueID(),
-                            field.name(),
-                            field.typeName(),
-                            getStringRepresentation(value, numberOfArrayElements));
-            result.add(fieldData);
-            if (isACollection(value)) {
-                convertToArrayReference(stackFrame.thread(), value);
-            }
+            FieldData fieldData;
             if (isAnObjectReference(value)) {
+                fieldData =
+                        new FieldData(
+                                ((ObjectReference) value).uniqueID(),
+                                field.name(),
+                                field.typeName(),
+                                getStringRepresentation(value, numberOfArrayElements));
                 fieldData.setNestedTypes(
                         getNestedFields(
                                 (ObjectReference) value, objectDepth, numberOfArrayElements));
+                if (isACollection(value)) {
+                    convertToArrayReference(stackFrame.thread(), value);
+                }
+            } else {
+                fieldData =
+                        new FieldData(
+                                field.name(),
+                                field.typeName(),
+                                getStringRepresentation(value, numberOfArrayElements));
             }
+            result.add(fieldData);
         }
         return result;
     }
