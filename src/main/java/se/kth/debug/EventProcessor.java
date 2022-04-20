@@ -30,12 +30,7 @@ public class EventProcessor {
     }
 
     /** Monitor events triggered by JDB. */
-    public void startEventProcessor(
-            int objectDepth,
-            int stackTraceDepth,
-            int numberOfArrayElements,
-            boolean skipPrintingField)
-            throws AbsentInformationException {
+    public void startEventProcessor(CollectorOptions context) throws AbsentInformationException {
         VirtualMachine vm = debugger.launchVMAndJunit();
         debugger.addClassPrepareEvent(vm);
         vm.resume();
@@ -53,12 +48,7 @@ public class EventProcessor {
                     if (event instanceof BreakpointEvent) {
                         methodName = ((BreakpointEvent) event).location().method().name();
                         List<StackFrameContext> result =
-                                debugger.processBreakpoints(
-                                        (BreakpointEvent) event,
-                                        objectDepth,
-                                        stackTraceDepth,
-                                        numberOfArrayElements,
-                                        skipPrintingField);
+                                debugger.processBreakpoints((BreakpointEvent) event, context);
                         Location location = ((BreakpointEvent) event).location();
                         breakpointContexts.add(
                                 new BreakPointContext(
@@ -67,10 +57,7 @@ public class EventProcessor {
                     if (event instanceof MethodExitEvent) {
                         if (((MethodExitEvent) event).method().name().equals(methodName))
                             returnValues.add(
-                                    debugger.processMethodExit(
-                                            (MethodExitEvent) event,
-                                            objectDepth,
-                                            numberOfArrayElements));
+                                    debugger.processMethodExit((MethodExitEvent) event, context));
                     }
                 }
                 vm.resume();
