@@ -71,15 +71,9 @@ public class Collector implements Callable<Integer> {
 
     @Override
     public Integer call() throws IOException, AbsentInformationException {
+        CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(
-                        providedClasspath,
-                        tests,
-                        classesAndBreakpoints,
-                        objectDepth,
-                        stackTraceDepth,
-                        numberOfArrayElements,
-                        skipPrintingField);
+                invoke(providedClasspath, tests, classesAndBreakpoints, context);
         write(eventProcessor);
         return 0;
     }
@@ -88,17 +82,23 @@ public class Collector implements Callable<Integer> {
             String[] providedClasspath,
             String[] tests,
             File classesAndBreakpoints,
-            int objectDepth,
-            int stackTraceDepth,
-            int numberOfArrayElements,
-            boolean skipPrintingField)
+            CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
                 new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
-        eventProcessor.startEventProcessor(
-                objectDepth, stackTraceDepth, numberOfArrayElements, skipPrintingField);
+        eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
+    }
+
+    private CollectorOptions getCollectorOptions() {
+        CollectorOptions context = new CollectorOptions();
+        context.setObjectDepth(objectDepth);
+        context.setStackTraceDepth(stackTraceDepth);
+        context.setNumberOfArrayElements(numberOfArrayElements);
+        context.setSkipPrintingField(skipPrintingField);
+
+        return context;
     }
 
     public static void write(EventProcessor eventProcessor) throws IOException {

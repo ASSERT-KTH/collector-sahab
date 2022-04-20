@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import se.kth.debug.Collector;
+import se.kth.debug.CollectorOptions;
 import se.kth.debug.EventProcessor;
 import se.kth.debug.struct.result.BreakPointContext;
 import se.kth.debug.struct.result.RuntimeValue;
@@ -17,6 +18,16 @@ import se.kth.debug.struct.result.RuntimeValueKind;
 import se.kth.debug.struct.result.StackFrameContext;
 
 public class CollectorAPITest {
+
+    private static CollectorOptions getDefaultOptions() {
+        CollectorOptions context = new CollectorOptions();
+        context.setObjectDepth(0);
+        context.setStackTraceDepth(1);
+        context.setNumberOfArrayElements(10);
+        context.setSkipPrintingField(false);
+        return context;
+    }
+
     @Test
     void invoke_nonStaticFieldsOfStaticClassesShouldNotBeCollected()
             throws AbsentInformationException {
@@ -30,7 +41,7 @@ public class CollectorAPITest {
 
         // act
         EventProcessor eventProcessor =
-                Collector.invoke(classpath, tests, classesAndBreakpoints, 0, 1, 10, false);
+                Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
         BreakPointContext bp =
                 eventProcessor.getBreakpointContexts().stream()
                         .filter(bpc -> bpc.getLineNumber() == 24)
@@ -54,7 +65,7 @@ public class CollectorAPITest {
 
         // act
         EventProcessor eventProcessor =
-                Collector.invoke(classpath, tests, classesAndBreakpoints, 0, 1, 10, false);
+                Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
 
         BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
         StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
