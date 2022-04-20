@@ -10,7 +10,7 @@ public class ReturnData implements RuntimeValue {
     private final List<LocalVariableData> arguments;
     private final List<String> stackTrace;
     private final transient Long id;
-    private List<FieldData> nestedTypes = null;
+    private List<FieldData> nestedObjects = null;
     private String value;
 
     public ReturnData(
@@ -30,8 +30,8 @@ public class ReturnData implements RuntimeValue {
         this.stackTrace = stackTrace;
     }
 
-    public void setNestedTypes(List<FieldData> nestedTypes) {
-        this.nestedTypes = nestedTypes;
+    public void setNestedObjects(List<FieldData> nestedObjects) {
+        this.nestedObjects = nestedObjects;
     }
 
     @Override

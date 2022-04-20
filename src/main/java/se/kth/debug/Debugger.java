@@ -237,7 +237,7 @@ public class Debugger {
                                 numberOfArrayElements),
                         computeStackTrace(mee.thread()));
         if (isAnObjectReference(mee.returnValue())) {
-            returnData.setNestedTypes(
+            returnData.setNestedObjects(
                     getNestedFields(
                             (ObjectReference) mee.returnValue(),
                             objectDepth,
@@ -280,7 +280,7 @@ public class Debugger {
                 if (isACollection(value)) {
                     convertToArrayReference(stackFrame.thread(), value);
                 }
-                localVariableData.setNestedTypes(
+                localVariableData.setNestedObjects(
                         getNestedFields(
                                 (ObjectReference) value, objectDepth, numberOfArrayElements));
             } else {
@@ -320,7 +320,7 @@ public class Debugger {
                                 field.name(),
                                 field.typeName(),
                                 getStringRepresentation(value, numberOfArrayElements));
-                fieldData.setNestedTypes(
+                fieldData.setNestedObjects(
                         getNestedFields(
                                 (ObjectReference) value, objectDepth, numberOfArrayElements));
                 if (isACollection(value)) {
@@ -356,7 +356,7 @@ public class Debugger {
                                 field.name(),
                                 field.typeName(),
                                 getStringRepresentation(value, numberOfArrayElements));
-                fieldData.setNestedTypes(
+                fieldData.setNestedObjects(
                         getNestedFields(
                                 (ObjectReference) value, objectDepth - 1, numberOfArrayElements));
 

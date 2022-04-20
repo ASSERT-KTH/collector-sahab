@@ -7,7 +7,7 @@ public class FieldData implements RuntimeValue {
     private final String name;
     private final String type;
     private transient Long id = null;
-    private List<FieldData> nestedTypes = null;
+    private List<FieldData> nestedObjects = null;
     private String value;
 
     public FieldData(Long id, String name, String type, String value) {
@@ -23,8 +23,8 @@ public class FieldData implements RuntimeValue {
         this.value = value;
     }
 
-    public void setNestedTypes(List<FieldData> nestedTypes) {
-        this.nestedTypes = nestedTypes;
+    public void setNestedObjects(List<FieldData> nestedObjects) {
+        this.nestedObjects = nestedObjects;
     }
 
     @Override
