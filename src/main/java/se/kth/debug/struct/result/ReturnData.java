@@ -11,13 +11,13 @@ public class ReturnData implements RuntimeValue {
     private final List<String> stackTrace;
     private final transient Long id;
     private List<FieldData> nestedObjects = null;
-    private String value;
+    private Object value;
 
     public ReturnData(
             Long id,
             String methodName,
             String returnType,
-            String value,
+            Object value,
             String location,
             List<LocalVariableData> arguments,
             List<String> stackTrace) {
@@ -44,11 +44,12 @@ public class ReturnData implements RuntimeValue {
     }
 
     @Override
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String newValue) {
+    @Override
+    public void setValue(Object newValue) {
         value = newValue;
     }
 }

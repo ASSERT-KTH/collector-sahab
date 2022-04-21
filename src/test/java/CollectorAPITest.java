@@ -83,7 +83,7 @@ public class CollectorAPITest {
         RuntimeValue set = runtimeValues.get(2);
         assertThat(set.getKind(), is(RuntimeValueKind.FIELD));
 
-        String sanitisedValue = set.getValue().replace("[", "").replace("]", "");
+        String sanitisedValue = ((String) set.getValue()).replace("[", "").replace("]", "");
         Set<String> backToSet = new HashSet<>(Arrays.asList(sanitisedValue.split(", ", -1)));
         assertThat(backToSet, containsInAnyOrder("\"aman\"", "\"sharma\"", "\"sahab\""));
     }

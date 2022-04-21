@@ -5,7 +5,7 @@ public interface RuntimeValue {
 
     Long getID();
 
-    String getValue();
+    Object getValue();
 
-    void setValue(String value);
+    void setValue(Object value);
 }

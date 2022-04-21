@@ -8,16 +8,16 @@ public class LocalVariableData implements RuntimeValue {
     private final String type;
     private transient Long id = null;
     private List<FieldData> nestedObjects = null;
-    private String value;
+    private Object value;
 
-    public LocalVariableData(Long id, String name, String type, String value) {
+    public LocalVariableData(Long id, String name, String type, Object value) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.value = value;
     }
 
-    public LocalVariableData(String name, String type, String value) {
+    public LocalVariableData(String name, String type, Object value) {
         this.name = name;
         this.type = type;
         this.value = value;
@@ -37,11 +37,12 @@ public class LocalVariableData implements RuntimeValue {
     }
 
     @Override
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String newValue) {
+    @Override
+    public void setValue(Object newValue) {
         value = newValue;
     }
 }
