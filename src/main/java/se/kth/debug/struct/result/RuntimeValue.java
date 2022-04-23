@@ -5,7 +5,7 @@ public interface RuntimeValue {
 
     Long getID();
 
-    Object getValue();
+    ValueWrapper getValueWrapper();
 
-    void setValue(Object value);
+    void setValue(ValueWrapper value);
 }

@@ -60,6 +60,11 @@ public class Collector implements Callable<Integer> {
     private int numberOfArrayElements = 10;
 
     @CommandLine.Option(
+            names = "--array-depth",
+            description = "The depth of each element inside an array (default: ${DEFAULT-VALUE}).")
+    private int arrayDepth = 0;
+
+    @CommandLine.Option(
             names = "--skip-printing-field",
             description = "Whether to collect field data or not")
     private boolean skipPrintingField = false;
@@ -96,6 +101,7 @@ public class Collector implements Callable<Integer> {
         context.setObjectDepth(objectDepth);
         context.setStackTraceDepth(stackTraceDepth);
         context.setNumberOfArrayElements(numberOfArrayElements);
+        context.setArrayDepth(arrayDepth);
         context.setSkipPrintingField(skipPrintingField);
 
         return context;
