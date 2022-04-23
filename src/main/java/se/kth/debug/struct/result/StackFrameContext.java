@@ -30,7 +30,7 @@ public class StackFrameContext {
         return runtimeValueCollection;
     }
 
-    public void replaceValue(Long id, String value) {
+    public void replaceValue(Long id, ValueWrapper value) {
         List<RuntimeValue> candidates =
                 runtimeValueCollection.stream()
                         .filter(r -> Objects.equals(r.getID(), id))

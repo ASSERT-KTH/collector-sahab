@@ -1,8 +1,8 @@
-package foo;
+package foo.collections;
 
 import java.util.*;
 
-public class PrintingCollections {
+public class OneLevelCollections {
     private static List<Integer> list = List.of(1, 2, 3, 4, 5);
     private static Set<String> set = Set.of("aman", "sharma", "sahab");
 

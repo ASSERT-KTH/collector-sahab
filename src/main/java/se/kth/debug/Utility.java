@@ -111,5 +111,9 @@ public class Utility {
         public Long getId() {
             return ((ObjectReference) value).uniqueID();
         }
+
+        public String getType() {
+            return value.type().name();
+        }
     }
 }

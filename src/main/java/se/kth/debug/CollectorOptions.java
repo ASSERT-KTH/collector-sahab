@@ -4,6 +4,7 @@ public class CollectorOptions {
     private int objectDepth;
     private int stackTraceDepth;
     private int numberOfArrayElements;
+    private int arrayDepth;
     private boolean skipPrintingField;
 
     public int getObjectDepth() {
@@ -16,6 +17,10 @@ public class CollectorOptions {
 
     public int getNumberOfArrayElements() {
         return numberOfArrayElements;
+    }
+
+    public int getArrayDepth() {
+        return arrayDepth;
     }
 
     public boolean shouldSkipPrintingField() {
@@ -32,6 +37,10 @@ public class CollectorOptions {
 
     public void setNumberOfArrayElements(int numberOfArrayElements) {
         this.numberOfArrayElements = numberOfArrayElements;
+    }
+
+    public void setArrayDepth(int arrayDepth) {
+        this.arrayDepth = arrayDepth;
     }
 
     public void setSkipPrintingField(boolean skipPrintingField) {

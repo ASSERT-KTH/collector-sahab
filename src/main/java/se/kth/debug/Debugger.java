@@ -166,13 +166,12 @@ public class Debugger {
         }
         try {
             for (CallableWithIDOfValue c : callablesForCollection) {
-                String value =
-                        String.valueOf(
-                                ((ArrayReference) c.call())
-                                        .getValues().stream()
-                                                .map(v -> getStringRepresentation(v, context))
-                                                .collect(Collectors.toList()));
-                stackFrameContexts.forEach(sfc -> sfc.replaceValue(c.getId(), value));
+                ArrayReference array = ((ArrayReference) c.call());
+                stackFrameContexts.forEach(
+                        sfc ->
+                                sfc.replaceValue(
+                                        c.getId(),
+                                        constructArrayReference(array, c.getType(), context)));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -205,8 +204,7 @@ public class Debugger {
     public ReturnData processMethodExit(MethodExitEvent mee, CollectorOptions context)
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
-        String returnType = mee.method().returnTypeName();
-        String returnValue = getStringRepresentation(mee.returnValue(), context);
+        ValueWrapper returnValue = constructValue(mee.returnValue(), context);
         String location = mee.location().toString();
         List<LocalVariable> arguments = mee.method().arguments();
 
@@ -214,7 +212,6 @@ public class Debugger {
                 new ReturnData(
                         ((ObjectReference) mee.returnValue()).uniqueID(),
                         methodName,
-                        returnType,
                         returnValue,
                         location,
                         // the method will be in the 0th stack frame when the method exit event is
@@ -241,31 +238,94 @@ public class Debugger {
         return parseVariable(stackFrame, stackFrame.visibleVariables(), context);
     }
 
+    private ValueWrapper constructArrayReference(
+            ArrayReference array, String typeName, CollectorOptions context) {
+        List<Value> arrayValues =
+                array.getValues().stream()
+                        .limit(context.getNumberOfArrayElements())
+                        .collect(Collectors.toList());
+        List<Object> readableArrayValues =
+                arrayValues.stream().map(Debugger::getReadableValue).collect(Collectors.toList());
+        ValueWrapper topLevelArrayValue = new ValueWrapper(typeName, readableArrayValues);
+        if (arrayValues.size() > 0 && isAnObjectReference(arrayValues.get(0))) {
+            List<ValueWrapper> elementsInList = new ArrayList<>();
+            for (Value value : arrayValues) {
+                ValueWrapper valueWrapper = constructValue(value, context);
+                elementsInList.add(valueWrapper);
+                valueWrapper.setNestedObjects(
+                        getNestedFields(
+                                ((ObjectReference) value), context.getArrayDepth(), context));
+            }
+            topLevelArrayValue.setNestedObjects(elementsInList);
+        }
+        return topLevelArrayValue;
+    }
+
+    private static Object getReadableValue(Value value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof IntegerValue) {
+            return ((IntegerValue) value).value();
+        } else if (value instanceof BooleanValue) {
+            return ((BooleanValue) value).value();
+        } else if (value instanceof FloatValue) {
+            return ((FloatValue) value).value();
+        } else if (value instanceof StringReference) {
+            return ((StringReference) value).value();
+        } else if (value instanceof ShortValue) {
+            return ((ShortValue) value).value();
+        } else if (value instanceof LongValue) {
+            return ((LongValue) value).value();
+        } else if (value instanceof CharValue) {
+            return ((CharValue) value).value();
+        } else if (isPrimitiveWrapper(value)) {
+            Field field = ((ObjectReference) value).referenceType().fieldByName("value");
+            Value nestedValue = ((ObjectReference) value).getValue(field);
+            return getReadableValue(nestedValue);
+        } else {
+            return String.valueOf(((ObjectReference) value).referenceType().name());
+        }
+    }
+
+    private ValueWrapper constructValue(Value value, CollectorOptions context) {
+        if (value == null) {
+            return new ValueWrapper(null, null);
+        }
+        return new ValueWrapper(value.type().name(), getReadableValue(value));
+    }
+
     private List<LocalVariableData> parseVariable(
             StackFrame stackFrame, List<LocalVariable> variables, CollectorOptions context) {
         List<LocalVariableData> result = new ArrayList<>();
         for (LocalVariable variable : variables) {
             Value value = stackFrame.getValue(variable);
             LocalVariableData localVariableData;
-            if (isAnObjectReference(value)) {
+            if (value instanceof ArrayReference) {
+                localVariableData =
+                        new LocalVariableData(
+                                variable.name(),
+                                constructArrayReference(
+                                        (ArrayReference) value, variable.typeName(), context));
+            } else if (isACollection(value)) {
                 localVariableData =
                         new LocalVariableData(
                                 ((ObjectReference) value).uniqueID(),
                                 variable.name(),
-                                variable.typeName(),
-                                getStringRepresentation(value, context));
-                if (isACollection(value)) {
-                    convertToArrayReference(stackFrame.thread(), value);
-                }
+                                constructValue(value, context));
+                convertToArrayReference(stackFrame.thread(), value);
+            } else if (isAnObjectReference(value)) {
+                localVariableData =
+                        new LocalVariableData(
+                                ((ObjectReference) value).uniqueID(),
+                                variable.name(),
+                                constructValue(value, context));
                 localVariableData.setNestedObjects(
                         getNestedFields(
                                 (ObjectReference) value, context.getObjectDepth(), context));
             } else {
                 localVariableData =
-                        new LocalVariableData(
-                                variable.name(),
-                                variable.typeName(),
-                                getStringRepresentation(value, context));
+                        new LocalVariableData(variable.name(), constructValue(value, context));
             }
             result.add(localVariableData);
         }
@@ -289,25 +349,26 @@ public class Debugger {
                 value = stackFrame.thisObject().getValue(field);
             }
             FieldData fieldData;
-            if (isAnObjectReference(value)) {
+            if (value instanceof ArrayReference) {
+                fieldData =
+                        new FieldData(
+                                field.name(),
+                                constructArrayReference(
+                                        (ArrayReference) value, field.typeName(), context));
+            } else if (isACollection(value)) {
                 fieldData =
                         new FieldData(
                                 ((ObjectReference) value).uniqueID(),
                                 field.name(),
-                                field.typeName(),
-                                getStringRepresentation(value, context));
+                                constructValue(value, context));
+                convertToArrayReference(stackFrame.thread(), value);
+            } else if (isAnObjectReference(value)) {
+                fieldData = new FieldData(field.name(), constructValue(value, context));
                 fieldData.setNestedObjects(
                         getNestedFields(
                                 (ObjectReference) value, context.getObjectDepth(), context));
-                if (isACollection(value)) {
-                    convertToArrayReference(stackFrame.thread(), value);
-                }
             } else {
-                fieldData =
-                        new FieldData(
-                                field.name(),
-                                field.typeName(),
-                                getStringRepresentation(value, context));
+                fieldData = new FieldData(field.name(), constructValue(value, context));
             }
             result.add(fieldData);
         }
@@ -316,7 +377,7 @@ public class Debugger {
 
     private List<FieldData> getNestedFields(
             ObjectReference object, int objectDepth, CollectorOptions context) {
-        if (context.getObjectDepth() == 0) {
+        if (objectDepth == 0) {
             return null;
         }
         List<FieldData> result = new ArrayList<>();
@@ -325,60 +386,33 @@ public class Debugger {
             Value value = object.getValue(field);
 
             FieldData fieldData;
-            if (isAnObjectReference(value)) {
+            if (isACollection(value)) {
                 fieldData =
                         new FieldData(
                                 ((ObjectReference) value).uniqueID(),
                                 field.name(),
-                                field.typeName(),
-                                getStringRepresentation(value, context));
+                                constructValue(value, context));
+            } else if (isAnObjectReference(value)) {
+                fieldData =
+                        new FieldData(
+                                ((ObjectReference) value).uniqueID(),
+                                field.name(),
+                                constructValue(value, context));
                 fieldData.setNestedObjects(
                         getNestedFields((ObjectReference) value, objectDepth - 1, context));
 
             } else {
-                fieldData =
-                        new FieldData(
-                                field.name(),
-                                field.typeName(),
-                                getStringRepresentation(value, context));
+                fieldData = new FieldData(field.name(), constructValue(value, context));
             }
             result.add(fieldData);
         }
         return result;
     }
 
-    private static String getStringRepresentation(Value value, CollectorOptions context) {
-        if (value == null) {
-            return String.valueOf((Object) null);
-        }
-        if (value instanceof ArrayReference) {
-            List<String> itemsToString =
-                    ((ArrayReference) value)
-                            .getValues().stream()
-                                    .limit(context.getNumberOfArrayElements())
-                                    .map(v -> Debugger.getStringRepresentation(v, context))
-                                    .collect(Collectors.toList());
-            return String.valueOf(itemsToString);
-        }
-        if (value instanceof StringReference) {
-            // com.sun.jdi.SunReference contains the string representation, so we don't need to
-            // fetch its value from
-            // `value` field. Hence, the expression below is sufficient.
-            return String.valueOf(value);
-        }
-        if (isPrimitiveWrapper(value)) {
-            Field valueContainingField =
-                    ((ObjectReference) value).referenceType().fieldByName("value");
-            return String.valueOf(((ObjectReference) value).getValue(valueContainingField));
-        }
-        if (isAnObjectReference(value)) {
-            // we print type for object references
-            return String.valueOf(((ObjectReference) value).referenceType().name());
-        }
-        return String.valueOf(value);
-    }
-
     private static boolean isACollection(Value value) {
+        if (!isAnObjectReference(value)) {
+            return false;
+        }
         String className = ((ObjectReference) value).referenceType().name();
         try {
             return Collection.class.isAssignableFrom(Class.forName(className));

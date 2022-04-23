@@ -69,7 +69,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("input.txt").toString(),
+            TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
@@ -105,7 +105,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("without-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("input.txt").toString(),
+            TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",

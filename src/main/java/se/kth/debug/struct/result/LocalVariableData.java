@@ -5,21 +5,18 @@ import java.util.List;
 public class LocalVariableData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.LOCAL_VARIABLE;
     private final String name;
-    private final String type;
     private transient Long id = null;
     private List<FieldData> nestedObjects = null;
-    private String value;
+    private ValueWrapper value;
 
-    public LocalVariableData(Long id, String name, String type, String value) {
+    public LocalVariableData(Long id, String name, ValueWrapper value) {
         this.id = id;
         this.name = name;
-        this.type = type;
         this.value = value;
     }
 
-    public LocalVariableData(String name, String type, String value) {
+    public LocalVariableData(String name, ValueWrapper value) {
         this.name = name;
-        this.type = type;
         this.value = value;
     }
 
@@ -37,11 +34,12 @@ public class LocalVariableData implements RuntimeValue {
     }
 
     @Override
-    public String getValue() {
+    public ValueWrapper getValueWrapper() {
         return value;
     }
 
-    public void setValue(String newValue) {
+    @Override
+    public void setValue(ValueWrapper newValue) {
         value = newValue;
     }
 }
