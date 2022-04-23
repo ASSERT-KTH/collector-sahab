@@ -96,6 +96,33 @@ public class CollectorAPITest {
         }
 
         @Test
+        void invoke_primitiveArraysAreRecorded() throws AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.CollectionsTest::test_canWePrintPrimitive"};
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("collections")
+                            .resolve("primitive.txt")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
+
+            BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
+            StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
+            RuntimeValue thePrimitiveArray = stackFrameContext.getRuntimeValueCollection().get(0);
+            List<String> actualElements =
+                    (List<String>) thePrimitiveArray.getValueWrapper().getAtomicValue();
+
+            // assert
+            assertThat(actualElements, equalTo(List.of("yes", "we", "can")));
+        }
+
+        @Test
         void invoke_nestedCollectionsAreRepresentedCorrectly() throws AbsentInformationException {
             // arrange
             String[] classpath =
