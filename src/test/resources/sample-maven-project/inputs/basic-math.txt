@@ -1,1 +1,1 @@
-foo.BasicMath=7,11
+foo.BasicMath=5,9
