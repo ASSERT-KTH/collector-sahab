@@ -171,7 +171,8 @@ public class Debugger {
                         sfc ->
                                 sfc.replaceValue(
                                         c.getId(),
-                                        constructArrayReference(array, c.getType(), context)));
+                                        constructCollectionReference(
+                                                array, c.getType(), c.getThread(), context)));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -240,25 +241,91 @@ public class Debugger {
 
     private ValueWrapper constructArrayReference(
             ArrayReference array, String typeName, CollectorOptions context) {
-        List<Value> arrayValues =
+        List<Object> readableArrayValues =
+                getReadableValueOfArray(array, context.getArrayDepth(), context);
+        ValueWrapper topLevelArrayValue = new ValueWrapper(typeName, readableArrayValues);
+        //        if (arrayValues.size() > 0 && isAnObjectReference(arrayValues.get(0))) {
+        //            List<ValueWrapper> elementsInList = new ArrayList<>();
+        //            for (Value value : arrayValues) {
+        //                ValueWrapper valueWrapper = constructValue(value, context);
+        //                elementsInList.add(valueWrapper);
+        //                valueWrapper.setNestedObjects(
+        //                        getNestedFields(
+        //                                ((ObjectReference) value), context.getArrayDepth(),
+        // context));
+        //            }
+        //            topLevelArrayValue.setNestedObjects(elementsInList);
+        //        }
+        return topLevelArrayValue;
+    }
+
+    private ValueWrapper constructCollectionReference(
+            ArrayReference array,
+            String typeName,
+            ThreadReference thread,
+            CollectorOptions context) {
+        List<Object> readableCollectionValues =
+                getReadableValueOfCollection(array, context.getArrayDepth(), thread, context);
+        ValueWrapper topLevelCollectionValue = new ValueWrapper(typeName, readableCollectionValues);
+        return topLevelCollectionValue;
+    }
+
+    private static List<Object> getReadableValueOfCollection(
+            ArrayReference array,
+            int arrayDepth,
+            ThreadReference thread,
+            CollectorOptions context) {
+        if (arrayDepth == 0) {
+            return array.getValues().stream()
+                    .limit(context.getNumberOfArrayElements())
+                    .map(Debugger::getReadableValue)
+                    .collect(Collectors.toList());
+        }
+        List<Value> values =
                 array.getValues().stream()
                         .limit(context.getNumberOfArrayElements())
                         .collect(Collectors.toList());
-        List<Object> readableArrayValues =
-                arrayValues.stream().map(Debugger::getReadableValue).collect(Collectors.toList());
-        ValueWrapper topLevelArrayValue = new ValueWrapper(typeName, readableArrayValues);
-        if (arrayValues.size() > 0 && isAnObjectReference(arrayValues.get(0))) {
-            List<ValueWrapper> elementsInList = new ArrayList<>();
-            for (Value value : arrayValues) {
-                ValueWrapper valueWrapper = constructValue(value, context);
-                elementsInList.add(valueWrapper);
-                valueWrapper.setNestedObjects(
-                        getNestedFields(
-                                ((ObjectReference) value), context.getArrayDepth(), context));
+        List<Object> result = new ArrayList<>();
+        for (Value value : values) {
+            if (isACollection(value)) {
+                try {
+                    CallableWithIDOfValue task = new CallableWithIDOfValue(thread, value);
+                    Value nestedArray = task.call();
+                    result.add(
+                            getReadableValueOfCollection(
+                                    (ArrayReference) nestedArray, arrayDepth - 1, thread, context));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                result.add(getReadableValue(value));
             }
-            topLevelArrayValue.setNestedObjects(elementsInList);
         }
-        return topLevelArrayValue;
+        return result;
+    }
+
+    private static List<Object> getReadableValueOfArray(
+            ArrayReference array, int arrayDepth, CollectorOptions context) {
+        if (arrayDepth == 0) {
+            return array.getValues().stream()
+                    .limit(context.getNumberOfArrayElements())
+                    .map(Debugger::getReadableValue)
+                    .collect(Collectors.toList());
+        }
+        List<Value> values =
+                array.getValues().stream()
+                        .limit(context.getNumberOfArrayElements())
+                        .collect(Collectors.toList());
+        List<Object> result = new ArrayList<>();
+        for (Value value : values) {
+            if (value instanceof ArrayReference) {
+                result.add(
+                        getReadableValueOfArray((ArrayReference) value, arrayDepth - 1, context));
+            } else {
+                result.add(getReadableValue(value));
+            }
+        }
+        return result;
     }
 
     private static Object getReadableValue(Value value) {

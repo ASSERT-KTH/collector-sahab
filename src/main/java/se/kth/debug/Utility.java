@@ -115,5 +115,9 @@ public class Utility {
         public String getType() {
             return value.type().name();
         }
+
+        public ThreadReference getThread() {
+            return thread;
+        }
     }
 }

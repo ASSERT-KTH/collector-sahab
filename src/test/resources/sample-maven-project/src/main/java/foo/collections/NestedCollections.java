@@ -3,7 +3,7 @@ package foo.collections;
 import java.util.*;
 
 public class NestedCollections {
-    private static List<List<Integer>> x = List.of(List.of(1), List.of(1,2), List.of(1,2,3));
+    private static int[][][] x = {{{1},{2}}, {{3,4,5}, {5,3}}};
 
     public static boolean returnFalsy() {
         Set<Set<Set<String>>> y = new HashSet<>();
