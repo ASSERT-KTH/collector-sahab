@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -187,14 +188,14 @@ public class Debugger {
     public ReturnData processMethodExit(MethodExitEvent mee, CollectorOptions context)
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
-        ValueWrapper returnValue = constructValue(mee.returnValue(), context);
         String location = mee.location().toString();
         List<LocalVariable> arguments = mee.method().arguments();
 
         ReturnData returnData =
                 new ReturnData(
                         methodName,
-                        returnValue,
+                        mee.method().returnTypeName(),
+                        computeReadableValue(mee.returnValue(), context),
                         location,
                         // the method will be in the 0th stack frame when the method exit event is
                         // triggered
@@ -253,20 +254,16 @@ public class Debugger {
         }
     }
 
-    private ValueWrapper constructValue(Value value, CollectorOptions context) {
-        if (value == null) {
-            return new ValueWrapper(null, null);
-        }
-        return new ValueWrapper(value.type().name(), getReadableValue(value));
-    }
-
     private List<LocalVariableData> parseVariable(
             StackFrame stackFrame, List<LocalVariable> variables, CollectorOptions context) {
         List<LocalVariableData> result = new ArrayList<>();
         for (LocalVariable variable : variables) {
             Value value = stackFrame.getValue(variable);
             LocalVariableData localVariableData =
-                    new LocalVariableData(variable.name(), constructValue(value, context));
+                    new LocalVariableData(
+                            variable.name(),
+                            variable.typeName(),
+                            computeReadableValue(value, context));
             result.add(localVariableData);
             if (isAnObjectReference(value)) {
                 localVariableData.setNestedObjects(
@@ -293,7 +290,9 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            FieldData fieldData = new FieldData(field.name(), constructValue(value, context));
+            FieldData fieldData =
+                    new FieldData(
+                            field.name(), field.typeName(), computeReadableValue(value, context));
             if (isAnObjectReference(value)) {
                 fieldData.setNestedObjects(
                         getNestedFields(
@@ -302,6 +301,18 @@ public class Debugger {
             result.add(fieldData);
         }
         return result;
+    }
+
+    private static Object computeReadableValue(Value value, CollectorOptions context) {
+        if (value instanceof ArrayReference) {
+            return ((ArrayReference) value)
+                    .getValues().stream()
+                            .filter(Objects::nonNull)
+                            .limit(context.getNumberOfArrayElements())
+                            .map(Debugger::getReadableValue)
+                            .collect(Collectors.toList());
+        }
+        return getReadableValue(value);
     }
 
     private List<FieldData> getNestedFields(
@@ -314,7 +325,9 @@ public class Debugger {
         for (Field field : fields) {
             Value value = object.getValue(field);
 
-            FieldData fieldData = new FieldData(field.name(), constructValue(value, context));
+            FieldData fieldData =
+                    new FieldData(
+                            field.name(), field.typeName(), computeReadableValue(value, context));
             result.add(fieldData);
             if (isAnObjectReference(value)) {
                 fieldData.setNestedObjects(
