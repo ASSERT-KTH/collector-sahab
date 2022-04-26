@@ -5,30 +5,27 @@ import java.util.List;
 public class ReturnData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.RETURN;
     private final String methodName;
-    private final String type;
-    private final Object value;
+    private final ValueWrapper value;
     private final String location;
     private final List<LocalVariableData> arguments;
     private final List<String> stackTrace;
-    private List<FieldData> nestedObjects = null;
+    private List<FieldData> fields = null;
 
     public ReturnData(
             String methodName,
-            String type,
-            Object value,
+            ValueWrapper value,
             String location,
             List<LocalVariableData> arguments,
             List<String> stackTrace) {
         this.methodName = methodName;
-        this.type = type;
         this.value = value;
         this.location = location;
         this.arguments = arguments;
         this.stackTrace = stackTrace;
     }
 
-    public void setNestedObjects(List<FieldData> nestedObjects) {
-        this.nestedObjects = nestedObjects;
+    public void setFields(List<FieldData> fields) {
+        this.fields = fields;
     }
 
     @Override
@@ -37,7 +34,7 @@ public class ReturnData implements RuntimeValue {
     }
 
     @Override
-    public Object getValue() {
+    public ValueWrapper getValueWrapper() {
         return value;
     }
 }

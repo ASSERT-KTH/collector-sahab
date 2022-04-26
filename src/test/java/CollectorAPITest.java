@@ -25,7 +25,7 @@ public class CollectorAPITest {
         context.setObjectDepth(0);
         context.setStackTraceDepth(1);
         context.setNumberOfArrayElements(10);
-        context.setArrayDepth(4);
+        context.setArrayDepth(0);
         context.setSkipPrintingField(false);
         return context;
     }
@@ -81,16 +81,18 @@ public class CollectorAPITest {
             // assert
             RuntimeValue queue = runtimeValues.get(0);
             assertThat(queue.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
-            assertThat(queue.getValue(), equalTo(List.of("Added at runtime")));
+            assertThat(
+                    queue.getValueWrapper().getAtomicValue(), equalTo(List.of("Added at runtime")));
 
             RuntimeValue list = runtimeValues.get(1);
             assertThat(list.getKind(), is(RuntimeValueKind.FIELD));
-            assertThat(list.getValue(), equalTo(List.of(1, 2, 3, 4, 5)));
+            assertThat(list.getValueWrapper(), equalTo(List.of(1, 2, 3, 4, 5)));
 
             RuntimeValue set = runtimeValues.get(2);
             assertThat(set.getKind(), is(RuntimeValueKind.FIELD));
             assertThat(
-                    ((List<String>) set.getValue()), containsInAnyOrder("aman", "sahab", "sharma"));
+                    ((List<String>) set.getValueWrapper().getAtomicValue()),
+                    containsInAnyOrder("aman", "sahab", "sharma"));
         }
 
         @Test
@@ -113,7 +115,8 @@ public class CollectorAPITest {
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
             RuntimeValue thePrimitiveArray = stackFrameContext.getRuntimeValueCollection().get(0);
-            List<String> actualElements = (List<String>) thePrimitiveArray.getValue();
+            List<String> actualElements =
+                    (List<String>) thePrimitiveArray.getValueWrapper().getAtomicValue();
 
             // assert
             assertThat(actualElements, equalTo(List.of("yes", "we", "can")));
