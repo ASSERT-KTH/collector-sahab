@@ -8,18 +8,15 @@ public class ReturnData implements RuntimeValue {
     private final String location;
     private final List<LocalVariableData> arguments;
     private final List<String> stackTrace;
-    private final transient Long id;
     private List<FieldData> nestedObjects = null;
     private ValueWrapper value;
 
     public ReturnData(
-            Long id,
             String methodName,
             ValueWrapper value,
             String location,
             List<LocalVariableData> arguments,
             List<String> stackTrace) {
-        this.id = id;
         this.methodName = methodName;
         this.value = value;
         this.location = location;
@@ -34,10 +31,6 @@ public class ReturnData implements RuntimeValue {
     @Override
     public RuntimeValueKind getKind() {
         return kind;
-    }
-
-    public Long getID() {
-        return id;
     }
 
     @Override
