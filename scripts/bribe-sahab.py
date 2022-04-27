@@ -68,6 +68,7 @@ def _run_collector_sahab(project, tests, revision, ref):
     f"-t {test_methods} "
     f"-b {breakpoint_output} "
     f"-r {return_output} "
+    "-m method-name.txt "
     f"--object-depth=0"
   )
 
