@@ -30,7 +30,11 @@ public class CollectorAPITest {
         // act
         EventProcessor eventProcessor =
                 Collector.invoke(
-                        classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        null,
+                        TestHelper.getDefaultOptions());
         BreakPointContext bp =
                 eventProcessor.getBreakpointContexts().stream()
                         .filter(bpc -> bpc.getLineNumber() == 24)
@@ -68,7 +72,11 @@ public class CollectorAPITest {
             // act
             EventProcessor eventProcessor =
                     Collector.invoke(
-                            classpath, tests, classesAndBreakpoints, setObjectAndArrayDepth(1, 0));
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            null,
+                            setObjectAndArrayDepth(1, 0));
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
@@ -122,6 +130,7 @@ public class CollectorAPITest {
                             classpath,
                             tests,
                             classesAndBreakpoints,
+                            null,
                             TestHelper.getDefaultOptions());
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
@@ -156,6 +165,7 @@ public class CollectorAPITest {
                                 classpath,
                                 tests,
                                 classesAndBreakpoints,
+                                null,
                                 setObjectAndArrayDepth(1, arrayDepth));
                 return eventProcessor.getBreakpointContexts().get(0).getStackFrameContexts().get(0);
             }

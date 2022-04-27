@@ -36,11 +36,11 @@ public class Collector implements Callable<Integer> {
             description = "File containing all return values of methods in the provided class.")
     private static String returnValueJson;
 
-    @CommandLine.Option(
-            names = "-i",
-            description = "File containing class names and breakpoints",
-            defaultValue = "input.txt")
-    private File classesAndBreakpoints;
+    @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
+    private static File classesAndBreakpoints = null;
+
+    @CommandLine.Option(names = "-ir", description = "File containing method names")
+    private static File methodNames = null;
 
     @CommandLine.Option(
             names = "--object-depth",
@@ -78,7 +78,7 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(providedClasspath, tests, classesAndBreakpoints, context);
+                invoke(providedClasspath, tests, classesAndBreakpoints, methodNames, context);
         write(eventProcessor);
         return 0;
     }
@@ -87,10 +87,11 @@ public class Collector implements Callable<Integer> {
             String[] providedClasspath,
             String[] tests,
             File classesAndBreakpoints,
+            File methodNames,
             CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
+                new EventProcessor(providedClasspath, tests, classesAndBreakpoints, methodNames);
         eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
@@ -114,7 +115,10 @@ public class Collector implements Callable<Integer> {
         } else {
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
-        if (!eventProcessor.getReturnValues().isEmpty()) {
+        if (methodNames == null) {
+            logger.info(
+                    "Return data was not asked for. Please provide method names if you desire otherwise.");
+        } else if (!eventProcessor.getReturnValues().isEmpty()) {
             writeReturnValuesToFile(eventProcessor.getReturnValues());
             logger.info("Return values are output to the file!");
         } else {

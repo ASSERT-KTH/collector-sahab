@@ -23,10 +23,19 @@ public class EventProcessor {
     private final Debugger debugger;
     private String methodName = null;
 
-    EventProcessor(String[] providedClasspath, String[] tests, File classesAndBreakpoints) {
+    private boolean shouldRecordBreakpointData = false;
+    private boolean shouldRecordReturnData = false;
+
+    EventProcessor(
+            String[] providedClasspath,
+            String[] tests,
+            File classesAndBreakpoints,
+            File methodNames) {
         debugger =
                 new Debugger(
                         providedClasspath, tests, parseFileAndBreakpoints(classesAndBreakpoints));
+        shouldRecordBreakpointData = classesAndBreakpoints != null;
+        shouldRecordReturnData = methodNames != null;
     }
 
     /** Monitor events triggered by JDB. */
@@ -42,8 +51,12 @@ public class EventProcessor {
                         debugger.getProcess().destroy();
                     }
                     if (event instanceof ClassPrepareEvent) {
-                        debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
-                        // debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
+                        if (shouldRecordBreakpointData) {
+                            debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
+                        }
+                        if (shouldRecordReturnData) {
+                            debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
+                        }
                     }
                     if (event instanceof BreakpointEvent) {
                         methodName = ((BreakpointEvent) event).location().method().name();
