@@ -13,6 +13,10 @@ public class FieldData implements RuntimeValue {
         this.value = value;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setFields(List<FieldData> fields) {
         this.fields = fields;
     }
@@ -25,5 +29,10 @@ public class FieldData implements RuntimeValue {
     @Override
     public ValueWrapper getValueWrapper() {
         return value;
+    }
+
+    @Override
+    public List<FieldData> getFields() {
+        return fields;
     }
 }

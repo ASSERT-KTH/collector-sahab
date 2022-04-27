@@ -37,4 +37,9 @@ public class ReturnData implements RuntimeValue {
     public ValueWrapper getValueWrapper() {
         return value;
     }
+
+    @Override
+    public List<FieldData> getFields() {
+        return fields;
+    }
 }

@@ -11,11 +11,9 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import se.kth.debug.Collector;
+import se.kth.debug.CollectorOptions;
 import se.kth.debug.EventProcessor;
-import se.kth.debug.struct.result.BreakPointContext;
-import se.kth.debug.struct.result.RuntimeValue;
-import se.kth.debug.struct.result.RuntimeValueKind;
-import se.kth.debug.struct.result.StackFrameContext;
+import se.kth.debug.struct.result.*;
 
 public class CollectorAPITest {
 
@@ -47,8 +45,16 @@ public class CollectorAPITest {
 
     @Nested
     class RepresentingCollections {
+
+        private CollectorOptions setObjectAndArrayDepth(int objectDepth, int arrayDepth) {
+            CollectorOptions context = TestHelper.getDefaultOptions();
+            context.setArrayDepth(arrayDepth);
+            context.setObjectDepth(objectDepth);
+            return context;
+        }
+
         @Test
-        void invoke_collectionsAreConvertedToArray() throws AbsentInformationException {
+        void invoke_recordValuesFromArrayFieldInsideCollection() throws AbsentInformationException {
             // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
@@ -63,10 +69,7 @@ public class CollectorAPITest {
             // act
             EventProcessor eventProcessor =
                     Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            TestHelper.getDefaultOptions());
+                            classpath, tests, classesAndBreakpoints, setObjectAndArrayDepth(1, 0));
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
@@ -74,18 +77,30 @@ public class CollectorAPITest {
 
             // assert
             RuntimeValue queue = runtimeValues.get(0);
+            FieldData arrayContainingQueueElements = queue.getFields().get(0);
+
             assertThat(queue.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
+            assertThat(arrayContainingQueueElements.getName(), equalTo("elements"));
             assertThat(
-                    queue.getValueWrapper().getAtomicValue(), equalTo(List.of("Added at runtime")));
+                    arrayContainingQueueElements.getValueWrapper().getAtomicValue(),
+                    equalTo(List.of("Added at runtime")));
 
             RuntimeValue list = runtimeValues.get(1);
+            FieldData arrayContainingListElements = list.getFields().get(1);
+
             assertThat(list.getKind(), is(RuntimeValueKind.FIELD));
-            assertThat(list.getValueWrapper(), equalTo(List.of(1, 2, 3, 4, 5)));
+            assertThat(arrayContainingListElements.getName(), equalTo("elements"));
+            assertThat(
+                    arrayContainingListElements.getValueWrapper().getAtomicValue(),
+                    equalTo(List.of(1, 2, 3, 4, 5)));
 
             RuntimeValue set = runtimeValues.get(2);
+            FieldData arrayContainingSetElements = set.getFields().get(1);
+
             assertThat(set.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(arrayContainingSetElements.getName(), equalTo("elements"));
             assertThat(
-                    ((List<String>) set.getValueWrapper().getAtomicValue()),
+                    (List<String>) arrayContainingSetElements.getValueWrapper().getAtomicValue(),
                     containsInAnyOrder("aman", "sahab", "sharma"));
         }
 
