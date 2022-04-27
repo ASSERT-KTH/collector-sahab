@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.MethodForExitEvent;
 import se.kth.debug.struct.result.*;
 
 public class Debugger {
@@ -25,14 +26,17 @@ public class Debugger {
     private final String[] pathToBuiltProject;
     private final String[] tests;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
+    private final MethodForExitEvent methodForExitEvent;
 
     public Debugger(
             String[] pathToBuiltProject,
             String[] tests,
-            List<FileAndBreakpoint> classesAndBreakpoints) {
+            List<FileAndBreakpoint> classesAndBreakpoints,
+            MethodForExitEvent methodForExitEvent) {
         this.pathToBuiltProject = pathToBuiltProject;
         this.tests = tests;
         this.classesAndBreakpoints = classesAndBreakpoints;
+        this.methodForExitEvent = methodForExitEvent;
     }
 
     public VirtualMachine launchVMAndJunit() {
@@ -87,11 +91,19 @@ public class Debugger {
 
     public void addClassPrepareEvent(VirtualMachine vm) {
         EventRequestManager erm = vm.eventRequestManager();
-        for (FileAndBreakpoint classToBeDebugged : classesAndBreakpoints) {
+        if (classesAndBreakpoints != null) {
+            for (FileAndBreakpoint classToBeDebugged : classesAndBreakpoints) {
+                ClassPrepareRequest cpr = erm.createClassPrepareRequest();
+                cpr.addClassFilter(classToBeDebugged.getFileName());
+                cpr.setEnabled(true);
+                logger.log(Level.INFO, classToBeDebugged.getFileName() + " added!");
+                vm.resume();
+            }
+        }
+        if (methodForExitEvent != null) {
             ClassPrepareRequest cpr = erm.createClassPrepareRequest();
-            cpr.addClassFilter(classToBeDebugged.getFileName());
+            cpr.addClassFilter(methodForExitEvent.getClassName());
             cpr.setEnabled(true);
-            logger.log(Level.INFO, classToBeDebugged.getFileName() + " added!");
             vm.resume();
         }
     }
@@ -187,6 +199,9 @@ public class Debugger {
     public ReturnData processMethodExit(MethodExitEvent mee, CollectorOptions context)
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
+        if (!methodName.equals(methodForExitEvent.getName())) {
+            return null;
+        }
         String location = mee.location().toString();
         List<LocalVariable> arguments = mee.method().arguments();
 

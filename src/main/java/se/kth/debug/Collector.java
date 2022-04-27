@@ -36,11 +36,11 @@ public class Collector implements Callable<Integer> {
             description = "File containing all return values of methods in the provided class.")
     private static String returnValueJson;
 
-    @CommandLine.Option(
-            names = "-i",
-            description = "File containing class names and breakpoints",
-            defaultValue = "input.txt")
-    private File classesAndBreakpoints;
+    @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
+    private static File classesAndBreakpoints = null;
+
+    @CommandLine.Option(names = "-m", description = "File containing method name")
+    private static File methodForExitEvent = null;
 
     @CommandLine.Option(
             names = "--object-depth",
@@ -78,7 +78,12 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(providedClasspath, tests, classesAndBreakpoints, context);
+                invoke(
+                        providedClasspath,
+                        tests,
+                        classesAndBreakpoints,
+                        methodForExitEvent,
+                        context);
         write(eventProcessor);
         return 0;
     }
@@ -87,10 +92,12 @@ public class Collector implements Callable<Integer> {
             String[] providedClasspath,
             String[] tests,
             File classesAndBreakpoints,
+            File methodForExitEvent,
             CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
+                new EventProcessor(
+                        providedClasspath, tests, classesAndBreakpoints, methodForExitEvent);
         eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
@@ -108,13 +115,19 @@ public class Collector implements Callable<Integer> {
     }
 
     public static void write(EventProcessor eventProcessor) throws IOException {
-        if (!eventProcessor.getBreakpointContexts().isEmpty()) {
+        if (classesAndBreakpoints == null) {
+            logger.info(
+                    "Breakpoint data was not asked for. Please provide class names and line numbers if you desire otherwise.");
+        } else if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
             logger.info("Output file generated!");
         } else {
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
-        if (!eventProcessor.getReturnValues().isEmpty()) {
+        if (methodForExitEvent == null) {
+            logger.info(
+                    "Return data was not asked for. Please provide method names if you desire otherwise.");
+        } else if (!eventProcessor.getReturnValues().isEmpty()) {
             writeReturnValuesToFile(eventProcessor.getReturnValues());
             logger.info("Return values are output to the file!");
         } else {

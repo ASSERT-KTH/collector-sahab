@@ -1,5 +1,7 @@
 package se.kth.debug;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
 import java.io.*;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.MethodForExitEvent;
 import se.kth.debug.struct.result.BreakPointContext;
 import se.kth.debug.struct.result.ReturnData;
 import se.kth.debug.struct.result.StackFrameContext;
@@ -21,12 +24,24 @@ public class EventProcessor {
     private final List<BreakPointContext> breakpointContexts = new ArrayList<>();
     private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
-    private String methodName = null;
 
-    EventProcessor(String[] providedClasspath, String[] tests, File classesAndBreakpoints) {
+    private boolean shouldRecordBreakpointData = false;
+    private boolean shouldRecordReturnData = false;
+
+    EventProcessor(
+            String[] providedClasspath,
+            String[] tests,
+            File classesAndBreakpoints,
+            File methodsForExitEvent) {
+        parseMethodsForExitEvent(methodsForExitEvent);
+        shouldRecordBreakpointData = classesAndBreakpoints != null;
+        shouldRecordReturnData = methodsForExitEvent != null;
         debugger =
                 new Debugger(
-                        providedClasspath, tests, parseFileAndBreakpoints(classesAndBreakpoints));
+                        providedClasspath,
+                        tests,
+                        parseFileAndBreakpoints(classesAndBreakpoints),
+                        parseMethodsForExitEvent(methodsForExitEvent));
     }
 
     /** Monitor events triggered by JDB. */
@@ -42,11 +57,14 @@ public class EventProcessor {
                         debugger.getProcess().destroy();
                     }
                     if (event instanceof ClassPrepareEvent) {
-                        debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
-                        // debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
+                        if (shouldRecordBreakpointData) {
+                            debugger.setBreakpoints(vm, (ClassPrepareEvent) event);
+                        }
+                        if (shouldRecordReturnData) {
+                            debugger.registerMethodExits(vm, (ClassPrepareEvent) event);
+                        }
                     }
                     if (event instanceof BreakpointEvent) {
-                        methodName = ((BreakpointEvent) event).location().method().name();
                         List<StackFrameContext> result =
                                 debugger.processBreakpoints((BreakpointEvent) event, context);
                         Location location = ((BreakpointEvent) event).location();
@@ -55,9 +73,11 @@ public class EventProcessor {
                                         location.sourcePath(), location.lineNumber(), result));
                     }
                     if (event instanceof MethodExitEvent) {
-                        if (((MethodExitEvent) event).method().name().equals(methodName))
-                            returnValues.add(
-                                    debugger.processMethodExit((MethodExitEvent) event, context));
+                        ReturnData rd =
+                                debugger.processMethodExit((MethodExitEvent) event, context);
+                        if (rd != null) {
+                            returnValues.add(rd);
+                        }
                     }
                 }
                 vm.resume();
@@ -71,6 +91,9 @@ public class EventProcessor {
     }
 
     private List<FileAndBreakpoint> parseFileAndBreakpoints(File classesAndBreakpoints) {
+        if (classesAndBreakpoints == null) {
+            return null;
+        }
         try (BufferedReader br = new BufferedReader(new FileReader(classesAndBreakpoints))) {
             List<FileAndBreakpoint> parsedFileAndBreakpoints = new ArrayList<>();
             for (String line; (line = br.readLine()) != null; ) {
@@ -85,6 +108,18 @@ public class EventProcessor {
                 parsedFileAndBreakpoints.add(fNB);
             }
             return parsedFileAndBreakpoints;
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private MethodForExitEvent parseMethodsForExitEvent(File methodsForExitEvent) {
+        if (methodsForExitEvent == null) {
+            return null;
+        }
+        try (JsonReader jr = new JsonReader(new FileReader(methodsForExitEvent))) {
+            Gson gson = new Gson();
+            return gson.fromJson(jr, MethodForExitEvent.class);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

@@ -5,10 +5,10 @@ import java.util.List;
 public class ReturnData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.RETURN;
     private final String methodName;
+    private final List<String> stackTrace;
     private final ValueWrapper value;
     private final String location;
     private final List<LocalVariableData> arguments;
-    private final List<String> stackTrace;
     private List<FieldData> fields = null;
 
     public ReturnData(
