@@ -23,4 +23,8 @@ public class ValueWrapper {
     public Object getAtomicValue() {
         return atomicValue;
     }
+
+    public List<?> getNestedObjects() {
+        return nestedObjects;
+    }
 }

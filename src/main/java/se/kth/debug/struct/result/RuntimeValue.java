@@ -1,11 +1,11 @@
 package se.kth.debug.struct.result;
 
+import java.util.List;
+
 public interface RuntimeValue {
     RuntimeValueKind getKind();
 
-    Long getID();
-
     ValueWrapper getValueWrapper();
 
-    void setValue(ValueWrapper value);
+    List<FieldData> getFields();
 }

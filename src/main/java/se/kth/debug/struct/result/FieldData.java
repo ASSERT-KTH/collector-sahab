@@ -5,32 +5,25 @@ import java.util.List;
 public class FieldData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.FIELD;
     private final String name;
-    private transient Long id = null;
-    private List<FieldData> nestedObjects = null;
-    private ValueWrapper value;
-
-    public FieldData(Long id, String name, ValueWrapper value) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
-    }
+    private final ValueWrapper value;
+    private List<FieldData> fields = null;
 
     public FieldData(String name, ValueWrapper value) {
         this.name = name;
         this.value = value;
     }
 
-    public void setNestedObjects(List<FieldData> nestedObjects) {
-        this.nestedObjects = nestedObjects;
+    public String getName() {
+        return name;
+    }
+
+    public void setFields(List<FieldData> fields) {
+        this.fields = fields;
     }
 
     @Override
     public RuntimeValueKind getKind() {
         return kind;
-    }
-
-    public Long getID() {
-        return id;
     }
 
     @Override
@@ -39,7 +32,7 @@ public class FieldData implements RuntimeValue {
     }
 
     @Override
-    public void setValue(ValueWrapper newValue) {
-        value = newValue;
+    public List<FieldData> getFields() {
+        return fields;
     }
 }

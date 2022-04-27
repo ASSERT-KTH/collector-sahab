@@ -8,14 +8,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import se.kth.debug.Utility.CallableWithIDOfValue;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.result.*;
 
@@ -26,7 +25,6 @@ public class Debugger {
     private final String[] pathToBuiltProject;
     private final String[] tests;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
-    private final List<CallableWithIDOfValue> callablesForCollection = new ArrayList<>();
 
     public Debugger(
             String[] pathToBuiltProject,
@@ -164,21 +162,6 @@ public class Debugger {
                 return stackFrameContexts;
             }
         }
-        try {
-            for (CallableWithIDOfValue c : callablesForCollection) {
-                ArrayReference array = ((ArrayReference) c.call());
-                stackFrameContexts.forEach(
-                        sfc ->
-                                sfc.replaceValue(
-                                        c.getId(),
-                                        constructArrayReference(array, c.getType(), context)));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            callablesForCollection.clear();
-        }
-
         return stackFrameContexts;
     }
 
@@ -204,25 +187,29 @@ public class Debugger {
     public ReturnData processMethodExit(MethodExitEvent mee, CollectorOptions context)
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
-        ValueWrapper returnValue = constructValue(mee.returnValue(), context);
         String location = mee.location().toString();
         List<LocalVariable> arguments = mee.method().arguments();
 
         ReturnData returnData =
                 new ReturnData(
-                        ((ObjectReference) mee.returnValue()).uniqueID(),
                         methodName,
-                        returnValue,
+                        constructValue(
+                                mee.returnValue(),
+                                mee.method().returnTypeName(),
+                                context.getObjectDepth(),
+                                context.getArrayDepth(),
+                                context),
                         location,
                         // the method will be in the 0th stack frame when the method exit event is
                         // triggered
                         collectArguments(mee.thread().frame(0), arguments, context),
                         computeStackTrace(mee.thread()));
         if (isAnObjectReference(mee.returnValue())) {
-            returnData.setNestedObjects(
+            returnData.setFields(
                     getNestedFields(
                             (ObjectReference) mee.returnValue(),
                             context.getObjectDepth(),
+                            context.getArrayDepth(),
                             context));
         }
         return returnData;
@@ -236,29 +223,6 @@ public class Debugger {
     private List<LocalVariableData> collectLocalVariable(
             StackFrame stackFrame, CollectorOptions context) throws AbsentInformationException {
         return parseVariable(stackFrame, stackFrame.visibleVariables(), context);
-    }
-
-    private ValueWrapper constructArrayReference(
-            ArrayReference array, String typeName, CollectorOptions context) {
-        List<Value> arrayValues =
-                array.getValues().stream()
-                        .limit(context.getNumberOfArrayElements())
-                        .collect(Collectors.toList());
-        List<Object> readableArrayValues =
-                arrayValues.stream().map(Debugger::getReadableValue).collect(Collectors.toList());
-        ValueWrapper topLevelArrayValue = new ValueWrapper(typeName, readableArrayValues);
-        if (arrayValues.size() > 0 && isAnObjectReference(arrayValues.get(0))) {
-            List<ValueWrapper> elementsInList = new ArrayList<>();
-            for (Value value : arrayValues) {
-                ValueWrapper valueWrapper = constructValue(value, context);
-                elementsInList.add(valueWrapper);
-                valueWrapper.setNestedObjects(
-                        getNestedFields(
-                                ((ObjectReference) value), context.getArrayDepth(), context));
-            }
-            topLevelArrayValue.setNestedObjects(elementsInList);
-        }
-        return topLevelArrayValue;
     }
 
     private static Object getReadableValue(Value value) {
@@ -288,46 +252,29 @@ public class Debugger {
         }
     }
 
-    private ValueWrapper constructValue(Value value, CollectorOptions context) {
-        if (value == null) {
-            return new ValueWrapper(null, null);
-        }
-        return new ValueWrapper(value.type().name(), getReadableValue(value));
-    }
-
     private List<LocalVariableData> parseVariable(
             StackFrame stackFrame, List<LocalVariable> variables, CollectorOptions context) {
         List<LocalVariableData> result = new ArrayList<>();
         for (LocalVariable variable : variables) {
             Value value = stackFrame.getValue(variable);
-            LocalVariableData localVariableData;
-            if (value instanceof ArrayReference) {
-                localVariableData =
-                        new LocalVariableData(
-                                variable.name(),
-                                constructArrayReference(
-                                        (ArrayReference) value, variable.typeName(), context));
-            } else if (isACollection(value)) {
-                localVariableData =
-                        new LocalVariableData(
-                                ((ObjectReference) value).uniqueID(),
-                                variable.name(),
-                                constructValue(value, context));
-                convertToArrayReference(stackFrame.thread(), value);
-            } else if (isAnObjectReference(value)) {
-                localVariableData =
-                        new LocalVariableData(
-                                ((ObjectReference) value).uniqueID(),
-                                variable.name(),
-                                constructValue(value, context));
-                localVariableData.setNestedObjects(
-                        getNestedFields(
-                                (ObjectReference) value, context.getObjectDepth(), context));
-            } else {
-                localVariableData =
-                        new LocalVariableData(variable.name(), constructValue(value, context));
-            }
+            LocalVariableData localVariableData =
+                    new LocalVariableData(
+                            variable.name(),
+                            constructValue(
+                                    value,
+                                    variable.typeName(),
+                                    context.getObjectDepth(),
+                                    context.getArrayDepth(),
+                                    context));
             result.add(localVariableData);
+            if (isAnObjectReference(value)) {
+                localVariableData.setFields(
+                        getNestedFields(
+                                (ObjectReference) value,
+                                context.getObjectDepth(),
+                                context.getArrayDepth(),
+                                context));
+            }
         }
         return result;
     }
@@ -348,35 +295,86 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            FieldData fieldData;
-            if (value instanceof ArrayReference) {
-                fieldData =
-                        new FieldData(
-                                field.name(),
-                                constructArrayReference(
-                                        (ArrayReference) value, field.typeName(), context));
-            } else if (isACollection(value)) {
-                fieldData =
-                        new FieldData(
-                                ((ObjectReference) value).uniqueID(),
-                                field.name(),
-                                constructValue(value, context));
-                convertToArrayReference(stackFrame.thread(), value);
-            } else if (isAnObjectReference(value)) {
-                fieldData = new FieldData(field.name(), constructValue(value, context));
-                fieldData.setNestedObjects(
+            FieldData fieldData =
+                    new FieldData(
+                            field.name(),
+                            constructValue(
+                                    value,
+                                    field.typeName(),
+                                    context.getObjectDepth(),
+                                    context.getArrayDepth(),
+                                    context));
+            if (isAnObjectReference(value)) {
+                fieldData.setFields(
                         getNestedFields(
-                                (ObjectReference) value, context.getObjectDepth(), context));
-            } else {
-                fieldData = new FieldData(field.name(), constructValue(value, context));
+                                (ObjectReference) value,
+                                context.getObjectDepth(),
+                                context.getArrayDepth(),
+                                context));
             }
             result.add(fieldData);
         }
         return result;
     }
 
-    private List<FieldData> getNestedFields(
-            ObjectReference object, int objectDepth, CollectorOptions context) {
+    private static ValueWrapper constructValue(
+            Value value,
+            String typeName,
+            int objectDepth,
+            int arrayDepth,
+            CollectorOptions context) {
+        if (value instanceof ArrayReference) {
+            List<Value> neededValues =
+                    ((ArrayReference) value)
+                            .getValues().stream()
+                                    .filter(Objects::nonNull)
+                                    .limit(context.getNumberOfArrayElements())
+                                    .collect(Collectors.toList());
+            ValueWrapper topLevelArrayWrtToRecursion =
+                    new ValueWrapper(
+                            typeName,
+                            neededValues.stream()
+                                    .map(Debugger::getReadableValue)
+                                    .collect(Collectors.toList()));
+            if (arrayDepth > 0) {
+                List<ValueWrapper> nestedObjects = new ArrayList<>();
+                for (Value nestedValue : neededValues) {
+                    if (nestedValue instanceof ArrayReference) {
+                        ValueWrapper vw =
+                                constructValue(
+                                        nestedValue,
+                                        nestedValue.type().name(),
+                                        objectDepth,
+                                        arrayDepth - 1,
+                                        context);
+                        nestedObjects.add(vw);
+                    } else if (isAnObjectReference(nestedValue)) {
+                        ValueWrapper vw =
+                                new ValueWrapper(
+                                        nestedValue.type().name(), getReadableValue(value));
+                        vw.setNestedObjects(
+                                getNestedFields(
+                                        (ObjectReference) nestedValue,
+                                        objectDepth - 1,
+                                        arrayDepth,
+                                        context));
+                        nestedObjects.add(vw);
+                    } else {
+                        ValueWrapper vw =
+                                new ValueWrapper(
+                                        nestedValue.type().name(), getReadableValue(nestedValue));
+                        nestedObjects.add(vw);
+                    }
+                }
+                topLevelArrayWrtToRecursion.setNestedObjects(nestedObjects);
+            }
+            return topLevelArrayWrtToRecursion;
+        }
+        return new ValueWrapper(typeName, getReadableValue(value));
+    }
+
+    private static List<FieldData> getNestedFields(
+            ObjectReference object, int objectDepth, int arrayDepth, CollectorOptions context) {
         if (objectDepth == 0) {
             return null;
         }
@@ -385,45 +383,19 @@ public class Debugger {
         for (Field field : fields) {
             Value value = object.getValue(field);
 
-            FieldData fieldData;
-            if (isACollection(value)) {
-                fieldData =
-                        new FieldData(
-                                ((ObjectReference) value).uniqueID(),
-                                field.name(),
-                                constructValue(value, context));
-            } else if (isAnObjectReference(value)) {
-                fieldData =
-                        new FieldData(
-                                ((ObjectReference) value).uniqueID(),
-                                field.name(),
-                                constructValue(value, context));
-                fieldData.setNestedObjects(
-                        getNestedFields((ObjectReference) value, objectDepth - 1, context));
-
-            } else {
-                fieldData = new FieldData(field.name(), constructValue(value, context));
-            }
+            FieldData fieldData =
+                    new FieldData(
+                            field.name(),
+                            constructValue(
+                                    value, field.typeName(), objectDepth, arrayDepth - 1, context));
             result.add(fieldData);
+            if (isAnObjectReference(value)) {
+                fieldData.setFields(
+                        getNestedFields(
+                                (ObjectReference) value, objectDepth - 1, arrayDepth, context));
+            }
         }
         return result;
-    }
-
-    private static boolean isACollection(Value value) {
-        if (!isAnObjectReference(value)) {
-            return false;
-        }
-        String className = ((ObjectReference) value).referenceType().name();
-        try {
-            return Collection.class.isAssignableFrom(Class.forName(className));
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-    private void convertToArrayReference(ThreadReference thread, Value value) {
-        CallableWithIDOfValue task = new CallableWithIDOfValue(thread, value);
-        callablesForCollection.add(task);
     }
 
     private static boolean isPrimitiveWrapper(Value value) {

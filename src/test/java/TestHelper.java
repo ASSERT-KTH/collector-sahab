@@ -1,6 +1,7 @@
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import se.kth.debug.CollectorOptions;
 
 public class TestHelper {
     public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT =
@@ -14,5 +15,15 @@ public class TestHelper {
                         buildDirectory.resolve("test-classes").toString(),
                         buildDirectory.resolve("dependency").toString());
         return classpath.toArray(new String[] {});
+    }
+
+    public static CollectorOptions getDefaultOptions() {
+        CollectorOptions context = new CollectorOptions();
+        context.setObjectDepth(0);
+        context.setStackTraceDepth(1);
+        context.setNumberOfArrayElements(10);
+        context.setArrayDepth(0);
+        context.setSkipPrintingField(false);
+        return context;
     }
 }
