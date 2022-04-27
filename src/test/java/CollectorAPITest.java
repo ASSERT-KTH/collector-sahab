@@ -3,7 +3,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assume.assumeFalse;
 
 import com.sun.jdi.AbsentInformationException;
 import java.io.File;
@@ -135,30 +134,94 @@ public class CollectorAPITest {
             assertThat(actualElements, equalTo(List.of("yes", "we", "can")));
         }
 
-        @Test
-        void invoke_nestedCollectionsAreRepresentedCorrectly() throws AbsentInformationException {
-            // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-            String[] tests = new String[] {"foo.CollectionsTest::test_returnFalsy"};
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT.resolve("collections").resolve("nested.txt").toFile();
+        @Nested
+        class NestedArraysAreRepresentedCorrectly {
+            private StackFrameContext arrangeAndAct(int arrayDepth)
+                    throws AbsentInformationException {
+                // arrange
+                String[] classpath =
+                        TestHelper.getMavenClasspathFromBuildDirectory(
+                                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+                String[] tests = new String[] {"foo.CollectionsTest::test_returnFalsy"};
+                File classesAndBreakpoints =
+                        TestHelper.PATH_TO_INPUT
+                                .resolve("collections")
+                                .resolve("nested.txt")
+                                .toFile();
 
-            // act
-            EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            TestHelper.getDefaultOptions());
+                // act
+                EventProcessor eventProcessor =
+                        Collector.invoke(
+                                classpath,
+                                tests,
+                                classesAndBreakpoints,
+                                setObjectAndArrayDepth(1, arrayDepth));
+                return eventProcessor.getBreakpointContexts().get(0).getStackFrameContexts().get(0);
+            }
 
-            BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
-            StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
-            List<RuntimeValue> runtimeValues = stackFrameContext.getRuntimeValueCollection();
+            @Test
+            void invoke_arrayDepth0() throws AbsentInformationException {
+                StackFrameContext sfc = arrangeAndAct(0);
+                List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
 
-            // assert
-            assumeFalse(true);
+                RuntimeValue primitiveIntArray = runtimeValueCollection.get(0);
+                assertThat(primitiveIntArray.getKind(), is(RuntimeValueKind.FIELD));
+                assertThat(
+                        primitiveIntArray.getValueWrapper().getAtomicValue(),
+                        equalTo(List.of("int[][]", "int[][]")));
+            }
+
+            @Test
+            void invoke_arrayDepth1() throws AbsentInformationException {
+                StackFrameContext sfc = arrangeAndAct(1);
+                List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
+
+                RuntimeValue primitiveIntArray = runtimeValueCollection.get(0);
+                List<?> nestedObjects = primitiveIntArray.getValueWrapper().getNestedObjects();
+
+                assertThat(nestedObjects.size(), equalTo(2));
+                assertThat(
+                        ((ValueWrapper) nestedObjects.get(0)).getAtomicValue(),
+                        equalTo(List.of("int[]", "int[]")));
+                assertThat(
+                        ((ValueWrapper) nestedObjects.get(1)).getAtomicValue(),
+                        equalTo(List.of("int[]", "int[]")));
+            }
+
+            @Test
+            void invoke_arrayDepth2() throws AbsentInformationException {
+                StackFrameContext sfc = arrangeAndAct(2);
+                List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
+
+                RuntimeValue primitiveIntArray = runtimeValueCollection.get(0);
+                List<?> nestedObject1 =
+                        ((ValueWrapper)
+                                        primitiveIntArray
+                                                .getValueWrapper()
+                                                .getNestedObjects()
+                                                .get(0))
+                                .getNestedObjects();
+                List<?> nestedObject2 =
+                        ((ValueWrapper)
+                                        primitiveIntArray
+                                                .getValueWrapper()
+                                                .getNestedObjects()
+                                                .get(1))
+                                .getNestedObjects();
+
+                assertThat(
+                        ((ValueWrapper) nestedObject1.get(0)).getAtomicValue(),
+                        equalTo(List.of(1)));
+                assertThat(
+                        ((ValueWrapper) nestedObject1.get(1)).getAtomicValue(),
+                        equalTo(List.of(2)));
+                assertThat(
+                        ((ValueWrapper) nestedObject2.get(0)).getAtomicValue(),
+                        equalTo(List.of(3, 4, 5)));
+                assertThat(
+                        ((ValueWrapper) nestedObject2.get(1)).getAtomicValue(),
+                        equalTo(List.of(5, 3)));
+            }
         }
     }
 }
