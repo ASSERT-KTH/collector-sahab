@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import se.kth.debug.Collector;
-import se.kth.debug.CollectorOptions;
 import se.kth.debug.EventProcessor;
 import se.kth.debug.struct.result.BreakPointContext;
 import se.kth.debug.struct.result.RuntimeValue;
@@ -19,16 +18,6 @@ import se.kth.debug.struct.result.RuntimeValueKind;
 import se.kth.debug.struct.result.StackFrameContext;
 
 public class CollectorAPITest {
-
-    private static CollectorOptions getDefaultOptions() {
-        CollectorOptions context = new CollectorOptions();
-        context.setObjectDepth(0);
-        context.setStackTraceDepth(1);
-        context.setNumberOfArrayElements(10);
-        context.setArrayDepth(0);
-        context.setSkipPrintingField(false);
-        return context;
-    }
 
     @Test
     void invoke_nonStaticFieldsOfStaticClassesShouldNotBeCollected()
@@ -43,7 +32,8 @@ public class CollectorAPITest {
 
         // act
         EventProcessor eventProcessor =
-                Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
+                Collector.invoke(
+                        classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
         BreakPointContext bp =
                 eventProcessor.getBreakpointContexts().stream()
                         .filter(bpc -> bpc.getLineNumber() == 24)
@@ -72,7 +62,11 @@ public class CollectorAPITest {
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            TestHelper.getDefaultOptions());
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
@@ -110,7 +104,11 @@ public class CollectorAPITest {
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            TestHelper.getDefaultOptions());
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
@@ -134,7 +132,11 @@ public class CollectorAPITest {
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(classpath, tests, classesAndBreakpoints, getDefaultOptions());
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            TestHelper.getDefaultOptions());
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
