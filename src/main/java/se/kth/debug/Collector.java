@@ -39,8 +39,8 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
     private static File classesAndBreakpoints = null;
 
-    @CommandLine.Option(names = "-ir", description = "File containing method names")
-    private static File methodNames = null;
+    @CommandLine.Option(names = "-m", description = "File containing method name")
+    private static File methodForExitEvent = null;
 
     @CommandLine.Option(
             names = "--object-depth",
@@ -78,7 +78,12 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(providedClasspath, tests, classesAndBreakpoints, methodNames, context);
+                invoke(
+                        providedClasspath,
+                        tests,
+                        classesAndBreakpoints,
+                        methodForExitEvent,
+                        context);
         write(eventProcessor);
         return 0;
     }
@@ -87,11 +92,12 @@ public class Collector implements Callable<Integer> {
             String[] providedClasspath,
             String[] tests,
             File classesAndBreakpoints,
-            File methodNames,
+            File methodForExitEvent,
             CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(providedClasspath, tests, classesAndBreakpoints, methodNames);
+                new EventProcessor(
+                        providedClasspath, tests, classesAndBreakpoints, methodForExitEvent);
         eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
@@ -109,13 +115,16 @@ public class Collector implements Callable<Integer> {
     }
 
     public static void write(EventProcessor eventProcessor) throws IOException {
-        if (!eventProcessor.getBreakpointContexts().isEmpty()) {
+        if (classesAndBreakpoints == null) {
+            logger.info(
+                    "Breakpoint data was not asked for. Please provide class names and line numbers if you desire otherwise.");
+        } else if (!eventProcessor.getBreakpointContexts().isEmpty()) {
             writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
             logger.info("Output file generated!");
         } else {
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
-        if (methodNames == null) {
+        if (methodForExitEvent == null) {
             logger.info(
                     "Return data was not asked for. Please provide method names if you desire otherwise.");
         } else if (!eventProcessor.getReturnValues().isEmpty()) {

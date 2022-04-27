@@ -1,5 +1,8 @@
 package se.kth.debug;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
 import gumtree.spoon.diff.operations.Operation;
@@ -39,6 +42,7 @@ public class MatchedLineFinder {
         CtMethod<?> methodLeft = findMethod(diff.getRootOperations());
         CtMethod<?> methodRight =
                 (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
+        writeMethodName(methodLeft);
         Set<Integer> matchedLinesLeft = getMatchedLines(diffLines, methodLeft);
         Set<Integer> matchedLinesRight = getMatchedLines(diffLines, methodRight);
         String fullyQualifiedNameOfContainerClass =
@@ -56,6 +60,15 @@ public class MatchedLineFinder {
                         StringUtils.join(matchedLinesRight, ","));
         writeToFile(outputLeft, "input-left.txt");
         writeToFile(outputRight, "input-right.txt");
+    }
+
+    private static void writeMethodName(CtMethod<?> method) throws IOException {
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonObject object = new JsonObject();
+        object.addProperty("name", method.getSimpleName());
+        object.addProperty("signature", method.getSignature());
+        object.addProperty("className", method.getDeclaringType().getQualifiedName());
+        writeToFile(gson.toJson(object), "method-name.txt");
     }
 
     private static Set<Integer> getDiffLines(List<Operation> rootOperations) {
