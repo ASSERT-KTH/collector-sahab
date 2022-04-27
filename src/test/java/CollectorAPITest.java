@@ -142,11 +142,12 @@ public class CollectorAPITest {
                 String[] classpath =
                         TestHelper.getMavenClasspathFromBuildDirectory(
                                 TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-                String[] tests = new String[] {"foo.CollectionsTest::test_returnFalsy"};
+                String[] tests =
+                        new String[] {"foo.CollectionsTest::test_canNestedArrayBeRepresented"};
                 File classesAndBreakpoints =
                         TestHelper.PATH_TO_INPUT
                                 .resolve("collections")
-                                .resolve("nested.txt")
+                                .resolve("nested-array.txt")
                                 .toFile();
 
                 // act
