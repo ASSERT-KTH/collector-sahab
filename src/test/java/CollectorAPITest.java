@@ -201,5 +201,55 @@ public class CollectorAPITest {
                 assertThat(nestedObject2.get(1).getValue(), equalTo(List.of(5, 3)));
             }
         }
+
+        @Test
+        void invoke_elementsInsideNestedSetAreRecorded() throws AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests =
+                    new String[] {"foo.CollectionsTest::test_canWeRepresentNestedCollection"};
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("collections")
+                            .resolve("nested-collection.txt")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(
+                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(8));
+
+            // assert
+            RuntimeValue onlyNestedSet =
+                    eventProcessor
+                            .getBreakpointContexts()
+                            .get(0)
+                            .getStackFrameContexts()
+                            .get(0)
+                            .getRuntimeValueCollection()
+                            .get(0);
+            ArrayElement innerMostSet =
+                    onlyNestedSet
+                            .getFields()
+                            .get(1)
+                            .getFields()
+                            .get(7)
+                            .getArrayElements()
+                            .get(0)
+                            .getFields()
+                            .get(1)
+                            .getFields()
+                            .get(1)
+                            .getFields()
+                            .get(7)
+                            .getArrayElements()
+                            .get(0);
+
+            assertThat(
+                    innerMostSet.getFields().get(1).getValue(),
+                    equalTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+        }
     }
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import foo.collections.NestedArray;
+import foo.collections.NestedCollection;
 import foo.collections.OneLevelCollections;
 import foo.collections.Primitive;
 
@@ -22,5 +23,10 @@ public class CollectionsTest {
     void test_canWePrintPrimitive() {
         Primitive.canWePrintPrimitive();
         assertTrue(true);
+    }
+
+    @Test
+    void test_canWeRepresentNestedCollection() {
+        assertTrue(NestedCollection.canWeRepresentNestedCollection());
     }
 }
