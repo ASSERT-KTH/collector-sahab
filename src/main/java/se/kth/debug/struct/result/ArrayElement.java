@@ -2,30 +2,16 @@ package se.kth.debug.struct.result;
 
 import java.util.List;
 
-public class FieldData implements RuntimeValue {
-    private final RuntimeValueKind kind = RuntimeValueKind.FIELD;
-    private final String name;
+public class ArrayElement implements RuntimeValue {
+    private final RuntimeValueKind kind = RuntimeValueKind.ARRAY_ELEMENT;
     private final String type;
     private final Object value;
     private List<FieldData> fields = null;
     private List<ArrayElement> arrayElements = null;
 
-    public FieldData(String name, String type, Object value) {
-        this.name = name;
+    public ArrayElement(String type, Object value) {
         this.type = type;
         this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setFields(List<FieldData> fields) {
-        this.fields = fields;
-    }
-
-    public void setArrayElements(List<ArrayElement> arrayElements) {
-        this.arrayElements = arrayElements;
     }
 
     @Override
@@ -46,5 +32,13 @@ public class FieldData implements RuntimeValue {
     @Override
     public List<ArrayElement> getArrayElements() {
         return arrayElements;
+    }
+
+    public void setArrayElements(List<ArrayElement> arrayElements) {
+        this.arrayElements = arrayElements;
+    }
+
+    public void setFields(List<FieldData> fields) {
+        this.fields = fields;
     }
 }
