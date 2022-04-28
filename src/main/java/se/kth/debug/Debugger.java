@@ -242,6 +242,8 @@ public class Debugger {
         return parseVariable(stackFrame, stackFrame.visibleVariables(), context);
     }
 
+    // We do not use recursion to compute representation of nested array elements because we need
+    // only the values at current level.
     private static Object computeReadableValue(Value value, CollectorOptions context) {
         if (value instanceof ArrayReference) {
             return getReadableValueOfArray((ArrayReference) value, context);
