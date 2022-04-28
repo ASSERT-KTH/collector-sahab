@@ -84,17 +84,14 @@ public class CollectorAPITest {
             assertThat(queue.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
             assertThat(arrayContainingQueueElements.getName(), equalTo("elements"));
             assertThat(
-                    arrayContainingQueueElements.getValueWrapper().getAtomicValue(),
-                    equalTo(List.of("Added at runtime")));
+                    arrayContainingQueueElements.getValue(), equalTo(List.of("Added at runtime")));
 
             RuntimeValue list = runtimeValues.get(1);
             FieldData arrayContainingListElements = list.getFields().get(1);
 
             assertThat(list.getKind(), is(RuntimeValueKind.FIELD));
             assertThat(arrayContainingListElements.getName(), equalTo("elements"));
-            assertThat(
-                    arrayContainingListElements.getValueWrapper().getAtomicValue(),
-                    equalTo(List.of(1, 2, 3, 4, 5)));
+            assertThat(arrayContainingListElements.getValue(), equalTo(List.of(1, 2, 3, 4, 5)));
 
             RuntimeValue set = runtimeValues.get(2);
             FieldData arrayContainingSetElements = set.getFields().get(1);
@@ -102,7 +99,7 @@ public class CollectorAPITest {
             assertThat(set.getKind(), is(RuntimeValueKind.FIELD));
             assertThat(arrayContainingSetElements.getName(), equalTo("elements"));
             assertThat(
-                    (List<String>) arrayContainingSetElements.getValueWrapper().getAtomicValue(),
+                    (List<String>) arrayContainingSetElements.getValue(),
                     containsInAnyOrder("aman", "sahab", "sharma"));
         }
 
@@ -131,8 +128,7 @@ public class CollectorAPITest {
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
             RuntimeValue thePrimitiveArray = stackFrameContext.getRuntimeValueCollection().get(0);
-            List<String> actualElements =
-                    (List<String>) thePrimitiveArray.getValueWrapper().getAtomicValue();
+            List<String> actualElements = (List<String>) thePrimitiveArray.getValue();
 
             // assert
             assertThat(actualElements, equalTo(List.of("yes", "we", "can")));
@@ -172,9 +168,7 @@ public class CollectorAPITest {
 
                 RuntimeValue primitiveIntArray = runtimeValueCollection.get(0);
                 assertThat(primitiveIntArray.getKind(), is(RuntimeValueKind.FIELD));
-                assertThat(
-                        primitiveIntArray.getValueWrapper().getAtomicValue(),
-                        equalTo(List.of("int[][]", "int[][]")));
+                assertThat(primitiveIntArray.getValue(), equalTo(List.of("int[][]", "int[][]")));
             }
 
             @Test
@@ -183,15 +177,11 @@ public class CollectorAPITest {
                 List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
 
                 RuntimeValue primitiveIntArray = runtimeValueCollection.get(0);
-                List<?> nestedObjects = primitiveIntArray.getValueWrapper().getNestedObjects();
+                List<ArrayElement> nestedObjects = primitiveIntArray.getArrayElements();
 
                 assertThat(nestedObjects.size(), equalTo(2));
-                assertThat(
-                        ((ValueWrapper) nestedObjects.get(0)).getAtomicValue(),
-                        equalTo(List.of("int[]", "int[]")));
-                assertThat(
-                        ((ValueWrapper) nestedObjects.get(1)).getAtomicValue(),
-                        equalTo(List.of("int[]", "int[]")));
+                assertThat(nestedObjects.get(0).getValue(), equalTo(List.of("int[]", "int[]")));
+                assertThat(nestedObjects.get(1).getValue(), equalTo(List.of("int[]", "int[]")));
             }
 
             @Test
@@ -200,33 +190,15 @@ public class CollectorAPITest {
                 List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
 
                 RuntimeValue primitiveIntArray = runtimeValueCollection.get(0);
-                List<?> nestedObject1 =
-                        ((ValueWrapper)
-                                        primitiveIntArray
-                                                .getValueWrapper()
-                                                .getNestedObjects()
-                                                .get(0))
-                                .getNestedObjects();
-                List<?> nestedObject2 =
-                        ((ValueWrapper)
-                                        primitiveIntArray
-                                                .getValueWrapper()
-                                                .getNestedObjects()
-                                                .get(1))
-                                .getNestedObjects();
+                List<ArrayElement> nestedObject1 =
+                        primitiveIntArray.getArrayElements().get(0).getArrayElements();
+                List<ArrayElement> nestedObject2 =
+                        primitiveIntArray.getArrayElements().get(1).getArrayElements();
 
-                assertThat(
-                        ((ValueWrapper) nestedObject1.get(0)).getAtomicValue(),
-                        equalTo(List.of(1)));
-                assertThat(
-                        ((ValueWrapper) nestedObject1.get(1)).getAtomicValue(),
-                        equalTo(List.of(2)));
-                assertThat(
-                        ((ValueWrapper) nestedObject2.get(0)).getAtomicValue(),
-                        equalTo(List.of(3, 4, 5)));
-                assertThat(
-                        ((ValueWrapper) nestedObject2.get(1)).getAtomicValue(),
-                        equalTo(List.of(5, 3)));
+                assertThat(nestedObject1.get(0).getValue(), equalTo(List.of(1)));
+                assertThat(nestedObject1.get(1).getValue(), equalTo(List.of(2)));
+                assertThat(nestedObject2.get(0).getValue(), equalTo(List.of(3, 4, 5)));
+                assertThat(nestedObject2.get(1).getValue(), equalTo(List.of(5, 3)));
             }
         }
     }

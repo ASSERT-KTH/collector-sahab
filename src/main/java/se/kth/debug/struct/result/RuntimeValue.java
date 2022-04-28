@@ -5,7 +5,9 @@ import java.util.List;
 public interface RuntimeValue {
     RuntimeValueKind getKind();
 
-    ValueWrapper getValueWrapper();
+    Object getValue();
 
     List<FieldData> getFields();
+
+    List<ArrayElement> getArrayElements();
 }

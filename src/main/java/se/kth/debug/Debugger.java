@@ -208,11 +208,8 @@ public class Debugger {
         ReturnData returnData =
                 new ReturnData(
                         methodName,
-                        constructValue(
-                                mee.returnValue(),
-                                mee.method().returnTypeName(),
-                                context.getExecutionDepth(),
-                                context),
+                        mee.method().returnTypeName(),
+                        computeReadableValue(mee.returnValue(), context),
                         location,
                         // the method will be in the 0th stack frame when the method exit event is
                         // triggered
@@ -222,6 +219,13 @@ public class Debugger {
             returnData.setFields(
                     getNestedFields(
                             (ObjectReference) mee.returnValue(),
+                            context.getExecutionDepth(),
+                            context));
+        }
+        if (mee.returnValue() instanceof ArrayReference) {
+            returnData.setArrayElements(
+                    getNestedElements(
+                            (ArrayReference) mee.returnValue(),
                             context.getExecutionDepth(),
                             context));
         }
@@ -236,6 +240,24 @@ public class Debugger {
     private List<LocalVariableData> collectLocalVariable(
             StackFrame stackFrame, CollectorOptions context) throws AbsentInformationException {
         return parseVariable(stackFrame, stackFrame.visibleVariables(), context);
+    }
+
+    // We do not use recursion to compute representation of nested array elements because we need
+    // only the values at current level.
+    private static Object computeReadableValue(Value value, CollectorOptions context) {
+        if (value instanceof ArrayReference) {
+            return getReadableValueOfArray((ArrayReference) value, context);
+        }
+        return getReadableValue(value);
+    }
+
+    private static List<Object> getReadableValueOfArray(
+            ArrayReference array, CollectorOptions context) {
+        return array.getValues().stream()
+                .filter(Objects::nonNull)
+                .limit(context.getNumberOfArrayElements())
+                .map(Debugger::getReadableValue)
+                .collect(Collectors.toList());
     }
 
     private static Object getReadableValue(Value value) {
@@ -273,16 +295,18 @@ public class Debugger {
             LocalVariableData localVariableData =
                     new LocalVariableData(
                             variable.name(),
-                            constructValue(
-                                    value,
-                                    variable.typeName(),
-                                    context.getExecutionDepth(),
-                                    context));
+                            variable.typeName(),
+                            computeReadableValue(value, context));
             result.add(localVariableData);
             if (isAnObjectReference(value)) {
                 localVariableData.setFields(
                         getNestedFields(
                                 (ObjectReference) value, context.getExecutionDepth(), context));
+            }
+            if (value instanceof ArrayReference) {
+                localVariableData.setArrayElements(
+                        getNestedElements(
+                                (ArrayReference) value, context.getExecutionDepth(), context));
             }
         }
         return result;
@@ -306,67 +330,57 @@ public class Debugger {
             }
             FieldData fieldData =
                     new FieldData(
-                            field.name(),
-                            constructValue(
-                                    value, field.typeName(), context.getExecutionDepth(), context));
+                            field.name(), field.typeName(), computeReadableValue(value, context));
             if (isAnObjectReference(value)) {
                 fieldData.setFields(
                         getNestedFields(
                                 (ObjectReference) value, context.getExecutionDepth(), context));
+            }
+            if (value instanceof ArrayReference) {
+                fieldData.setArrayElements(
+                        getNestedElements(
+                                (ArrayReference) value, context.getExecutionDepth(), context));
             }
             result.add(fieldData);
         }
         return result;
     }
 
-    private static ValueWrapper constructValue(
-            Value value, String typeName, int executionDepth, CollectorOptions context) {
-        if (value instanceof ArrayReference) {
-            List<Value> neededValues =
-                    ((ArrayReference) value)
-                            .getValues().stream()
-                                    .filter(Objects::nonNull)
-                                    .limit(context.getNumberOfArrayElements())
-                                    .collect(Collectors.toList());
-            ValueWrapper topLevelArrayWrtToRecursion =
-                    new ValueWrapper(
-                            typeName,
-                            neededValues.stream()
-                                    .map(Debugger::getReadableValue)
-                                    .collect(Collectors.toList()));
-            if (executionDepth > 0) {
-                List<ValueWrapper> nestedObjects = new ArrayList<>();
-                for (Value nestedValue : neededValues) {
-                    if (nestedValue instanceof ArrayReference) {
-                        ValueWrapper vw =
-                                constructValue(
-                                        nestedValue,
-                                        nestedValue.type().name(),
-                                        executionDepth - 1,
-                                        context);
-                        nestedObjects.add(vw);
-                    } else if (isAnObjectReference(nestedValue)) {
-                        ValueWrapper vw =
-                                new ValueWrapper(
-                                        nestedValue.type().name(), getReadableValue(value));
-                        vw.setNestedObjects(
-                                getNestedFields(
-                                        (ObjectReference) nestedValue,
-                                        executionDepth - 1,
-                                        context));
-                        nestedObjects.add(vw);
-                    } else {
-                        ValueWrapper vw =
-                                new ValueWrapper(
-                                        nestedValue.type().name(), getReadableValue(nestedValue));
-                        nestedObjects.add(vw);
-                    }
-                }
-                topLevelArrayWrtToRecursion.setNestedObjects(nestedObjects);
-            }
-            return topLevelArrayWrtToRecursion;
+    private static List<ArrayElement> getNestedElements(
+            ArrayReference array, int executionDepth, CollectorOptions context) {
+        if (executionDepth == 0) {
+            return null;
         }
-        return new ValueWrapper(typeName, getReadableValue(value));
+        List<ArrayElement> result = new ArrayList<>();
+        List<Value> neededValues =
+                array.getValues().stream()
+                        .filter(Objects::nonNull)
+                        .limit(context.getNumberOfArrayElements())
+                        .collect(Collectors.toList());
+        for (Value nestedValue : neededValues) {
+            if (nestedValue instanceof ArrayReference) {
+                ArrayElement arrayElement =
+                        new ArrayElement(
+                                nestedValue.type().name(),
+                                getReadableValueOfArray((ArrayReference) nestedValue, context));
+                result.add(arrayElement);
+                arrayElement.setArrayElements(
+                        getNestedElements(
+                                (ArrayReference) nestedValue, executionDepth - 1, context));
+            } else if (isAnObjectReference(nestedValue)) {
+                ArrayElement arrayElement =
+                        new ArrayElement(nestedValue.type().name(), getReadableValue(nestedValue));
+                result.add(arrayElement);
+                arrayElement.setFields(
+                        getNestedFields(
+                                (ObjectReference) nestedValue, executionDepth - 1, context));
+            } else {
+                ArrayElement arrayElement =
+                        new ArrayElement(nestedValue.type().name(), getReadableValue(nestedValue));
+                result.add(arrayElement);
+            }
+        }
+        return result;
     }
 
     private static List<FieldData> getNestedFields(
@@ -381,12 +395,15 @@ public class Debugger {
 
             FieldData fieldData =
                     new FieldData(
-                            field.name(),
-                            constructValue(value, field.typeName(), executionDepth - 1, context));
+                            field.name(), field.typeName(), computeReadableValue(value, context));
             result.add(fieldData);
             if (isAnObjectReference(value)) {
                 fieldData.setFields(
                         getNestedFields((ObjectReference) value, executionDepth - 1, context));
+            }
+            if (value instanceof ArrayReference) {
+                fieldData.setArrayElements(
+                        getNestedElements((ArrayReference) value, executionDepth - 1, context));
             }
         }
         return result;

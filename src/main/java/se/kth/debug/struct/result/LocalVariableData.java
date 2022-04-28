@@ -5,16 +5,23 @@ import java.util.List;
 public class LocalVariableData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.LOCAL_VARIABLE;
     private final String name;
-    private final ValueWrapper value;
+    private final String type;
+    private final Object value;
     private List<FieldData> fields = null;
+    private List<ArrayElement> arrayElements = null;
 
-    public LocalVariableData(String name, ValueWrapper value) {
+    public LocalVariableData(String name, String type, Object value) {
         this.name = name;
+        this.type = type;
         this.value = value;
     }
 
     public void setFields(List<FieldData> fields) {
         this.fields = fields;
+    }
+
+    public void setArrayElements(List<ArrayElement> arrayElements) {
+        this.arrayElements = arrayElements;
     }
 
     @Override
@@ -23,12 +30,17 @@ public class LocalVariableData implements RuntimeValue {
     }
 
     @Override
-    public ValueWrapper getValueWrapper() {
+    public Object getValue() {
         return value;
     }
 
     @Override
     public List<FieldData> getFields() {
         return fields;
+    }
+
+    @Override
+    public List<ArrayElement> getArrayElements() {
+        return arrayElements;
     }
 }
