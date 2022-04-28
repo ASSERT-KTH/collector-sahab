@@ -5,11 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.sun.jdi.AbsentInformationException;
 import java.io.*;
-import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import picocli.CommandLine;
-import se.kth.debug.struct.result.*;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
@@ -30,13 +28,13 @@ public class Collector implements Callable<Integer> {
     private String[] tests;
 
     @CommandLine.Option(names = "-o", description = "Path to output file (JSON)")
-    private static String collectedOutput;
+    private String collectedOutput;
 
     @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
-    private static File classesAndBreakpoints = null;
+    private File classesAndBreakpoints = null;
 
     @CommandLine.Option(names = "-m", description = "File containing method name")
-    private static File methodForExitEvent = null;
+    private File methodForExitEvent = null;
 
     @CommandLine.Option(
             names = "--stack-trace-depth",
@@ -104,7 +102,7 @@ public class Collector implements Callable<Integer> {
         return context;
     }
 
-    public static void write(EventProcessor eventProcessor) throws IOException {
+    public void write(EventProcessor eventProcessor) throws IOException {
         final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
         JsonObject output = new JsonObject();
 
