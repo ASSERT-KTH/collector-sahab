@@ -2,6 +2,7 @@ package se.kth.debug;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.sun.jdi.AbsentInformationException;
 import java.io.*;
 import java.util.*;
@@ -28,13 +29,8 @@ public class Collector implements Callable<Integer> {
             split = " ")
     private String[] tests;
 
-    @CommandLine.Option(names = "-b", description = "Path to output file (JSON)")
-    private static String breakpointJson;
-
-    @CommandLine.Option(
-            names = "-r",
-            description = "File containing all return values of methods in the provided class.")
-    private static String returnValueJson;
+    @CommandLine.Option(names = "-o", description = "Path to output file (JSON)")
+    private static String collectedOutput;
 
     @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
     private static File classesAndBreakpoints = null;
@@ -109,46 +105,36 @@ public class Collector implements Callable<Integer> {
     }
 
     public static void write(EventProcessor eventProcessor) throws IOException {
+        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        JsonObject output = new JsonObject();
+
         if (classesAndBreakpoints == null) {
             logger.info(
                     "Breakpoint data was not asked for. Please provide class names and line numbers if you desire otherwise.");
         } else if (!eventProcessor.getBreakpointContexts().isEmpty()) {
-            writeBreakpointsToFile(eventProcessor.getBreakpointContexts());
-            logger.info("Output file generated!");
+            output.add("breakpoint", gson.toJsonTree(eventProcessor.getBreakpointContexts()));
+            logger.info("Breakpoints serialised!");
         } else {
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
+
         if (methodForExitEvent == null) {
             logger.info(
                     "Return data was not asked for. Please provide method names if you desire otherwise.");
         } else if (!eventProcessor.getReturnValues().isEmpty()) {
-            writeReturnValuesToFile(eventProcessor.getReturnValues());
-            logger.info("Return values are output to the file!");
+            output.add("return", gson.toJsonTree(eventProcessor.getReturnValues()));
+            logger.info("Return values serialised!");
         } else {
             logger.info("No method exits were encountered.");
         }
-    }
 
-    private static void writeBreakpointsToFile(List<BreakPointContext> breakPointContext)
-            throws IOException {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-        File file = new File(breakpointJson);
+        File file = new File(collectedOutput);
         if (file.getParentFile() != null) {
             file.getParentFile().mkdirs();
         }
-        try (FileWriter writer = new FileWriter(breakpointJson)) {
-            writer.write(gson.toJson(breakPointContext));
-        }
-    }
-
-    private static void writeReturnValuesToFile(List<ReturnData> returnValues) throws IOException {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-        File file = new File(returnValueJson);
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
-        }
-        try (FileWriter writer = new FileWriter(returnValueJson)) {
-            writer.write(gson.toJson(returnValues));
+        try (FileWriter writer = new FileWriter(collectedOutput)) {
+            writer.write(gson.toJson(output));
+            logger.info("File output to: " + file.getAbsolutePath());
         }
     }
 }

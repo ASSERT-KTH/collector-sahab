@@ -62,8 +62,7 @@ public class CollectorTest {
     @Test
     void should_exitWithZero_withNonEmptyOutput(@TempDir Path tempDir) throws IOException {
         // arrange
-        Path breakpointJson = tempDir.resolve("output.json");
-        Path returnValueJson = tempDir.resolve("return.json");
+        Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
@@ -74,18 +73,14 @@ public class CollectorTest {
             StringUtils.join(classpath, " "),
             "-t",
             "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
-            "-b",
-            breakpointJson.toString(),
-            "-r",
-            returnValueJson.toString()
+            "-o",
+            outputJson.toString()
         };
 
         // assert
         ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
         assertEquals(0, exit.status);
-
-        assertNonEmptyFile(breakpointJson);
-        assertThat(returnValueJson.toFile(), not(anExistingFile()));
+        assertNonEmptyFile(outputJson);
     }
 
     private static void assertNonEmptyFile(Path pathToFile) throws IOException {
@@ -98,8 +93,7 @@ public class CollectorTest {
     @Test
     void should_exitWithNonZeroCode(@TempDir Path tempDir) {
         // arrange
-        Path breakpointJson = tempDir.resolve("output.json");
-        Path returnValueJson = tempDir.resolve("return.json");
+        Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("without-debug"));
@@ -110,17 +104,13 @@ public class CollectorTest {
             StringUtils.join(classpath, " "),
             "-t",
             "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
-            "-b",
-            breakpointJson.toString(),
-            "-r",
-            returnValueJson.toString()
+            "-o",
+            outputJson.toString(),
         };
 
         // assert
         ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
         assertNotEquals(0, exit.status);
-
-        assertThat(breakpointJson.toFile(), not(anExistingFile()));
-        assertThat(returnValueJson.toFile(), not(anExistingFile()));
+        assertThat(outputJson.toFile(), not(anExistingFile()));
     }
 }

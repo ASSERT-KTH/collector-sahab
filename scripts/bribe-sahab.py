@@ -57,8 +57,7 @@ def _run_collector_sahab(project, tests, revision, ref):
   ]
   test_methods = " ".join(tests)
   output_directory = _get_or_create_directory_for_creating_output_files(ref)
-  breakpoint_output = os.path.join(output_directory, "breakpoint", f"{revision.name.lower()}.json")
-  return_output = os.path.join(output_directory, "return", f"{revision.name.lower()}.json")
+  collector_sahab_output = os.path.join(output_directory, f"{revision.name.lower()}.json")
 
   cmd = (
     "java "
@@ -66,8 +65,7 @@ def _run_collector_sahab(project, tests, revision, ref):
     f"-i {revision.value.get_input_file()} "
     f"-p {' '.join(project_dependencies)} "
     f"-t {test_methods} "
-    f"-b {breakpoint_output} "
-    f"-r {return_output} "
+    f"-o {collector_sahab_output} "
     "-m method-name.txt"
   )
 
