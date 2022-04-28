@@ -19,10 +19,9 @@ public class TestHelper {
 
     public static CollectorOptions getDefaultOptions() {
         CollectorOptions context = new CollectorOptions();
-        context.setObjectDepth(0);
         context.setStackTraceDepth(1);
         context.setNumberOfArrayElements(10);
-        context.setArrayDepth(0);
+        context.setExecutionDepth(0);
         context.setSkipPrintingField(false);
         return context;
     }

@@ -49,10 +49,9 @@ public class CollectorAPITest {
     @Nested
     class RepresentingCollections {
 
-        private CollectorOptions setObjectAndArrayDepth(int objectDepth, int arrayDepth) {
+        private CollectorOptions setExecutionDepth(int executionDepth) {
             CollectorOptions context = TestHelper.getDefaultOptions();
-            context.setArrayDepth(arrayDepth);
-            context.setObjectDepth(objectDepth);
+            context.setExecutionDepth(executionDepth);
             return context;
         }
 
@@ -72,11 +71,7 @@ public class CollectorAPITest {
             // act
             EventProcessor eventProcessor =
                     Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            null,
-                            setObjectAndArrayDepth(1, 0));
+                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(1));
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
@@ -145,7 +140,7 @@ public class CollectorAPITest {
 
         @Nested
         class NestedArraysAreRepresentedCorrectly {
-            private StackFrameContext arrangeAndAct(int arrayDepth)
+            private StackFrameContext arrangeAndAct(int executionDepth)
                     throws AbsentInformationException {
                 // arrange
                 String[] classpath =
@@ -166,7 +161,7 @@ public class CollectorAPITest {
                                 tests,
                                 classesAndBreakpoints,
                                 null,
-                                setObjectAndArrayDepth(1, arrayDepth));
+                                setExecutionDepth(executionDepth));
                 return eventProcessor.getBreakpointContexts().get(0).getStackFrameContexts().get(0);
             }
 

@@ -211,8 +211,7 @@ public class Debugger {
                         constructValue(
                                 mee.returnValue(),
                                 mee.method().returnTypeName(),
-                                context.getObjectDepth(),
-                                context.getArrayDepth(),
+                                context.getExecutionDepth(),
                                 context),
                         location,
                         // the method will be in the 0th stack frame when the method exit event is
@@ -223,8 +222,7 @@ public class Debugger {
             returnData.setFields(
                     getNestedFields(
                             (ObjectReference) mee.returnValue(),
-                            context.getObjectDepth(),
-                            context.getArrayDepth(),
+                            context.getExecutionDepth(),
                             context));
         }
         return returnData;
@@ -278,17 +276,13 @@ public class Debugger {
                             constructValue(
                                     value,
                                     variable.typeName(),
-                                    context.getObjectDepth(),
-                                    context.getArrayDepth(),
+                                    context.getExecutionDepth(),
                                     context));
             result.add(localVariableData);
             if (isAnObjectReference(value)) {
                 localVariableData.setFields(
                         getNestedFields(
-                                (ObjectReference) value,
-                                context.getObjectDepth(),
-                                context.getArrayDepth(),
-                                context));
+                                (ObjectReference) value, context.getExecutionDepth(), context));
             }
         }
         return result;
@@ -314,18 +308,11 @@ public class Debugger {
                     new FieldData(
                             field.name(),
                             constructValue(
-                                    value,
-                                    field.typeName(),
-                                    context.getObjectDepth(),
-                                    context.getArrayDepth(),
-                                    context));
+                                    value, field.typeName(), context.getExecutionDepth(), context));
             if (isAnObjectReference(value)) {
                 fieldData.setFields(
                         getNestedFields(
-                                (ObjectReference) value,
-                                context.getObjectDepth(),
-                                context.getArrayDepth(),
-                                context));
+                                (ObjectReference) value, context.getExecutionDepth(), context));
             }
             result.add(fieldData);
         }
@@ -333,11 +320,7 @@ public class Debugger {
     }
 
     private static ValueWrapper constructValue(
-            Value value,
-            String typeName,
-            int objectDepth,
-            int arrayDepth,
-            CollectorOptions context) {
+            Value value, String typeName, int executionDepth, CollectorOptions context) {
         if (value instanceof ArrayReference) {
             List<Value> neededValues =
                     ((ArrayReference) value)
@@ -351,7 +334,7 @@ public class Debugger {
                             neededValues.stream()
                                     .map(Debugger::getReadableValue)
                                     .collect(Collectors.toList()));
-            if (arrayDepth > 0) {
+            if (executionDepth > 0) {
                 List<ValueWrapper> nestedObjects = new ArrayList<>();
                 for (Value nestedValue : neededValues) {
                     if (nestedValue instanceof ArrayReference) {
@@ -359,8 +342,7 @@ public class Debugger {
                                 constructValue(
                                         nestedValue,
                                         nestedValue.type().name(),
-                                        objectDepth,
-                                        arrayDepth - 1,
+                                        executionDepth - 1,
                                         context);
                         nestedObjects.add(vw);
                     } else if (isAnObjectReference(nestedValue)) {
@@ -370,8 +352,7 @@ public class Debugger {
                         vw.setNestedObjects(
                                 getNestedFields(
                                         (ObjectReference) nestedValue,
-                                        objectDepth - 1,
-                                        arrayDepth,
+                                        executionDepth - 1,
                                         context));
                         nestedObjects.add(vw);
                     } else {
@@ -389,8 +370,8 @@ public class Debugger {
     }
 
     private static List<FieldData> getNestedFields(
-            ObjectReference object, int objectDepth, int arrayDepth, CollectorOptions context) {
-        if (objectDepth == 0) {
+            ObjectReference object, int executionDepth, CollectorOptions context) {
+        if (executionDepth == 0) {
             return null;
         }
         List<FieldData> result = new ArrayList<>();
@@ -401,13 +382,11 @@ public class Debugger {
             FieldData fieldData =
                     new FieldData(
                             field.name(),
-                            constructValue(
-                                    value, field.typeName(), objectDepth, arrayDepth - 1, context));
+                            constructValue(value, field.typeName(), executionDepth - 1, context));
             result.add(fieldData);
             if (isAnObjectReference(value)) {
                 fieldData.setFields(
-                        getNestedFields(
-                                (ObjectReference) value, objectDepth - 1, arrayDepth, context));
+                        getNestedFields((ObjectReference) value, executionDepth - 1, context));
             }
         }
         return result;

@@ -43,11 +43,6 @@ public class Collector implements Callable<Integer> {
     private static File methodForExitEvent = null;
 
     @CommandLine.Option(
-            names = "--object-depth",
-            description = "Nesting level of object required (default: ${DEFAULT-VALUE}).")
-    private int objectDepth = 0;
-
-    @CommandLine.Option(
             names = "--stack-trace-depth",
             description =
                     "The depth of stack trace the data needs to be collected from (default: ${DEFAULT-VALUE}).")
@@ -60,9 +55,9 @@ public class Collector implements Callable<Integer> {
     private int numberOfArrayElements = 10;
 
     @CommandLine.Option(
-            names = "--array-depth",
+            names = "--execution-depth",
             description = "The depth of each element inside an array (default: ${DEFAULT-VALUE}).")
-    private int arrayDepth = 0;
+    private int executionDepth = 0;
 
     @CommandLine.Option(
             names = "--skip-printing-field",
@@ -105,10 +100,9 @@ public class Collector implements Callable<Integer> {
 
     private CollectorOptions getCollectorOptions() {
         CollectorOptions context = new CollectorOptions();
-        context.setObjectDepth(objectDepth);
         context.setStackTraceDepth(stackTraceDepth);
         context.setNumberOfArrayElements(numberOfArrayElements);
-        context.setArrayDepth(arrayDepth);
+        context.setExecutionDepth(executionDepth);
         context.setSkipPrintingField(skipPrintingField);
 
         return context;
