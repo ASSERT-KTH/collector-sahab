@@ -16,6 +16,12 @@ import se.kth.debug.struct.result.*;
 
 public class CollectorAPITest {
 
+    private static CollectorOptions setExecutionDepth(int executionDepth) {
+        CollectorOptions context = TestHelper.getDefaultOptions();
+        context.setExecutionDepth(executionDepth);
+        return context;
+    }
+
     @Test
     void invoke_nonStaticFieldsOfStaticClassesShouldNotBeCollected()
             throws AbsentInformationException {
@@ -48,13 +54,6 @@ public class CollectorAPITest {
 
     @Nested
     class RepresentingCollections {
-
-        private CollectorOptions setExecutionDepth(int executionDepth) {
-            CollectorOptions context = TestHelper.getDefaultOptions();
-            context.setExecutionDepth(executionDepth);
-            return context;
-        }
-
         @Test
         void invoke_recordValuesFromArrayFieldInsideCollection() throws AbsentInformationException {
             // arrange
@@ -250,6 +249,36 @@ public class CollectorAPITest {
             assertThat(
                     innerMostSet.getFields().get(1).getValue(),
                     equalTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+        }
+    }
+
+    @Nested
+    class RepresentingObjects {
+        @Test
+        void fieldInsideAOneLevelObjectShouldBeRecorded() throws AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.ObjectsTest::justOneLevel"};
+            File methodName =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("return")
+                            .resolve("one-level-nested-object.txt")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(classpath, tests, null, methodName, setExecutionDepth(1));
+
+            // assert
+            RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
+            assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));
+            assertThat(returnValue.getFields().size(), equalTo(1));
+
+            FieldData field = returnValue.getFields().get(0);
+            assertThat(field.getName(), equalTo("sides"));
+            assertThat(field.getValue(), equalTo(3));
         }
     }
 }
