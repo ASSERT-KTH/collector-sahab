@@ -66,7 +66,6 @@ public class MatchedLineFinder {
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonObject object = new JsonObject();
         object.addProperty("name", method.getSimpleName());
-        object.addProperty("signature", method.getSignature());
         object.addProperty("className", method.getDeclaringType().getQualifiedName());
         writeToFile(gson.toJson(object), "method-name.txt");
     }

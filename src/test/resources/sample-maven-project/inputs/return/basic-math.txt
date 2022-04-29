@@ -1,5 +1,4 @@
 {
   "name": "add",
-  "signature": "add(int,int)",
   "className": "foo.BasicMath"
 }
