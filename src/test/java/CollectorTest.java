@@ -74,7 +74,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
+            TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
@@ -105,7 +105,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("without-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
+            TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
@@ -131,7 +131,7 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
+                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -163,7 +163,7 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-m",
-                TestHelper.PATH_TO_INPUT.resolve("return").resolve("basic-math.txt").toString(),
+                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -195,9 +195,9 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
+                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
                 "-m",
-                TestHelper.PATH_TO_INPUT.resolve("return").resolve("basic-math.txt").toString(),
+                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",

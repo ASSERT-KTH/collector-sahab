@@ -34,6 +34,11 @@ public class ArrayElement implements RuntimeValue {
         return arrayElements;
     }
 
+    @Override
+    public String getName() {
+        return null;
+    }
+
     public void setArrayElements(List<ArrayElement> arrayElements) {
         this.arrayElements = arrayElements;
     }

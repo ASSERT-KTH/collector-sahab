@@ -16,6 +16,12 @@ import se.kth.debug.struct.result.*;
 
 public class CollectorAPITest {
 
+    private static CollectorOptions setExecutionDepth(int executionDepth) {
+        CollectorOptions context = TestHelper.getDefaultOptions();
+        context.setExecutionDepth(executionDepth);
+        return context;
+    }
+
     @Test
     void invoke_nonStaticFieldsOfStaticClassesShouldNotBeCollected()
             throws AbsentInformationException {
@@ -25,7 +31,7 @@ public class CollectorAPITest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.StaticClassFieldTest::test_doSomething"};
         File classesAndBreakpoints =
-                TestHelper.PATH_TO_INPUT.resolve("static-class-field.txt").toFile();
+                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("static-class-field.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
@@ -48,13 +54,6 @@ public class CollectorAPITest {
 
     @Nested
     class RepresentingCollections {
-
-        private CollectorOptions setExecutionDepth(int executionDepth) {
-            CollectorOptions context = TestHelper.getDefaultOptions();
-            context.setExecutionDepth(executionDepth);
-            return context;
-        }
-
         @Test
         void invoke_recordValuesFromArrayFieldInsideCollection() throws AbsentInformationException {
             // arrange
@@ -63,7 +62,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_returnTruthy"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
+                    TestHelper.PATH_TO_BREAKPOINT_INPUT
                             .resolve("collections")
                             .resolve("one-level.txt")
                             .toFile();
@@ -111,7 +110,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_canWePrintPrimitive"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
+                    TestHelper.PATH_TO_BREAKPOINT_INPUT
                             .resolve("collections")
                             .resolve("primitive.txt")
                             .toFile();
@@ -145,7 +144,7 @@ public class CollectorAPITest {
                 String[] tests =
                         new String[] {"foo.CollectionsTest::test_canNestedArrayBeRepresented"};
                 File classesAndBreakpoints =
-                        TestHelper.PATH_TO_INPUT
+                        TestHelper.PATH_TO_BREAKPOINT_INPUT
                                 .resolve("collections")
                                 .resolve("nested-array.txt")
                                 .toFile();
@@ -211,7 +210,7 @@ public class CollectorAPITest {
             String[] tests =
                     new String[] {"foo.CollectionsTest::test_canWeRepresentNestedCollection"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
+                    TestHelper.PATH_TO_BREAKPOINT_INPUT
                             .resolve("collections")
                             .resolve("nested-collection.txt")
                             .toFile();
@@ -250,6 +249,77 @@ public class CollectorAPITest {
             assertThat(
                     innerMostSet.getFields().get(1).getValue(),
                     equalTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+        }
+    }
+
+    @Nested
+    class RepresentingObjects {
+        @Test
+        void fieldInsideAOneLevelObjectShouldBeRecorded() throws AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.ObjectsTest::justOneLevel"};
+            File methodName =
+                    TestHelper.PATH_TO_RETURN_INPUT
+                            .resolve("one-level-nested-object.json")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(classpath, tests, null, methodName, setExecutionDepth(1));
+
+            // assert
+            RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
+            assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));
+            assertThat(returnValue.getFields().size(), equalTo(1));
+
+            FieldData field = returnValue.getFields().get(0);
+            assertThat(field.getName(), equalTo("sides"));
+            assertThat(field.getValue(), equalTo(3));
+        }
+
+        @Test
+        void fieldInsideMultipleLevelNestedObjectShouldBeRecorded()
+                throws AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.ObjectsTest::maybeTwoMoreLevels"};
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                            .resolve("multiple-level-nested-object.txt")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(
+                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(3));
+
+            // assert
+            RuntimeValue field =
+                    eventProcessor
+                            .getBreakpointContexts()
+                            .get(0)
+                            .getStackFrameContexts()
+                            .get(0)
+                            .getRuntimeValueCollection()
+                            .get(0);
+
+            RuntimeValue oneLevelDeep = field.getFields().get(0);
+            assertThat(oneLevelDeep.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(oneLevelDeep.getName(), equalTo("z"));
+
+            RuntimeValue twoLevelsDeep = oneLevelDeep.getFields().get(0);
+            assertThat(twoLevelsDeep.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(twoLevelsDeep.getName(), equalTo("y"));
+
+            RuntimeValue threeLevelsDeep = twoLevelsDeep.getFields().get(0);
+            assertThat(threeLevelsDeep.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(threeLevelsDeep.getName(), equalTo("x"));
+            assertThat(threeLevelsDeep.getValue(), equalTo(42));
         }
     }
 }

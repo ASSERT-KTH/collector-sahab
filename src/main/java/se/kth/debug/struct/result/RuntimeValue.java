@@ -10,4 +10,6 @@ public interface RuntimeValue {
     List<FieldData> getFields();
 
     List<ArrayElement> getArrayElements();
+
+    String getName();
 }

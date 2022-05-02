@@ -6,7 +6,9 @@ import se.kth.debug.CollectorOptions;
 public class TestHelper {
     public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT =
             Paths.get("src/test/resources/sample-maven-project");
-    public static final Path PATH_TO_INPUT = PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("inputs");
+    private static final Path PATH_TO_INPUT = PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("inputs");
+    public static final Path PATH_TO_BREAKPOINT_INPUT = PATH_TO_INPUT.resolve("breakpoint");
+    public static final Path PATH_TO_RETURN_INPUT = PATH_TO_INPUT.resolve("return");
 
     public static String[] getMavenClasspathFromBuildDirectory(Path buildDirectory) {
         List<String> classpath =
