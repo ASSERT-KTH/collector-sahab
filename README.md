@@ -42,10 +42,13 @@ There are two ways to achieve this:
       $ java -jar/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar \
            -p [path/to/all/classes/required ...]
            -t [classname::testMethod ...]
-           -i <path/to/input/file>
-           -b <path/to/breakpoint/file>
-           -r <path/to/return/file>
-           --object-depth (default=1)
+           -i <path/to/input/breakpoint/file>
+           -m <path/to/input/return/file>
+           -o <path/to/output>
+           --execution-depth (default=0)
+           --number-of-array-elements (default=10)
+           --skip-printing-field (default=false)
+           --stack-trace-depth (default=0)
       ```
 
 ## Scripts
