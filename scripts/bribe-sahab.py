@@ -5,7 +5,7 @@ import subprocess
 from revision import REVISION
 from compile_target import compile
 
-COLLECTOR_JAR = "/home/assert/Desktop/assert-achievements/collector-sahab/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar"
+COLLECTOR_JAR = "/home/assert/Desktop/assert-achievements/collector-sahab/target/collector-sahab-1.0-SNAPSHOT-jar-with-dependencies.jar"
 OUTPUT_DIRECTORY = "/home/assert/Desktop/experiments/drr-as-pr/"
 
 class VerifyDirectory(argparse.Action):

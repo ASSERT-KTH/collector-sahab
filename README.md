@@ -39,7 +39,7 @@ There are two ways to achieve this:
       ```
    2. Run the process
       ```bash
-      $ java -jar/target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar \
+      $ java -jar/target/collector-sahab-1.0-SNAPSHOT-jar-with-dependencies.jar \
            -p [path/to/all/classes/required ...]
            -t [classname::testMethod ...]
            -i <path/to/input/breakpoint/file>
@@ -65,7 +65,7 @@ It takes in exactly four arguments in the specified order:
 
 **Example execution**
 ```bash
-java -cp target/debugger-1.0-SNAPSHOT-jar-with-dependencies.jar se.kth.debug.MatchedLineFinder /home/assert/Desktop/experiments/drr-as-pr/Time-11 DateTimeZoneBuilder.java e5d67a8162aebb7dbd5df8cdc21442ef111d2ba1 1c04679173a46faa59e73f68def33f60843f8beb
+java -cp target/collector-sahab-1.0-SNAPSHOT-jar-with-dependencies.jar se.kth.debug.MatchedLineFinder /home/assert/Desktop/experiments/drr-as-pr/Time-11 DateTimeZoneBuilder.java e5d67a8162aebb7dbd5df8cdc21442ef111d2ba1 1c04679173a46faa59e73f68def33f60843f8beb
 ```
 
 > Runs as a part of `script/bribe-sahab.py`
