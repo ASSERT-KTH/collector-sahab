@@ -280,5 +280,37 @@ public class CollectorAPITest {
             assertThat(field.getName(), equalTo("sides"));
             assertThat(field.getValue(), equalTo(3));
         }
+
+        @Test
+        void fieldInsideMultipleLevelNestedObjectShouldBeRecorded()
+                throws AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.ObjectsTest::maybeTwoMoreLevels"};
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT.resolve("multiple-level-nested-object.txt").toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(
+                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(3));
+
+            // assert
+            RuntimeValue field =
+                    eventProcessor
+                            .getBreakpointContexts()
+                            .get(0)
+                            .getStackFrameContexts()
+                            .get(0)
+                            .getRuntimeValueCollection()
+                            .get(0);
+            RuntimeValue threeLevelsDeep = field.getFields().get(0).getFields().get(0).getFields().get(0);
+
+            assertThat(threeLevelsDeep.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(threeLevelsDeep.getName(), equalTo("x"));
+            assertThat(threeLevelsDeep.getValue(), equalTo(42));
+        }
     }
 }

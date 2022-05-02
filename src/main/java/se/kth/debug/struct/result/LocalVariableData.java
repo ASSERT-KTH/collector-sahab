@@ -43,4 +43,9 @@ public class LocalVariableData implements RuntimeValue {
     public List<ArrayElement> getArrayElements() {
         return arrayElements;
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

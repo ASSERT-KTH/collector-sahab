@@ -55,4 +55,9 @@ public class ReturnData implements RuntimeValue {
     public List<ArrayElement> getArrayElements() {
         return arrayElements;
     }
+
+    @Override
+    public String getName() {
+        return methodName;
+    }
 }
