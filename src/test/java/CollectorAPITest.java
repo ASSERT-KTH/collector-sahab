@@ -262,7 +262,9 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::justOneLevel"};
             File methodName =
-                    TestHelper.PATH_TO_RETURN_INPUT.resolve("one-level-nested-object.txt").toFile();
+                    TestHelper.PATH_TO_RETURN_INPUT
+                            .resolve("one-level-nested-object.json")
+                            .toFile();
 
             // act
             EventProcessor eventProcessor =
