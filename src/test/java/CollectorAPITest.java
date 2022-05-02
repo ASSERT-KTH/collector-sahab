@@ -307,9 +307,16 @@ public class CollectorAPITest {
                             .get(0)
                             .getRuntimeValueCollection()
                             .get(0);
-            RuntimeValue threeLevelsDeep =
-                    field.getFields().get(0).getFields().get(0).getFields().get(0);
 
+            RuntimeValue oneLevelDeep = field.getFields().get(0);
+            assertThat(oneLevelDeep.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(oneLevelDeep.getName(), equalTo("z"));
+
+            RuntimeValue twoLevelsDeep = oneLevelDeep.getFields().get(0);
+            assertThat(twoLevelsDeep.getKind(), is(RuntimeValueKind.FIELD));
+            assertThat(twoLevelsDeep.getName(), equalTo("y"));
+
+            RuntimeValue threeLevelsDeep = twoLevelsDeep.getFields().get(0);
             assertThat(threeLevelsDeep.getKind(), is(RuntimeValueKind.FIELD));
             assertThat(threeLevelsDeep.getName(), equalTo("x"));
             assertThat(threeLevelsDeep.getValue(), equalTo(42));
