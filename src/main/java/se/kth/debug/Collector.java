@@ -113,6 +113,7 @@ public class Collector implements Callable<Integer> {
             output.add("breakpoint", gson.toJsonTree(eventProcessor.getBreakpointContexts()));
             logger.info("Breakpoints serialised!");
         } else {
+            output.add("breakpoint", gson.toJsonTree(eventProcessor.getBreakpointContexts()));
             logger.info("Output file was not generated as breakpoints were not visited.");
         }
 
@@ -123,6 +124,7 @@ public class Collector implements Callable<Integer> {
             output.add("return", gson.toJsonTree(eventProcessor.getReturnValues()));
             logger.info("Return values serialised!");
         } else {
+            output.add("return", gson.toJsonTree(eventProcessor.getReturnValues()));
             logger.info("No method exits were encountered.");
         }
 

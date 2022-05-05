@@ -223,7 +223,7 @@ public class CollectorTest {
     }
 
     @Test
-    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) throws IOException {
+    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
@@ -243,13 +243,9 @@ public class CollectorTest {
         };
 
         // act
-        assertThrows(ExitException.class, () -> Collector.main(args));
+        ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
 
         // assert
-        try (JsonReader jsonReader = new JsonReader(new FileReader(outputJson.toFile()))) {
-            final Gson gson = new Gson();
-            Object json = gson.fromJson(jsonReader, Object.class);
-            assertThat(((LinkedTreeMap<?, ?>) json).size(), equalTo(0));
-        }
+        assertThat(exit.status, equalTo(0));
     }
 }
