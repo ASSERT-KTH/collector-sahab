@@ -231,7 +231,9 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("zero-breakpoints-basic-math.txt").toString(),
+            TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    .resolve("zero-breakpoints-basic-math.txt")
+                    .toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
