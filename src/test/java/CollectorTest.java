@@ -221,4 +221,33 @@ public class CollectorTest {
             }
         }
     }
+
+    @Test
+    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) throws IOException {
+        // arrange
+        Path outputJson = tempDir.resolve("output.json");
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] args = {
+            "-i",
+            TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("zero-breakpoints-basic-math.txt").toString(),
+            "-p",
+            StringUtils.join(classpath, " "),
+            "-t",
+            "foo.BasicMathTest::test_add",
+            "-o",
+            outputJson.toString()
+        };
+
+        // act
+        assertThrows(ExitException.class, () -> Collector.main(args));
+
+        // assert
+        try (JsonReader jsonReader = new JsonReader(new FileReader(outputJson.toFile()))) {
+            final Gson gson = new Gson();
+            Object json = gson.fromJson(jsonReader, Object.class);
+            assertThat(((LinkedTreeMap<?, ?>) json).size(), equalTo(0));
+        }
+    }
 }
