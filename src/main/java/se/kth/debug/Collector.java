@@ -114,7 +114,7 @@ public class Collector implements Callable<Integer> {
             logger.info("Breakpoints serialised!");
         } else {
             output.add("breakpoint", gson.toJsonTree(eventProcessor.getBreakpointContexts()));
-            logger.info("Output file was not generated as breakpoints were not visited.");
+            logger.info("Output file was not generated as breakpoints were not encountered.");
         }
 
         if (methodForExitEvent == null) {
