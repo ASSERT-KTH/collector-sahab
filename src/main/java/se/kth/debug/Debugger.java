@@ -280,6 +280,8 @@ public class Debugger {
             return ((CharValue) value).value();
         } else if (value instanceof ByteValue) {
             return ((ByteValue) value).value();
+        } else if (value instanceof DoubleValue) {
+            return ((DoubleValue) value).value();
         } else if (isPrimitiveWrapper(value)) {
             Field field = ((ObjectReference) value).referenceType().fieldByName("value");
             Value nestedValue = ((ObjectReference) value).getValue(field);
