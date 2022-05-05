@@ -2,6 +2,7 @@ package se.kth.debug;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
@@ -14,7 +15,6 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtClass;
@@ -48,18 +48,8 @@ public class MatchedLineFinder {
         String fullyQualifiedNameOfContainerClass =
                 methodLeft.getParent(CtClass.class).getQualifiedName();
 
-        String outputLeft =
-                String.format(
-                        "%s=%s%n",
-                        fullyQualifiedNameOfContainerClass,
-                        StringUtils.join(matchedLinesLeft, ","));
-        String outputRight =
-                String.format(
-                        "%s=%s%n",
-                        fullyQualifiedNameOfContainerClass,
-                        StringUtils.join(matchedLinesRight, ","));
-        writeToFile(outputLeft, "input-left.txt");
-        writeToFile(outputRight, "input-right.txt");
+        createInputFile(fullyQualifiedNameOfContainerClass, matchedLinesLeft, "input-left.txt");
+        createInputFile(fullyQualifiedNameOfContainerClass, matchedLinesRight, "input-right.txt");
     }
 
     private static void writeMethodName(CtMethod<?> method) throws IOException {
@@ -67,7 +57,9 @@ public class MatchedLineFinder {
         JsonObject object = new JsonObject();
         object.addProperty("name", method.getSimpleName());
         object.addProperty("className", method.getDeclaringType().getQualifiedName());
-        writeToFile(gson.toJson(object), "method-name.txt");
+        try (FileWriter writer = new FileWriter("method-name.txt")) {
+            writer.write(gson.toJson(object));
+        }
     }
 
     private static Set<Integer> getDiffLines(List<Operation> rootOperations) {
@@ -190,9 +182,19 @@ public class MatchedLineFinder {
         return new File(revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
     }
 
-    private static void writeToFile(String content, String filename) throws IOException {
+    private static void createInputFile(
+            String fullyQualifiedClassName, Set<Integer> breakpoints, String filename)
+            throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        JsonArray array = new JsonArray();
+        JsonObject object = new JsonObject();
+        object.addProperty("fileName", fullyQualifiedClassName);
+        object.add("breakpoints", gson.toJsonTree(breakpoints));
+        array.add(object);
+
         try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(content);
+            writer.write(gson.toJson(array));
         }
     }
 }

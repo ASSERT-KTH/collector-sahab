@@ -1,15 +1,14 @@
 package se.kth.debug;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.MethodForExitEvent;
 import se.kth.debug.struct.result.BreakPointContext;
@@ -94,20 +93,9 @@ public class EventProcessor {
         if (classesAndBreakpoints == null) {
             return null;
         }
-        try (BufferedReader br = new BufferedReader(new FileReader(classesAndBreakpoints))) {
-            List<FileAndBreakpoint> parsedFileAndBreakpoints = new ArrayList<>();
-            for (String line; (line = br.readLine()) != null; ) {
-                String[] fileAndBreakpoints = line.split("=");
-                String[] breakpoints = fileAndBreakpoints[1].split(",");
-                List<Integer> parsedBreakpoints =
-                        Arrays.stream(breakpoints)
-                                .map(Integer::parseInt)
-                                .collect(Collectors.toList());
-                FileAndBreakpoint fNB =
-                        new FileAndBreakpoint(fileAndBreakpoints[0], parsedBreakpoints);
-                parsedFileAndBreakpoints.add(fNB);
-            }
-            return parsedFileAndBreakpoints;
+        try (JsonReader jr = new JsonReader(new FileReader(classesAndBreakpoints))) {
+            Gson gson = new Gson();
+            return gson.fromJson(jr, new TypeToken<List<FileAndBreakpoint>>() {}.getType());
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

@@ -1,1 +1,6 @@
-foo.StaticClassField$Pair=15,24
+[
+    {
+        "fileName": "foo.StaticClassField$Pair",
+        "breakpoints": [15,24]
+    }
+]

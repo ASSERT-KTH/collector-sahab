@@ -1,1 +1,6 @@
-foo.objects.MultipleLevelNestedObject=6
+[
+    {
+        "fileName": "foo.objects.MultipleLevelNestedObject",
+        "breakpoints": [6]
+    }
+]

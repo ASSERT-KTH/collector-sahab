@@ -1,1 +1,6 @@
-foo.collections.NestedCollection=11
+[
+    {
+        "fileName": "foo.collections.NestedCollection",
+        "breakpoints": [11]
+    }
+]
