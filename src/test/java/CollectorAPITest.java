@@ -322,4 +322,22 @@ public class CollectorAPITest {
             assertThat(threeLevelsDeep.getValue(), equalTo(42));
         }
     }
+
+    @Test
+    void getReadableValue_voidValueShouldBeRecorded() throws AbsentInformationException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.VoidMethodTest::test_doNothing"};
+        File methodName = TestHelper.PATH_TO_RETURN_INPUT.resolve("void-method.json").toFile();
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath, tests, null, methodName, TestHelper.getDefaultOptions());
+
+        // assert
+        RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
+        assertThat(returnValue.getValue(), equalTo("<void value>"));
+    }
 }

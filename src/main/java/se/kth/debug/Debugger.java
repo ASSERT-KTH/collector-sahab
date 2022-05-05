@@ -282,6 +282,8 @@ public class Debugger {
             return ((ByteValue) value).value();
         } else if (value instanceof DoubleValue) {
             return ((DoubleValue) value).value();
+        } else if (value instanceof VoidValue) {
+            return String.valueOf(value);
         } else if (isPrimitiveWrapper(value)) {
             Field field = ((ObjectReference) value).referenceType().fieldByName("value");
             Value nestedValue = ((ObjectReference) value).getValue(field);
