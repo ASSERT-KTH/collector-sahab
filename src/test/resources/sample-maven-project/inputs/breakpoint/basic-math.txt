@@ -1,1 +1,6 @@
-foo.BasicMath=5,9
+[
+    {
+        "fileName": "foo.BasicMath",
+        "breakpoints": [5,9]
+    }
+]

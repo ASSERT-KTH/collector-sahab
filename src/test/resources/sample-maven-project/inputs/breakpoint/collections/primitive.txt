@@ -1,1 +1,6 @@
-foo.collections.Primitive=6
+[
+    {
+        "fileName": "foo.collections.Primitive",
+        "breakpoints": [6]
+    }
+]
