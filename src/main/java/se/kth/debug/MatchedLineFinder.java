@@ -11,6 +11,8 @@ import gumtree.spoon.diff.support.SpoonSupport;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -25,6 +27,8 @@ public class MatchedLineFinder {
     private static final Logger LOGGER = Logger.getLogger("MatchedLineFinder");
 
     public static void main(String[] args) throws Exception {
+        cleanupPreviousExecutionFiles();
+
         File project = new File(args[0]);
         File diffedFile = getAbsolutePathWithGivenBase(project, args[1]);
         String left = args[2];
@@ -195,6 +199,19 @@ public class MatchedLineFinder {
 
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write(gson.toJson(array));
+        }
+    }
+
+    private static void cleanupPreviousExecutionFiles() {
+        // No need to clear the following files since `scripts/compile_target.py` does that
+        // 1. breakpoint input
+        // 2. build files of project
+        // GumTree files are assumed to be replaced since I have confidence on GumTree
+        Path oldMethodName = new File("method-name.txt").toPath();
+        try {
+            Files.delete(oldMethodName);
+        } catch (IOException e) {
+            LOGGER.info("Could not delete method-name since it does not exist");
         }
     }
 }

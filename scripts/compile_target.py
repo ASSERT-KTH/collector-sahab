@@ -20,7 +20,7 @@ parser.add_argument("-c", "--commits", nargs=2, required=True, help="Revisions o
 def compile(project, commit, revision):
   
   driver = Command(project)
-  driver.remove(os.path.join("/home/assert/Desktop/assert-achievements/collector-sahab", revision.value.get_input_file()))
+  driver.remove(os.path.join(os.getcwd(), revision.value.get_input_file()))
   driver.remove(revision.value.get_output_directory())
 
   driver.git_checkout(commit)
