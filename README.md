@@ -31,11 +31,19 @@ There are two ways to achieve this:
    $ mvn package
     ```
 2. Prepare for execution of `collector sahab`.
-   1. Create an `input` file containing a map of class names and breakpoints.
+   1. Create an `input` file containing a list of class names and breakpoints.
       Example:
-      ```text
-      ch.hsr.geohash.BoundingBox=210
-      ch.hsr.geohash.util.DoubleUtil=12,15
+      ```json
+      [
+        {
+          "fileName": "ch.hsr.geohash.BoundingBox",
+          "breakpoints": [210]
+        },
+        {
+          "fileName": "ch.hsr.geohash.util.DoubleUtil",
+          "breakpoints": [12, 15]
+        }
+      ]
       ```
    2. Run the process
       ```bash
