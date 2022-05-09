@@ -71,6 +71,85 @@ There are two ways to achieve this:
          > `-i` and `-m` are arguments for collecting data for breakpoints and method exit
         respectively. One should provide _at least one_ of them to get some valuable output
         in the output file (defined by `-o`).
+      
+   4. Example output
+   
+   ```json
+   {
+      "breakpoint": [
+            {
+               "file": "foo/BasicMath.java",
+               "lineNumber": 5,
+               "stackFrameContexts": [
+               {
+                  "positionFromTopInStackTrace": 1,
+                  "location": "foo.BasicMath:5",
+                  "stackTrace": [
+                     "add:5, foo.BasicMath",
+                     "test_add:11, foo.BasicMathTest",
+                     "runTest:40, se.kth.debug.MethodTestRunner",
+                     "lambda$main$0:16, se.kth.debug.MethodTestRunner",
+                     "call:-1, se.kth.debug.MethodTestRunner$$Lambda$1.81628611"
+                  ],
+                  "runtimeValueCollection": [
+                     {
+                        "kind": "LOCAL_VARIABLE",
+                        "name": "x",
+                        "type": "int",
+                        "value": 23,
+                        "fields": null,
+                        "arrayElements": null
+                     },
+                     {  
+                        "kind": "LOCAL_VARIABLE",
+                        "name": "y",
+                        "type": "int",
+                        "value": 2,
+                        "fields": null,
+                        "arrayElements": null
+                     }
+                  ]
+               }
+            ]
+         },
+         {
+            "file": "foo/BasicMath.java",
+            "lineNumber": 9,
+            "stackFrameContexts": [
+               {
+                  "positionFromTopInStackTrace": 1,
+                  "location": "foo.BasicMath:9",
+                  "stackTrace": [
+                     "subtract:9, foo.BasicMath",
+                     "test_subtract:16, foo.BasicMathTest",
+                     "runTest:40, se.kth.debug.MethodTestRunner",
+                     "lambda$main$0:16, se.kth.debug.MethodTestRunner",
+                     "call:-1, se.kth.debug.MethodTestRunner$$Lambda$1.81628611"
+                  ],
+                  "runtimeValueCollection": [
+                     {
+                        "kind": "LOCAL_VARIABLE",
+                        "name": "x",
+                        "type": "int",
+                        "value": 2,
+                        "fields": null,
+                        "arrayElements": null
+                     },
+                     {
+                        "kind": "LOCAL_VARIABLE",
+                        "name": "y",
+                        "type": "int",
+                        "value": 1,
+                        "fields": null,
+                        "arrayElements": null
+                     } 
+                  ]
+               }
+            ]
+         }
+      ]
+   }
+   ```
 
 ## Scripts
 
