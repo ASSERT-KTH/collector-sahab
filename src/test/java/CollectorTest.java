@@ -105,10 +105,13 @@ public class CollectorTest {
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("without-debug"));
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve(
+                                "without-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
+            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO
+                    .resolve("basic-math.txt")
+                    .toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",

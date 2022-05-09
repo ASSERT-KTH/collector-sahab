@@ -10,6 +10,9 @@ public class TestHelper {
     public static final Path PATH_TO_BREAKPOINT_INPUT = PATH_TO_INPUT.resolve("breakpoint");
     public static final Path PATH_TO_RETURN_INPUT = PATH_TO_INPUT.resolve("return");
 
+    public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO =
+            Paths.get("src/test/resources/sample-maven-project-cannot-be-debugged");
+
     public static String[] getMavenClasspathFromBuildDirectory(Path buildDirectory) {
         List<String> classpath =
                 List.of(
