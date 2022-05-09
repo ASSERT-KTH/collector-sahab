@@ -87,9 +87,9 @@ There are two ways to achieve this:
                   "stackTrace": [
                      "add:5, foo.BasicMath",
                      "test_add:11, foo.BasicMathTest",
-                     "runTest:40, se.kth.debug.MethodTestRunner",
-                     "lambda$main$0:16, se.kth.debug.MethodTestRunner",
-                     "call:-1, se.kth.debug.MethodTestRunner$$Lambda$1.81628611"
+                     "runTest:40, se.kth.debug.JUnitTestRunner",
+                     "lambda$main$0:16, se.kth.debug.JUnitTestRunner",
+                     "call:-1, se.kth.debug.JUnitTestRunner$$Lambda$1.81628611"
                   ],
                   "runtimeValueCollection": [
                      {
@@ -122,9 +122,9 @@ There are two ways to achieve this:
                   "stackTrace": [
                      "subtract:9, foo.BasicMath",
                      "test_subtract:16, foo.BasicMathTest",
-                     "runTest:40, se.kth.debug.MethodTestRunner",
-                     "lambda$main$0:16, se.kth.debug.MethodTestRunner",
-                     "call:-1, se.kth.debug.MethodTestRunner$$Lambda$1.81628611"
+                     "runTest:40, se.kth.debug.JUnitTestRunner",
+                     "lambda$main$0:16, se.kth.debug.JUnitTestRunner",
+                     "call:-1, se.kth.debug.JUnitTestRunner$$Lambda$1.81628611"
                   ],
                   "runtimeValueCollection": [
                      {

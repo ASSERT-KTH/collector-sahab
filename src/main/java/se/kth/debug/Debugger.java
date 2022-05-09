@@ -49,14 +49,14 @@ public class Debugger {
                             "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y",
                             "-cp",
                             classpath,
-                            MethodTestRunner.class.getCanonicalName(),
+                            JUnitTestRunner.class.getCanonicalName(),
                             testsSeparatedBySpace);
             logger.log(
                     Level.INFO,
                     "java -cp "
                             + classpath
                             + " "
-                            + MethodTestRunner.class.getCanonicalName()
+                            + JUnitTestRunner.class.getCanonicalName()
                             + " "
                             + testsSeparatedBySpace);
 
