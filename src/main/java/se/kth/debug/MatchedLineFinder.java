@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
-import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.visitor.CtScanner;
 
 public class MatchedLineFinder {
@@ -50,7 +50,7 @@ public class MatchedLineFinder {
         Set<Integer> matchedLinesLeft = getMatchedLines(diffLines, methodLeft);
         Set<Integer> matchedLinesRight = getMatchedLines(diffLines, methodRight);
         String fullyQualifiedNameOfContainerClass =
-                methodLeft.getParent(CtClass.class).getQualifiedName();
+                getNearestNonAnonymousClass(methodLeft.getDeclaringType()).getQualifiedName();
 
         createInputFile(fullyQualifiedNameOfContainerClass, matchedLinesLeft, "input-left.txt");
         createInputFile(fullyQualifiedNameOfContainerClass, matchedLinesRight, "input-right.txt");
@@ -60,10 +60,19 @@ public class MatchedLineFinder {
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonObject object = new JsonObject();
         object.addProperty("name", method.getSimpleName());
-        object.addProperty("className", method.getDeclaringType().getQualifiedName());
+        object.addProperty(
+                "className",
+                getNearestNonAnonymousClass(method.getDeclaringType()).getQualifiedName());
         try (FileWriter writer = new FileWriter("method-name.txt")) {
             writer.write(gson.toJson(object));
         }
+    }
+
+    private static CtType<?> getNearestNonAnonymousClass(CtType<?> type) {
+        if (!type.isAnonymous()) {
+            return type;
+        }
+        return getNearestNonAnonymousClass(type.getDeclaringType());
     }
 
     private static Set<Integer> getDiffLines(List<Operation> rootOperations) {
