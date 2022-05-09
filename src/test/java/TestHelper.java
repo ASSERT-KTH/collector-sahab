@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -13,7 +15,11 @@ public class TestHelper {
     public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO =
             Paths.get("src/test/resources/sample-maven-project-cannot-be-debugged");
 
-    public static String[] getMavenClasspathFromBuildDirectory(Path buildDirectory) {
+    public static String[] getMavenClasspathFromBuildDirectory(Path buildDirectory)
+            throws FileNotFoundException {
+        if (!Files.exists(buildDirectory)) {
+            throw new FileNotFoundException(buildDirectory + " does not exist");
+        }
         List<String> classpath =
                 List.of(
                         buildDirectory.resolve("classes").toString(),

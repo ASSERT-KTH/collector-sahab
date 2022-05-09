@@ -6,6 +6,7 @@ import static org.hamcrest.core.Is.is;
 
 import com.sun.jdi.AbsentInformationException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class CollectorAPITest {
 
     @Test
     void invoke_nonStaticFieldsOfStaticClassesShouldNotBeCollected()
-            throws AbsentInformationException {
+            throws AbsentInformationException, FileNotFoundException {
         // arrange
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
@@ -55,7 +56,8 @@ public class CollectorAPITest {
     @Nested
     class RepresentingCollections {
         @Test
-        void invoke_recordValuesFromArrayFieldInsideCollection() throws AbsentInformationException {
+        void invoke_recordValuesFromArrayFieldInsideCollection()
+                throws AbsentInformationException, FileNotFoundException {
             // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
@@ -103,7 +105,8 @@ public class CollectorAPITest {
         }
 
         @Test
-        void invoke_primitiveArraysAreRecorded() throws AbsentInformationException {
+        void invoke_primitiveArraysAreRecorded()
+                throws AbsentInformationException, FileNotFoundException {
             // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
@@ -136,7 +139,7 @@ public class CollectorAPITest {
         @Nested
         class NestedArraysAreRepresentedCorrectly {
             private StackFrameContext arrangeAndAct(int executionDepth)
-                    throws AbsentInformationException {
+                    throws AbsentInformationException, FileNotFoundException {
                 // arrange
                 String[] classpath =
                         TestHelper.getMavenClasspathFromBuildDirectory(
@@ -161,7 +164,7 @@ public class CollectorAPITest {
             }
 
             @Test
-            void invoke_arrayDepth0() throws AbsentInformationException {
+            void invoke_arrayDepth0() throws AbsentInformationException, FileNotFoundException {
                 StackFrameContext sfc = arrangeAndAct(0);
                 List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
 
@@ -171,7 +174,7 @@ public class CollectorAPITest {
             }
 
             @Test
-            void invoke_arrayDepth1() throws AbsentInformationException {
+            void invoke_arrayDepth1() throws AbsentInformationException, FileNotFoundException {
                 StackFrameContext sfc = arrangeAndAct(1);
                 List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
 
@@ -184,7 +187,7 @@ public class CollectorAPITest {
             }
 
             @Test
-            void invoke_arrayDepth2() throws AbsentInformationException {
+            void invoke_arrayDepth2() throws AbsentInformationException, FileNotFoundException {
                 StackFrameContext sfc = arrangeAndAct(2);
                 List<RuntimeValue> runtimeValueCollection = sfc.getRuntimeValueCollection();
 
@@ -202,7 +205,8 @@ public class CollectorAPITest {
         }
 
         @Test
-        void invoke_elementsInsideNestedSetAreRecorded() throws AbsentInformationException {
+        void invoke_elementsInsideNestedSetAreRecorded()
+                throws AbsentInformationException, FileNotFoundException {
             // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
@@ -255,7 +259,8 @@ public class CollectorAPITest {
     @Nested
     class RepresentingObjects {
         @Test
-        void fieldInsideAOneLevelObjectShouldBeRecorded() throws AbsentInformationException {
+        void fieldInsideAOneLevelObjectShouldBeRecorded()
+                throws AbsentInformationException, FileNotFoundException {
             // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
@@ -282,7 +287,7 @@ public class CollectorAPITest {
 
         @Test
         void fieldInsideMultipleLevelNestedObjectShouldBeRecorded()
-                throws AbsentInformationException {
+                throws AbsentInformationException, FileNotFoundException {
             // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
@@ -324,7 +329,8 @@ public class CollectorAPITest {
     }
 
     @Test
-    void getReadableValue_voidValueShouldBeRecorded() throws AbsentInformationException {
+    void getReadableValue_voidValueShouldBeRecorded()
+            throws AbsentInformationException, FileNotFoundException {
         // arrange
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -100,7 +101,7 @@ public class CollectorTest {
     }
 
     @Test
-    void should_exitWithNonZeroCode(@TempDir Path tempDir) {
+    void should_exitWithNonZeroCode(@TempDir Path tempDir) throws FileNotFoundException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
@@ -229,7 +230,8 @@ public class CollectorTest {
     }
 
     @Test
-    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) {
+    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir)
+            throws FileNotFoundException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
