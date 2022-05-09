@@ -1,76 +1,26 @@
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.io.FileMatchers.anExistingFile;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.nio.file.Path;
-import java.security.Permission;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import se.kth.debug.Collector;
 
 public class CollectorTest {
-    /** Overrides the default security manager before starting execution of test cases. */
-    @BeforeAll
-    static void beforeAll() {
-        System.setSecurityManager(new DoNotExitJVM());
-    }
-
-    /** Restores the default security manager after executing all test cases. */
-    @AfterAll
-    static void afterAll() {
-        System.setSecurityManager(null);
-    }
-
-    /** Custom exception to be thrown whe never {@link System#exit(int)} is invoked. */
-    private static class ExitException extends SecurityException {
-        public final int status;
-
-        public ExitException(int status) {
-            this.status = status;
-        }
-    }
-
-    /** Override {@link SecurityManager} to prevent exiting JVM */
-    private static class DoNotExitJVM extends SecurityManager {
-        @Override
-        public void checkPermission(Permission perm) {}
-
-        @Override
-        public void checkPermission(Permission perm, Object context) {}
-
-        /**
-         * Throws an {@link ExitException} instead of exiting the JVM.
-         *
-         * @param status Exit code of the invocation
-         */
-        @Override
-        public void checkExit(int status) {
-            super.checkExit(status);
-            throw new ExitException(status);
-        }
-    }
-
     @Test
-    void should_exitWithZero_withNonEmptyOutput(@TempDir Path tempDir) throws IOException {
+    void should_runWithoutErrors_withNonEmptyOutput(@TempDir Path tempDir) throws IOException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
@@ -87,9 +37,10 @@ public class CollectorTest {
             outputJson.toString()
         };
 
+        // act
+        Collector.main(args);
+
         // assert
-        ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
-        assertEquals(0, exit.status);
         assertNonEmptyFile(outputJson);
     }
 
@@ -101,7 +52,8 @@ public class CollectorTest {
     }
 
     @Test
-    void should_exitWithNonZeroCode(@TempDir Path tempDir) throws FileNotFoundException {
+    void should_throwAbsentInformationException(@TempDir Path tempDir)
+            throws FileNotFoundException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
@@ -122,8 +74,12 @@ public class CollectorTest {
         };
 
         // assert
-        ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
-        assertNotEquals(0, exit.status);
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(errorStream));
+        Collector.main(args);
+
+        assertThat(
+                errorStream.toString(), containsString("com.sun.jdi.AbsentInformationException"));
         assertThat(outputJson.toFile(), not(anExistingFile()));
     }
 
@@ -148,7 +104,7 @@ public class CollectorTest {
             };
 
             // act
-            assertThrows(ExitException.class, () -> Collector.main(args));
+            Collector.main(args);
 
             // assert
             assertNonEmptyFile(outputJson);
@@ -180,7 +136,7 @@ public class CollectorTest {
             };
 
             // act
-            assertThrows(ExitException.class, () -> Collector.main(args));
+            Collector.main(args);
 
             // assert
             assertNonEmptyFile(outputJson);
@@ -214,7 +170,7 @@ public class CollectorTest {
             };
 
             // act
-            assertThrows(ExitException.class, () -> Collector.main(args));
+            Collector.main(args);
 
             // assert
             assertNonEmptyFile(outputJson);
@@ -251,10 +207,9 @@ public class CollectorTest {
         };
 
         // act
-        ExitException exit = assertThrows(ExitException.class, () -> Collector.main(args));
+        Collector.main(args);
 
         // assert
-        assertThat(exit.status, equalTo(0));
     }
 
     @Nested
@@ -283,7 +238,7 @@ public class CollectorTest {
             };
 
             // act
-            assertThrows(ExitException.class, () -> Collector.main(args));
+            Collector.main(args);
 
             // assert
             try (JsonReader jsonReader = new JsonReader(new FileReader(outputJson.toFile()))) {
@@ -317,7 +272,7 @@ public class CollectorTest {
             };
 
             // act
-            assertThrows(ExitException.class, () -> Collector.main(args));
+            Collector.main(args);
 
             // assert
             try (JsonReader jsonReader = new JsonReader(new FileReader(outputJson.toFile()))) {

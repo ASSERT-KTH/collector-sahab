@@ -59,8 +59,7 @@ public class Collector implements Callable<Integer> {
     private boolean skipPrintingField = false;
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new Collector()).execute(args);
-        System.exit(exitCode);
+        new CommandLine(new Collector()).execute(args);
     }
 
     @Override
