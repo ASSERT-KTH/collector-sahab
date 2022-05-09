@@ -45,7 +45,17 @@ There are two ways to achieve this:
         }
       ]
       ```
-   2. Run the process
+   2. Create `method-name` file containing the details of the method whose
+      return value is needed.
+      ```json
+      {
+        "name": "getMinimumValue",
+        "className": "org.joda.time.field.ZeroIsMaxDateTimeField"
+      }
+      ```
+         > The methods are compared by their name and declaring class which is a bit inaccurate,
+        but for now, it does the job. A better solution is to compare by their signature.
+   3. Run the process
       ```bash
       $ java -jar/target/collector-sahab-1.0-SNAPSHOT-jar-with-dependencies.jar \
            -p [path/to/all/classes/required ...]
@@ -58,6 +68,9 @@ There are two ways to achieve this:
            --skip-printing-field (default=false)
            --stack-trace-depth (default=0)
       ```
+         > `-i` and `-m` are arguments for collecting data for breakpoints and method exit
+        respectively. One should provide _at least one_ of them to get some valuable output
+        in the output file (defined by `-o`).
 
 ## Scripts
 
