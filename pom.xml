@@ -24,6 +24,7 @@
                         <include>CollectorTest.java</include>
                         <include>UtilityTest.java</include>
                         <include>CollectorAPITest.java</include>
+                        <include>JUnitTestRunnerTest.java</include>
                     </includes>
                 </configuration>
             </plugin>

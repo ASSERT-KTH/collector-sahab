@@ -1,0 +1,42 @@
+╷
+├─ JUnit Jupiter ✔
+└─ JUnit Vintage ✔
+   └─ JUnit4Test ✔
+      ├─ test_concat ✔
+      └─ test_upperCase ✔
+
+Test run finished after [\d]+ ms
+\[         3 containers found      \]
+\[         0 containers skipped    \]
+\[         3 containers started    \]
+\[         0 containers aborted    \]
+\[         3 containers successful \]
+\[         0 containers failed     \]
+\[         2 tests found           \]
+\[         0 tests skipped         \]
+\[         2 tests started         \]
+\[         0 tests aborted         \]
+\[         2 tests successful      \]
+\[         0 tests failed          \]
+
+╷
+├─ JUnit Jupiter ✔
+│  └─ JUnit5Test ✔
+│     ├─ test_add\(\) ✔
+│     └─ test_subtract\(\) ✔
+└─ JUnit Vintage ✔
+
+Test run finished after [\d]+ ms
+\[         3 containers found      \]
+\[         0 containers skipped    \]
+\[         3 containers started    \]
+\[         0 containers aborted    \]
+\[         3 containers successful \]
+\[         0 containers failed     \]
+\[         2 tests found           \]
+\[         0 tests skipped         \]
+\[         2 tests started         \]
+\[         0 tests aborted         \]
+\[         2 tests successful      \]
+\[         0 tests failed          \]
+
