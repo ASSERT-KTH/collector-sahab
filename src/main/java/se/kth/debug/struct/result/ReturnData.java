@@ -9,7 +9,7 @@ public class ReturnData implements RuntimeValue {
     private final String type;
     private final Object value;
     private final String location;
-    private final List<LocalVariableData> arguments;
+    private final List<LocalVariableData> parameterValues;
     private List<FieldData> fields = null;
     private List<ArrayElement> arrayElements = null;
 
@@ -18,13 +18,13 @@ public class ReturnData implements RuntimeValue {
             String type,
             Object value,
             String location,
-            List<LocalVariableData> arguments,
+            List<LocalVariableData> parameterValues,
             List<String> stackTrace) {
         this.methodName = methodName;
         this.type = type;
         this.value = value;
         this.location = location;
-        this.arguments = arguments;
+        this.parameterValues = parameterValues;
         this.stackTrace = stackTrace;
     }
 
