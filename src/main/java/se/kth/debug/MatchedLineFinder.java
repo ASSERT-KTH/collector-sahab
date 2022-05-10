@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtClass;
@@ -41,14 +42,14 @@ public class MatchedLineFinder {
         File rightJava = prepareFileForGumtree(project, right, diffedFile, RIGHT_FOLDER_NAME);
 
         Diff diff = new AstComparator().compare(leftJava, rightJava);
-        Set<Integer> diffLines = getDiffLines(diff.getRootOperations());
+        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
 
         CtMethod<?> methodLeft = findMethod(diff.getRootOperations());
         CtMethod<?> methodRight =
                 (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
         writeMethodName(methodLeft);
-        Set<Integer> matchedLinesLeft = getMatchedLines(diffLines, methodLeft);
-        Set<Integer> matchedLinesRight = getMatchedLines(diffLines, methodRight);
+        Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methodLeft);
+        Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methodRight);
         String fullyQualifiedNameOfContainerClass =
                 methodLeft.getParent(CtClass.class).getQualifiedName();
 
@@ -66,18 +67,23 @@ public class MatchedLineFinder {
         }
     }
 
-    private static Set<Integer> getDiffLines(List<Operation> rootOperations) {
-        Set<Integer> result = new HashSet<>();
+    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(List<Operation> rootOperations) {
+        Set<Integer> src = new HashSet<>();
+        Set<Integer> dst = new HashSet<>();
         rootOperations.forEach(
                 operation -> {
                     if (operation.getSrcNode() != null) {
-                        result.add(operation.getSrcNode().getPosition().getLine());
+                        if (operation.getSrcNode().getPosition().isValidPosition()) {
+                            src.add(operation.getSrcNode().getPosition().getLine());
+                        }
                     }
                     if (operation.getDstNode() != null) {
-                        result.add(operation.getSrcNode().getPosition().getLine());
+                        if (operation.getDstNode().getPosition().isValidPosition()) {
+                            dst.add(operation.getSrcNode().getPosition().getLine());
+                        }
                     }
                 });
-        return Collections.unmodifiableSet(result);
+        return Pair.of(src, dst);
     }
 
     static class BlockFinder extends CtScanner {
