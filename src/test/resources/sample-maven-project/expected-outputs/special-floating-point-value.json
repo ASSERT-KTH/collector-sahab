@@ -9,10 +9,7 @@
           "location": "foo.SpecialFloatingPointValue:5",
           "stackTrace": [
             "generateNaN:5, foo.SpecialFloatingPointValue",
-            "test_generateNaN:11, foo.SpecialFloatingPointValueTest",
-            "runTestMethod:45, se.kth.debug.JUnitTestRunner",
-            "lambda$main$0:17, se.kth.debug.JUnitTestRunner",
-            "call:-1, se.kth.debug.JUnitTestRunner$$Lambda$1.81628611"
+            "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
           ],
           "runtimeValueCollection": []
         }
@@ -27,10 +24,7 @@
           "location": "foo.SpecialFloatingPointValue:6",
           "stackTrace": [
             "generateNaN:6, foo.SpecialFloatingPointValue",
-            "test_generateNaN:11, foo.SpecialFloatingPointValueTest",
-            "runTestMethod:45, se.kth.debug.JUnitTestRunner",
-            "lambda$main$0:17, se.kth.debug.JUnitTestRunner",
-            "call:-1, se.kth.debug.JUnitTestRunner$$Lambda$1.81628611"
+            "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
           ],
           "runtimeValueCollection": [
             {
@@ -54,10 +48,7 @@
           "location": "foo.SpecialFloatingPointValue:7",
           "stackTrace": [
             "generateNaN:7, foo.SpecialFloatingPointValue",
-            "test_generateNaN:11, foo.SpecialFloatingPointValueTest",
-            "runTestMethod:45, se.kth.debug.JUnitTestRunner",
-            "lambda$main$0:17, se.kth.debug.JUnitTestRunner",
-            "call:-1, se.kth.debug.JUnitTestRunner$$Lambda$1.81628611"
+            "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
           ],
           "runtimeValueCollection": [
             {
@@ -87,10 +78,7 @@
       "methodName": "generateNaN",
       "stackTrace": [
         "generateNaN:7, foo.SpecialFloatingPointValue",
-        "test_generateNaN:11, foo.SpecialFloatingPointValueTest",
-        "runTestMethod:45, se.kth.debug.JUnitTestRunner",
-        "lambda$main$0:17, se.kth.debug.JUnitTestRunner",
-        "call:-1, se.kth.debug.JUnitTestRunner$$Lambda$1.81628611"
+        "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
       ],
       "type": "java.lang.Double",
       "value": NaN,

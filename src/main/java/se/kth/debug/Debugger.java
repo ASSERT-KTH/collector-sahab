@@ -186,7 +186,7 @@ public class Debugger {
             throws IncompatibleThreadStateException {
         List<String> result = new ArrayList<>();
         List<String> excludedPackages =
-                List.of("java.lang", "java.util", "org.junit", "junit", "jdk");
+                List.of("java.lang", "java.util", "org.junit", "junit", "jdk", "se.kth.debug");
         for (StackFrame stackFrame : threadReference.frames()) {
             Location location = stackFrame.location();
             String declaringTypeName = location.declaringType().name();
