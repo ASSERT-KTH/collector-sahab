@@ -105,11 +105,16 @@ public class MatchedLineFinder {
             List<CtStatement> statements = block.getStatements();
             statements.forEach(
                     statement -> {
-                        if (!diffLines.contains(statement.getPosition().getLine())) {
+                        if (!diffLines.contains(statement.getPosition().getLine())
+                                && !isStatementPartOfDiffedBlock(statement)) {
                             lines.add(statement.getPosition().getLine());
                         }
                     });
             super.visitCtBlock(block);
+        }
+
+        private boolean isStatementPartOfDiffedBlock(CtStatement statement) {
+            return diffLines.contains(statement.getParent(CtBlock.class).getPosition().getLine());
         }
 
         public Set<Integer> getLines() {
