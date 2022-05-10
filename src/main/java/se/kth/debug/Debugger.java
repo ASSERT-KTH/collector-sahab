@@ -7,9 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -91,21 +89,28 @@ public class Debugger {
 
     public void addClassPrepareEvent(VirtualMachine vm) {
         EventRequestManager erm = vm.eventRequestManager();
+        Set<String> classesToBeRegistered = combineClassNames();
+        for (String className : classesToBeRegistered) {
+            ClassPrepareRequest cpr = erm.createClassPrepareRequest();
+            cpr.addClassFilter(className);
+            cpr.setEnabled(true);
+            logger.log(Level.INFO, className + " added!");
+            vm.resume();
+        }
+    }
+
+    /** We need to register unique class prepare requests, so we combine the class filters. */
+    private Set<String> combineClassNames() {
+        Set<String> classesFromRegisteringClassPrepareRequest = new HashSet<>();
         if (classesAndBreakpoints != null) {
             for (FileAndBreakpoint classToBeDebugged : classesAndBreakpoints) {
-                ClassPrepareRequest cpr = erm.createClassPrepareRequest();
-                cpr.addClassFilter(classToBeDebugged.getFileName());
-                cpr.setEnabled(true);
-                logger.log(Level.INFO, classToBeDebugged.getFileName() + " added!");
-                vm.resume();
+                classesFromRegisteringClassPrepareRequest.add(classToBeDebugged.getFileName());
             }
         }
         if (methodForExitEvent != null) {
-            ClassPrepareRequest cpr = erm.createClassPrepareRequest();
-            cpr.addClassFilter(methodForExitEvent.getClassName());
-            cpr.setEnabled(true);
-            vm.resume();
+            classesFromRegisteringClassPrepareRequest.add(methodForExitEvent.getClassName());
         }
+        return classesFromRegisteringClassPrepareRequest;
     }
 
     public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent event)
