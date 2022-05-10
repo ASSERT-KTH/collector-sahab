@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtClass;
@@ -41,30 +42,41 @@ public class MatchedLineFinder {
         File leftJava = prepareFileForGumtree(project, left, diffedFile, LEFT_FOLDER_NAME);
         File rightJava = prepareFileForGumtree(project, right, diffedFile, RIGHT_FOLDER_NAME);
 
-        Diff diff = new AstComparator().compare(leftJava, rightJava);
+        Triple<String, String, String> output = invoke(leftJava, rightJava);
+
+        createInputFile(output.getLeft(), "input-left.txt");
+        createInputFile(output.getMiddle(), "method-name.txt");
+        createInputFile(output.getRight(), "input-right.txt");
+    }
+
+    /**
+     * Find the matched line and the patched method between two Java source files.
+     *
+     * @param left previous version of source file
+     * @param right revision of source file
+     * @return matched line for left, patched method, matched line for right
+     * @throws Exception raised from gumtree-spoon
+     */
+    public static Triple<String, String, String> invoke(File left, File right) throws Exception {
+        Diff diff = new AstComparator().compare(left, right);
         Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
 
         CtMethod<?> methodLeft = findMethod(diff.getRootOperations());
         CtMethod<?> methodRight =
                 (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
-        writeMethodName(methodLeft);
+
         Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methodLeft);
         Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methodRight);
         String fullyQualifiedNameOfContainerClass =
                 methodLeft.getParent(CtClass.class).getQualifiedName();
 
-        createInputFile(fullyQualifiedNameOfContainerClass, matchedLinesLeft, "input-left.txt");
-        createInputFile(fullyQualifiedNameOfContainerClass, matchedLinesRight, "input-right.txt");
-    }
+        String breakpointsLeft =
+                serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
+        String methodName = serialiseMethodName(methodLeft);
+        String breakpointsRight =
+                serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
 
-    private static void writeMethodName(CtMethod<?> method) throws IOException {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonObject object = new JsonObject();
-        object.addProperty("name", method.getSimpleName());
-        object.addProperty("className", method.getDeclaringType().getQualifiedName());
-        try (FileWriter writer = new FileWriter("method-name.txt")) {
-            writer.write(gson.toJson(object));
-        }
+        return Triple.of(breakpointsLeft, methodName, breakpointsRight);
     }
 
     private static Pair<Set<Integer>, Set<Integer>> getDiffLines(List<Operation> rootOperations) {
@@ -197,19 +209,30 @@ public class MatchedLineFinder {
         return new File(revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
     }
 
-    private static void createInputFile(
-            String fullyQualifiedClassName, Set<Integer> breakpoints, String filename)
-            throws IOException {
+    private static String serialiseBreakpoints(
+            String fullyQualifiedClassName, Set<Integer> breakpoints) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
         JsonArray array = new JsonArray();
         JsonObject object = new JsonObject();
         object.addProperty("fileName", fullyQualifiedClassName);
         object.add("breakpoints", gson.toJsonTree(breakpoints));
         array.add(object);
 
+        return gson.toJson(array);
+    }
+
+    private static String serialiseMethodName(CtMethod<?> method) {
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonObject object = new JsonObject();
+        object.addProperty("name", method.getSimpleName());
+        object.addProperty("className", method.getDeclaringType().getQualifiedName());
+
+        return gson.toJson(object);
+    }
+
+    private static void createInputFile(String content, String filename) throws IOException {
         try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(gson.toJson(array));
+            writer.write(content);
         }
     }
 
