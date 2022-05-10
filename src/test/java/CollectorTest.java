@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -285,5 +286,40 @@ public class CollectorTest {
                 assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(empty()));
             }
         }
+    }
+
+    @Test
+    void gson_shouldBeAbleToSerialise_specialFloatingPointValue(@TempDir Path tempDir)
+            throws IOException {
+        // arrange
+        Path outputJson = tempDir.resolve("output.json");
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] args = {
+            "-i",
+            TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    .resolve("special-floating-point-value.txt")
+                    .toString(),
+            "-m",
+            TestHelper.PATH_TO_RETURN_INPUT.resolve("special-floating-point-value.json").toString(),
+            "-p",
+            StringUtils.join(classpath, " "),
+            "-t",
+            "foo.SpecialFloatingPointValueTest::test_generateNaN",
+            "-o",
+            outputJson.toString()
+        };
+
+        // act
+        Collector.main(args);
+
+        // assert
+        String expectedOutput =
+                Files.readString(
+                        TestHelper.PATH_TO_EXPECTED_OUTPUT.resolve(
+                                "special-floating-point-value.json"));
+        String actualOutput = Files.readString(outputJson);
+        assertThat(actualOutput, equalTo(expectedOutput));
     }
 }

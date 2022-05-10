@@ -102,7 +102,12 @@ public class Collector implements Callable<Integer> {
     }
 
     public void write(EventProcessor eventProcessor) throws IOException {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        final Gson gson =
+                new GsonBuilder()
+                        .setPrettyPrinting()
+                        .serializeNulls()
+                        .serializeSpecialFloatingPointValues()
+                        .create();
         JsonObject output = new JsonObject();
 
         if (classesAndBreakpoints == null) {
