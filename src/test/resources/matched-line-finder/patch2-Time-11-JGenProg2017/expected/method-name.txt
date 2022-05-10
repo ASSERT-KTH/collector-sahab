@@ -1,4 +1,4 @@
 {
-    "name": "buildTailZone",
-    "className": "Patch2Time11JGenProg2017"
+  "name": "buildTailZone",
+  "className": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet"
 }
