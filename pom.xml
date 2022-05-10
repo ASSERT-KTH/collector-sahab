@@ -25,6 +25,7 @@
                         <include>UtilityTest.java</include>
                         <include>CollectorAPITest.java</include>
                         <include>JUnitTestRunnerTest.java</include>
+                        <include>MatchedLineFinderTest.java</include>
                     </includes>
                 </configuration>
             </plugin>

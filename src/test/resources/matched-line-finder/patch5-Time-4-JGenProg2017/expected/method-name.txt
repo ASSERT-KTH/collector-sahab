@@ -1,0 +1,4 @@
+{
+  "name": "getMinimumValue",
+  "className": "org.joda.time.field.ZeroIsMaxDateTimeField"
+}

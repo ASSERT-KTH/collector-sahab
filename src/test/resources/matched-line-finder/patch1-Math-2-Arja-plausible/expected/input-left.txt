@@ -1,0 +1,31 @@
+[
+  {
+    "fileName": "org.apache.commons.math3.distribution.AbstractIntegerDistribution",
+    "breakpoints": [
+      129,
+      130,
+      131,
+      132,
+      101,
+      133,
+      102,
+      135,
+      136,
+      105,
+      137,
+      106,
+      107,
+      109,
+      142,
+      110,
+      111,
+      114,
+      118,
+      119,
+      120,
+      125,
+      126,
+      127
+    ]
+  }
+]
