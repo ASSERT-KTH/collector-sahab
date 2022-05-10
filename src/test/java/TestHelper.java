@@ -8,11 +8,16 @@ import se.kth.debug.CollectorOptions;
 public class TestHelper {
     public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT =
             Paths.get("src/test/resources/sample-maven-project");
-    private static final Path PATH_TO_INPUT = PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("inputs");
+    private static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES =
+            PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("src").resolve("test").resolve("resources");
+
+    private static final Path PATH_TO_INPUT =
+            PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("inputs");
     public static final Path PATH_TO_BREAKPOINT_INPUT = PATH_TO_INPUT.resolve("breakpoint");
     public static final Path PATH_TO_RETURN_INPUT = PATH_TO_INPUT.resolve("return");
+
     public static final Path PATH_TO_EXPECTED_OUTPUT =
-            PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("expected-outputs");
+            PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("expected-outputs");
 
     public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO =
             Paths.get("src/test/resources/sample-maven-project-cannot-be-debugged");
