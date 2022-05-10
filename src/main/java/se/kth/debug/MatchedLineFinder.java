@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
+import gumtree.spoon.diff.operations.InsertOperation;
 import gumtree.spoon.diff.operations.Operation;
 import gumtree.spoon.diff.support.SpoonSupport;
 import java.io.File;
@@ -86,7 +87,12 @@ public class MatchedLineFinder {
                 operation -> {
                     if (operation.getSrcNode() != null) {
                         if (operation.getSrcNode().getPosition().isValidPosition()) {
-                            src.add(operation.getSrcNode().getPosition().getLine());
+                            // Nodes of insert operation should be inserted in dst
+                            if (operation instanceof InsertOperation) {
+                                dst.add(operation.getSrcNode().getPosition().getLine());
+                            } else {
+                                src.add(operation.getSrcNode().getPosition().getLine());
+                            }
                         }
                     }
                     if (operation.getDstNode() != null) {
