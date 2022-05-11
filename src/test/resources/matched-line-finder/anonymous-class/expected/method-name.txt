@@ -1,0 +1,4 @@
+{
+  "name": "greet",
+  "className": "foo.AnonymousClass$1"
+}

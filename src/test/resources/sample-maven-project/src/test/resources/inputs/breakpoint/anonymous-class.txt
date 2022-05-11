@@ -1,0 +1,14 @@
+[
+  {
+    "fileName": "foo.AnonymousClass$1",
+    "breakpoints": [
+      9
+    ]
+  },
+  {
+    "fileName": "foo.AnonymousClass$2",
+    "breakpoints": [
+      18
+    ]
+  }
+]
