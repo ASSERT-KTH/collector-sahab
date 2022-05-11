@@ -1,0 +1,8 @@
+[
+  {
+    "fileName": "foo.AnonymousClass$1",
+    "breakpoints": [
+      9
+    ]
+  }
+]
