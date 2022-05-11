@@ -1,6 +1,7 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Triple;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,7 +25,9 @@ import se.kth.debug.MatchedLineFinder;
 import se.kth.debug.struct.FileAndBreakpoint;
 import se.kth.debug.struct.MethodForExitEvent;
 
-public class MatchedLineFinderTest {
+class MatchedLineFinderTest {
+    static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
+
     @ParameterizedTest
     @ArgumentsSource(ResourceProvider.Patch.class)
     void should_correctlyGenerateAllInputFilesForCollectorSahab(
@@ -70,11 +74,21 @@ public class MatchedLineFinderTest {
         final Gson gson = new Gson();
         return gson.fromJson(json, MethodForExitEvent.class);
     }
+
+    @Test
+    void throwsNoDiffException_whenThereIsNoDiffLinePresent() {
+        // arrange
+        File left = BASE_DIR.resolve("EXCLUDE_no-diff").resolve("left.java").toFile();
+        File right = BASE_DIR.resolve("EXCLUDE_no-diff").resolve("right.java").toFile();
+
+        // assert
+        assertThrowsExactly(
+                MatchedLineFinder.NoDiffException.class,
+                () -> MatchedLineFinder.invoke(left, right));
+    }
 }
 
 class ResourceProvider {
-    private static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
-
     static class TestResource {
         String dir;
         File left;
@@ -106,8 +120,11 @@ class ResourceProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
-            return Arrays.stream(Objects.requireNonNull(BASE_DIR.toFile().listFiles()))
+            return Arrays.stream(
+                            Objects.requireNonNull(
+                                    MatchedLineFinderTest.BASE_DIR.toFile().listFiles()))
                     .filter(File::isDirectory)
+                    .filter(dir -> !dir.getName().startsWith("EXCLUDE_"))
                     .map(TestResource::fromTestDirectory)
                     .map(Arguments::of);
         }

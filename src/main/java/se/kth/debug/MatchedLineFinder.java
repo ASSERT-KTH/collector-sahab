@@ -164,7 +164,13 @@ public class MatchedLineFinder {
                 return candidate;
             }
         }
-        throw new RuntimeException("No diff line is enclosed in method");
+        throw new NoDiffException("No diff line is enclosed in method");
+    }
+
+    public static class NoDiffException extends RuntimeException {
+        public NoDiffException(String message) {
+            super(message);
+        }
     }
 
     private static File getAbsolutePathWithGivenBase(File base, String filename) {
