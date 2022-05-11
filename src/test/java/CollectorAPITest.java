@@ -346,4 +346,48 @@ public class CollectorAPITest {
         RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
         assertThat(returnValue.getValue(), equalTo("<void value>"));
     }
+
+    @Test
+    void collectVariables_variablesInsideAnonymousClassShouldBeCollected()
+            throws FileNotFoundException, AbsentInformationException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.AnonymousClassTest::test_implementAnonymousGreetings"};
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("anonymous-class.txt").toFile();
+
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        null,
+                        TestHelper.getDefaultOptions());
+
+        // assert
+        RuntimeValue hindiGreeting =
+                eventProcessor
+                        .getBreakpointContexts()
+                        .get(0)
+                        .getStackFrameContexts()
+                        .get(0)
+                        .getRuntimeValueCollection()
+                        .get(0);
+        assertThat(hindiGreeting.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
+        assertThat(hindiGreeting.getValue(), equalTo("Namaste"));
+
+        RuntimeValue swedishGreeting =
+                eventProcessor
+                        .getBreakpointContexts()
+                        .get(1)
+                        .getStackFrameContexts()
+                        .get(0)
+                        .getRuntimeValueCollection()
+                        .get(0);
+        assertThat(swedishGreeting.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
+        assertThat(swedishGreeting.getValue(), equalTo("Tjenare!"));
+    }
 }
