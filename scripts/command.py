@@ -51,6 +51,8 @@ class Command:
     self._run_sed(r"<target>1\.5<\/target>", r"")
     self._run_sed(r"<debug>false<\/debug>", r"")
     self._run_sed(r"<debuglevel>.*<\/debuglevel>", r"")
+    self._run_sed(r"<maven\.compile\.source>1\.5<\/maven\.compile\.source>", r"<maven\.compile\.source>1\.6<\/maven\.compile\.source>")
+    self._run_sed(r"<maven\.compile\.target>1\.5<\/maven\.compile\.target>", r"<maven\.compile\.target>1\.6<\/maven\.compile\.target>")
 
 
   def _run_sed(self, original, substitution):
