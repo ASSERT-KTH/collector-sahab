@@ -354,7 +354,7 @@ public class CollectorAPITest {
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-        String[] tests = new String[] {"foo.AnonymousClassTest::test_implementAnonymousGreetings"};
+        String[] tests = new String[] {"foo.AnonymousTest::test_implementAnonymousGreetings"};
         File classesAndBreakpoints =
                 TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("anonymous-class.txt").toFile();
 
@@ -389,5 +389,25 @@ public class CollectorAPITest {
                         .get(0);
         assertThat(swedishGreeting.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
         assertThat(swedishGreeting.getValue(), equalTo("Tjenare!"));
+    }
+
+    @Test
+    void processMethodExit_returnOfOuterMethodShouldBeCollected_notLambda()
+            throws AbsentInformationException, FileNotFoundException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.AnonymousTest::test_printString"};
+        File methodName = TestHelper.PATH_TO_RETURN_INPUT.resolve("lambda.json").toFile();
+
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath, tests, null, methodName, TestHelper.getDefaultOptions());
+
+        RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
+        assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));
+        assertThat(returnValue.getValue(), equalTo("Hey!"));
     }
 }
