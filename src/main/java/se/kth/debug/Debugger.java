@@ -237,9 +237,7 @@ public class Debugger {
                 if (fNB.getBreakpoints().isEmpty()) {
                     continue;
                 }
-                int rangeStart = Collections.min(fNB.getBreakpoints());
-                int rangeEnd = Collections.max(fNB.getBreakpoints());
-                return lineNumber >= rangeStart && lineNumber <= rangeEnd;
+                return fNB.getBreakpoints().contains(lineNumber);
             }
         }
         return false;
