@@ -32,7 +32,7 @@ public class CollectorAPITest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.StaticClassFieldTest::test_doSomething"};
         File classesAndBreakpoints =
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("static-class-field.txt").toFile();
+                TestHelper.PATH_TO_INPUT.resolve("static-class-field.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
@@ -64,7 +64,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_returnTruthy"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("collections")
                             .resolve("one-level.txt")
                             .toFile();
@@ -118,7 +118,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_canWePrintPrimitive"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("collections")
                             .resolve("primitive.txt")
                             .toFile();
@@ -153,7 +153,7 @@ public class CollectorAPITest {
                 String[] tests =
                         new String[] {"foo.CollectionsTest::test_canNestedArrayBeRepresented"};
                 File classesAndBreakpoints =
-                        TestHelper.PATH_TO_BREAKPOINT_INPUT
+                        TestHelper.PATH_TO_INPUT
                                 .resolve("collections")
                                 .resolve("nested-array.txt")
                                 .toFile();
@@ -220,7 +220,7 @@ public class CollectorAPITest {
             String[] tests =
                     new String[] {"foo.CollectionsTest::test_canWeRepresentNestedCollection"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("collections")
                             .resolve("nested-collection.txt")
                             .toFile();
@@ -278,7 +278,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::justOneLevel"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("objects")
                             .resolve("one-level-nesting.txt")
                             .toFile();
@@ -312,7 +312,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::maybeTwoMoreLevels"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("objects")
                             .resolve("multiple-level-nesting.txt")
                             .toFile();
@@ -360,8 +360,7 @@ public class CollectorAPITest {
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.VoidMethodTest::test_doNothing"};
-        File classesAndBreakpoints =
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("void-method.txt").toFile();
+        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("void-method.txt").toFile();
         // act
         EventProcessor eventProcessor =
                 Collector.invoke(
@@ -385,7 +384,7 @@ public class CollectorAPITest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.AnonymousTest::test_implementAnonymousGreetings"};
         File classesAndBreakpoints =
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("anonymous-class.txt").toFile();
+                TestHelper.PATH_TO_INPUT.resolve("anonymous-class.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
@@ -426,8 +425,7 @@ public class CollectorAPITest {
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.AnonymousTest::test_printString"};
-        File classesAndBreakpoints =
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("lambda.txt").toFile();
+        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("lambda.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
