@@ -3,12 +3,12 @@ package foo;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import foo.AnonymousClass;
+import foo.anonymous.Clazz;
 
-public class AnonymousClassTest {
+public class AnonymousTest {
     @Test
     void test_implementAnonymousGreetings() {
-        AnonymousClass.implementAnonymousGreetings();
+        Clazz.implementAnonymousGreetings();
         assertTrue(true);
     }
 }

@@ -354,7 +354,7 @@ public class CollectorAPITest {
         String[] classpath =
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-        String[] tests = new String[] {"foo.AnonymousClassTest::test_implementAnonymousGreetings"};
+        String[] tests = new String[] {"foo.AnonymousTest::test_implementAnonymousGreetings"};
         File classesAndBreakpoints =
                 TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("anonymous-class.txt").toFile();
 

@@ -1,6 +1,6 @@
-package foo;
+package foo.anonymous;
 
-public class AnonymousClass {
+public class Clazz {
     public static void implementAnonymousGreetings() {
         Greeting hindiGreeting = new Greeting() {
             @Override
