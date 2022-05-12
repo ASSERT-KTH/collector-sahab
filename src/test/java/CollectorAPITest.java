@@ -313,7 +313,8 @@ public class CollectorAPITest {
             String[] tests = new String[] {"foo.ObjectsTest::maybeTwoMoreLevels"};
             File classesAndBreakpoints =
                     TestHelper.PATH_TO_BREAKPOINT_INPUT
-                            .resolve("multiple-level-nested-object.txt")
+                            .resolve("objects")
+                            .resolve("multiple-level-nesting.txt")
                             .toFile();
 
             // act
