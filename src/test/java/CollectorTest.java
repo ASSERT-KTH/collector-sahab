@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -101,7 +102,8 @@ public class CollectorTest {
                 "-t",
                 "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
                 "-o",
-                outputJson.toString()
+                outputJson.toString(),
+                "--skip-return-values"
             };
 
             // act
@@ -126,14 +128,15 @@ public class CollectorTest {
                     TestHelper.getMavenClasspathFromBuildDirectory(
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
+                "-i",
+                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
                 "foo.BasicMathTest::test_add",
                 "-o",
-                outputJson.toString()
+                outputJson.toString(),
+                "--skip-breakpoint-values"
             };
 
             // act
@@ -160,8 +163,6 @@ public class CollectorTest {
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -187,8 +188,7 @@ public class CollectorTest {
     }
 
     @Test
-    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir)
-            throws FileNotFoundException {
+    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) throws IOException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
@@ -211,9 +211,11 @@ public class CollectorTest {
         Collector.main(args);
 
         // assert
+        assertNonEmptyFile(outputJson);
     }
 
     @Nested
+    @Disabled
     class BothAttributeShouldBePresent {
         @Test
         void breakpointShouldBePresentEvenIfItsDataIsEmpty(@TempDir Path tempDir)
@@ -228,8 +230,6 @@ public class CollectorTest {
                 TestHelper.PATH_TO_BREAKPOINT_INPUT
                         .resolve("zero-breakpoints-basic-math.txt")
                         .toString(),
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -262,8 +262,6 @@ public class CollectorTest {
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("void-method.txt").toString(),
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("wrong-method.json").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -283,7 +281,8 @@ public class CollectorTest {
                 assertThat(
                         (List<?>) (((LinkedTreeMap<?, ?>) json).get("breakpoint")),
                         is(not(empty())));
-                assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(empty()));
+                assertThat(
+                        (List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(not(empty())));
             }
         }
     }
@@ -301,8 +300,6 @@ public class CollectorTest {
             TestHelper.PATH_TO_BREAKPOINT_INPUT
                     .resolve("special-floating-point-value.txt")
                     .toString(),
-            "-m",
-            TestHelper.PATH_TO_RETURN_INPUT.resolve("special-floating-point-value.json").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",

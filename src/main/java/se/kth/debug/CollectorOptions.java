@@ -5,6 +5,8 @@ public class CollectorOptions {
     private int numberOfArrayElements;
     private int executionDepth;
     private boolean skipPrintingField;
+    private boolean skipReturnValues;
+    private boolean skipBreakpointValues;
 
     public int getStackTraceDepth() {
         return stackTraceDepth;
@@ -22,6 +24,14 @@ public class CollectorOptions {
         return skipPrintingField;
     }
 
+    public boolean shouldSkipBreakpointValues() {
+        return skipBreakpointValues;
+    }
+
+    public boolean shouldSkipReturnValues() {
+        return skipReturnValues;
+    }
+
     public void setStackTraceDepth(int stackTraceDepth) {
         this.stackTraceDepth = stackTraceDepth;
     }
@@ -36,5 +46,15 @@ public class CollectorOptions {
 
     public void setSkipPrintingField(boolean skipPrintingField) {
         this.skipPrintingField = skipPrintingField;
+    }
+
+    public CollectorOptions setSkipReturnValues(boolean skipReturnValues) {
+        this.skipReturnValues = skipReturnValues;
+        return this;
+    }
+
+    public CollectorOptions setSkipBreakpointValues(boolean skipBreakpointValues) {
+        this.skipBreakpointValues = skipBreakpointValues;
+        return this;
     }
 }
