@@ -12,14 +12,11 @@ import gumtree.spoon.diff.support.SpoonSupport;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtClass;
@@ -30,8 +27,6 @@ public class MatchedLineFinder {
     private static final Logger LOGGER = Logger.getLogger("MatchedLineFinder");
 
     public static void main(String[] args) throws Exception {
-        cleanupPreviousExecutionFiles();
-
         File project = new File(args[0]);
         File diffedFile = getAbsolutePathWithGivenBase(project, args[1]);
         String left = args[2];
@@ -43,22 +38,21 @@ public class MatchedLineFinder {
         File leftJava = prepareFileForGumtree(project, left, diffedFile, LEFT_FOLDER_NAME);
         File rightJava = prepareFileForGumtree(project, right, diffedFile, RIGHT_FOLDER_NAME);
 
-        Triple<String, String, String> output = invoke(leftJava, rightJava);
+        Pair<String, String> output = invoke(leftJava, rightJava);
 
         createInputFile(output.getLeft(), "input-left.txt");
-        createInputFile(output.getMiddle(), "method-name.txt");
         createInputFile(output.getRight(), "input-right.txt");
     }
 
     /**
-     * Find the matched line and the patched method between two Java source files.
+     * Find the matched line between two Java source files.
      *
      * @param left previous version of source file
      * @param right revision of source file
-     * @return matched line for left, patched method, matched line for right
+     * @return matched line for left and matched line for right
      * @throws Exception raised from gumtree-spoon
      */
-    public static Triple<String, String, String> invoke(File left, File right) throws Exception {
+    public static Pair<String, String> invoke(File left, File right) throws Exception {
         Diff diff = new AstComparator().compare(left, right);
         Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
 
@@ -73,11 +67,10 @@ public class MatchedLineFinder {
 
         String breakpointsLeft =
                 serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
-        String methodName = serialiseMethodName(methodLeft);
         String breakpointsRight =
                 serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
 
-        return Triple.of(breakpointsLeft, methodName, breakpointsRight);
+        return Pair.of(breakpointsLeft, breakpointsRight);
     }
 
     private static Pair<Set<Integer>, Set<Integer>> getDiffLines(List<Operation> rootOperations) {
@@ -233,31 +226,9 @@ public class MatchedLineFinder {
         return gson.toJson(array);
     }
 
-    private static String serialiseMethodName(CtMethod<?> method) {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonObject object = new JsonObject();
-        object.addProperty("name", method.getSimpleName());
-        object.addProperty("className", method.getDeclaringType().getQualifiedName());
-
-        return gson.toJson(object);
-    }
-
     private static void createInputFile(String content, String filename) throws IOException {
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write(content);
-        }
-    }
-
-    private static void cleanupPreviousExecutionFiles() {
-        // No need to clear the following files since `scripts/compile_target.py` does that
-        // 1. breakpoint input
-        // 2. build files of project
-        // GumTree files are assumed to be replaced since I have confidence on GumTree
-        Path oldMethodName = new File("method-name.txt").toPath();
-        try {
-            Files.delete(oldMethodName);
-        } catch (IOException e) {
-            LOGGER.info("Could not delete method-name since it does not exist");
         }
     }
 }

@@ -1,4 +1,0 @@
-{
-  "name": "buildTailZone",
-  "className": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet"
-}

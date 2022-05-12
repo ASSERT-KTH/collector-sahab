@@ -1,4 +1,0 @@
-{
-  "name": "printString",
-  "className": "Lambda"
-}
