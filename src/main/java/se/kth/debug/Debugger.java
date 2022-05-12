@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.MethodForExitEvent;
 import se.kth.debug.struct.result.*;
 
 public class Debugger {
@@ -24,17 +23,14 @@ public class Debugger {
     private final String[] pathToBuiltProject;
     private final String[] tests;
     private final List<FileAndBreakpoint> classesAndBreakpoints;
-    private final MethodForExitEvent methodForExitEvent;
 
     public Debugger(
             String[] pathToBuiltProject,
             String[] tests,
-            List<FileAndBreakpoint> classesAndBreakpoints,
-            MethodForExitEvent methodForExitEvent) {
+            List<FileAndBreakpoint> classesAndBreakpoints) {
         this.pathToBuiltProject = pathToBuiltProject;
         this.tests = tests;
         this.classesAndBreakpoints = classesAndBreakpoints;
-        this.methodForExitEvent = methodForExitEvent;
     }
 
     public VirtualMachine launchVMAndJunit() {
@@ -89,7 +85,7 @@ public class Debugger {
 
     public void addClassPrepareEvent(VirtualMachine vm) {
         EventRequestManager erm = vm.eventRequestManager();
-        Set<String> classesToBeRegistered = combineClassNames();
+        Set<String> classesToBeRegistered = getUniqueClasses();
         for (String className : classesToBeRegistered) {
             ClassPrepareRequest cpr = erm.createClassPrepareRequest();
             cpr.addClassFilter(className);
@@ -100,15 +96,12 @@ public class Debugger {
     }
 
     /** We need to register unique class prepare requests, so we combine the class filters. */
-    private Set<String> combineClassNames() {
+    private Set<String> getUniqueClasses() {
         Set<String> classesFromRegisteringClassPrepareRequest = new HashSet<>();
         if (classesAndBreakpoints != null) {
             for (FileAndBreakpoint classToBeDebugged : classesAndBreakpoints) {
                 classesFromRegisteringClassPrepareRequest.add(classToBeDebugged.getFileName());
             }
-        }
-        if (methodForExitEvent != null) {
-            classesFromRegisteringClassPrepareRequest.add(methodForExitEvent.getClassName());
         }
         return classesFromRegisteringClassPrepareRequest;
     }
@@ -204,7 +197,8 @@ public class Debugger {
     public ReturnData processMethodExit(MethodExitEvent mee, CollectorOptions context)
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
-        if (!methodName.equals(methodForExitEvent.getName())) {
+        if (!isReturnWithinBreakpoints(
+                mee.location().lineNumber(), mee.method().declaringType().name())) {
             return null;
         }
         String location = mee.location().toString();
@@ -235,6 +229,18 @@ public class Debugger {
                             context));
         }
         return returnData;
+    }
+
+    private boolean isReturnWithinBreakpoints(int lineNumber, String fullyQualifiedClassName) {
+        for (FileAndBreakpoint fNB : classesAndBreakpoints) {
+            if (fNB.getFileName().equals(fullyQualifiedClassName)) {
+                if (fNB.getBreakpoints().isEmpty()) {
+                    continue;
+                }
+                return fNB.getBreakpoints().contains(lineNumber);
+            }
+        }
+        return false;
     }
 
     private List<LocalVariableData> collectArguments(

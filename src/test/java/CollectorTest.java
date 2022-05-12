@@ -29,7 +29,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
+            TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
@@ -95,13 +95,14 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
+                TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
                 "foo.BasicMathTest::test_add foo.BasicMathTest::test_subtract",
                 "-o",
-                outputJson.toString()
+                outputJson.toString(),
+                "--skip-return-values"
             };
 
             // act
@@ -126,14 +127,15 @@ public class CollectorTest {
                     TestHelper.getMavenClasspathFromBuildDirectory(
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
+                "-i",
+                TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
                 "foo.BasicMathTest::test_add",
                 "-o",
-                outputJson.toString()
+                outputJson.toString(),
+                "--skip-breakpoint-values"
             };
 
             // act
@@ -159,9 +161,7 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("basic-math.txt").toString(),
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
+                TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -187,8 +187,7 @@ public class CollectorTest {
     }
 
     @Test
-    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir)
-            throws FileNotFoundException {
+    void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) throws IOException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
         String[] classpath =
@@ -196,9 +195,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_BREAKPOINT_INPUT
-                    .resolve("zero-breakpoints-basic-math.txt")
-                    .toString(),
+            TestHelper.PATH_TO_INPUT.resolve("zero-breakpoints-basic-math.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
@@ -211,6 +208,7 @@ public class CollectorTest {
         Collector.main(args);
 
         // assert
+        assertNonEmptyFile(outputJson);
     }
 
     @Nested
@@ -225,11 +223,7 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_BREAKPOINT_INPUT
-                        .resolve("zero-breakpoints-basic-math.txt")
-                        .toString(),
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("basic-math.json").toString(),
+                TestHelper.PATH_TO_INPUT.resolve("zero-breakpoints-basic-math.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -247,8 +241,7 @@ public class CollectorTest {
                 Object json = gson.fromJson(jsonReader, Object.class);
                 assertThat(((LinkedTreeMap<?, ?>) json).size(), equalTo(2));
                 assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("breakpoint")), is(empty()));
-                assertThat(
-                        (List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(not(empty())));
+                assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(empty()));
             }
         }
 
@@ -261,13 +254,11 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("void-method.txt").toString(),
-                "-m",
-                TestHelper.PATH_TO_RETURN_INPUT.resolve("wrong-method.json").toString(),
+                TestHelper.PATH_TO_INPUT.resolve("collections").resolve("primitive.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
-                "foo.VoidMethodTest::test_doNothing",
+                "foo.CollectionsTest::test_canWePrintPrimitive",
                 "-o",
                 outputJson.toString()
             };
@@ -298,11 +289,7 @@ public class CollectorTest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
-            TestHelper.PATH_TO_BREAKPOINT_INPUT
-                    .resolve("special-floating-point-value.txt")
-                    .toString(),
-            "-m",
-            TestHelper.PATH_TO_RETURN_INPUT.resolve("special-floating-point-value.json").toString(),
+            TestHelper.PATH_TO_INPUT.resolve("special-floating-point-value.txt").toString(),
             "-p",
             StringUtils.join(classpath, " "),
             "-t",

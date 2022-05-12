@@ -1,6 +1,5 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import com.google.gson.Gson;
@@ -14,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.tuple.Triple;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +22,6 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import se.kth.debug.MatchedLineFinder;
 import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.MethodForExitEvent;
 
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
@@ -32,26 +30,21 @@ class MatchedLineFinderTest {
     @ArgumentsSource(ResourceProvider.Patch.class)
     void should_correctlyGenerateAllInputFilesForCollectorSahab(
             ResourceProvider.TestResource sources) throws Exception {
-        Triple<String, String, String> inputsForCollectorSahab =
+        Pair<String, String> inputsForCollectorSahab =
                 MatchedLineFinder.invoke(sources.left, sources.right);
         assertInputsAreAsExpected(inputsForCollectorSahab, sources.expected);
     }
 
     private void assertInputsAreAsExpected(
-            Triple<String, String, String> input, Path dirContainingExpectedFiles)
-            throws IOException {
+            Pair<String, String> input, Path dirContainingExpectedFiles) throws IOException {
         List<FileAndBreakpoint> actualBreakpointLeft =
                 deserialiseFileAndBreakpoint(input.getLeft());
-        MethodForExitEvent actualMethodName = deserialiseMethodForExitEvent(input.getMiddle());
         List<FileAndBreakpoint> actualBreakpointRight =
                 deserialiseFileAndBreakpoint(input.getRight());
 
         List<FileAndBreakpoint> expectedBreakpointLeft =
                 deserialiseFileAndBreakpoint(
                         Files.readString(dirContainingExpectedFiles.resolve("input-left.txt")));
-        MethodForExitEvent expectedMethodName =
-                deserialiseMethodForExitEvent(
-                        Files.readString(dirContainingExpectedFiles.resolve("method-name.txt")));
         List<FileAndBreakpoint> expectedBreakpointRight =
                 deserialiseFileAndBreakpoint(
                         Files.readString(dirContainingExpectedFiles.resolve("input-right.txt")));
@@ -59,7 +52,6 @@ class MatchedLineFinderTest {
         assertThat(
                 actualBreakpointLeft,
                 containsInAnyOrder(expectedBreakpointLeft.toArray(new FileAndBreakpoint[0])));
-        assertThat(actualMethodName, equalTo(expectedMethodName));
         assertThat(
                 actualBreakpointRight,
                 containsInAnyOrder(expectedBreakpointRight.toArray(new FileAndBreakpoint[0])));
@@ -68,11 +60,6 @@ class MatchedLineFinderTest {
     private List<FileAndBreakpoint> deserialiseFileAndBreakpoint(String json) {
         final Gson gson = new Gson();
         return gson.fromJson(json, new TypeToken<List<FileAndBreakpoint>>() {}.getType());
-    }
-
-    private MethodForExitEvent deserialiseMethodForExitEvent(String json) {
-        final Gson gson = new Gson();
-        return gson.fromJson(json, MethodForExitEvent.class);
     }
 
     @Test

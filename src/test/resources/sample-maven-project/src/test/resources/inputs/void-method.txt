@@ -1,6 +1,6 @@
 [
     {
         "fileName": "foo.VoidMethod",
-        "breakpoints": [6]
+        "breakpoints": [6, 7]
     }
 ]

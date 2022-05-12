@@ -32,7 +32,7 @@ public class CollectorAPITest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.StaticClassFieldTest::test_doSomething"};
         File classesAndBreakpoints =
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("static-class-field.txt").toFile();
+                TestHelper.PATH_TO_INPUT.resolve("static-class-field.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
@@ -40,8 +40,7 @@ public class CollectorAPITest {
                         classpath,
                         tests,
                         classesAndBreakpoints,
-                        null,
-                        TestHelper.getDefaultOptions());
+                        TestHelper.getDefaultOptions().setSkipReturnValues(true));
         BreakPointContext bp =
                 eventProcessor.getBreakpointContexts().stream()
                         .filter(bpc -> bpc.getLineNumber() == 24)
@@ -51,6 +50,7 @@ public class CollectorAPITest {
 
         // assert
         assertThat(sf.getRuntimeValueCollection(), is(empty()));
+        assertThat(eventProcessor.getReturnValues(), is(empty()));
     }
 
     @Nested
@@ -64,7 +64,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_returnTruthy"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("collections")
                             .resolve("one-level.txt")
                             .toFile();
@@ -72,13 +72,18 @@ public class CollectorAPITest {
             // act
             EventProcessor eventProcessor =
                     Collector.invoke(
-                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(1));
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            setExecutionDepth(1).setSkipReturnValues(true));
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
             StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
             List<RuntimeValue> runtimeValues = stackFrameContext.getRuntimeValueCollection();
 
             // assert
+            assertThat(eventProcessor.getReturnValues(), is(empty()));
+
             RuntimeValue queue = runtimeValues.get(0);
             FieldData arrayContainingQueueElements = queue.getFields().get(0);
 
@@ -113,7 +118,7 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_canWePrintPrimitive"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("collections")
                             .resolve("primitive.txt")
                             .toFile();
@@ -124,7 +129,6 @@ public class CollectorAPITest {
                             classpath,
                             tests,
                             classesAndBreakpoints,
-                            null,
                             TestHelper.getDefaultOptions());
 
             BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
@@ -133,6 +137,8 @@ public class CollectorAPITest {
             List<String> actualElements = (List<String>) thePrimitiveArray.getValue();
 
             // assert
+            assertThat(eventProcessor.getReturnValues(), is(empty()));
+
             assertThat(actualElements, equalTo(List.of("yes", "we", "can")));
         }
 
@@ -147,7 +153,7 @@ public class CollectorAPITest {
                 String[] tests =
                         new String[] {"foo.CollectionsTest::test_canNestedArrayBeRepresented"};
                 File classesAndBreakpoints =
-                        TestHelper.PATH_TO_BREAKPOINT_INPUT
+                        TestHelper.PATH_TO_INPUT
                                 .resolve("collections")
                                 .resolve("nested-array.txt")
                                 .toFile();
@@ -158,8 +164,8 @@ public class CollectorAPITest {
                                 classpath,
                                 tests,
                                 classesAndBreakpoints,
-                                null,
-                                setExecutionDepth(executionDepth));
+                                setExecutionDepth(executionDepth).setSkipReturnValues(true));
+                assertThat(eventProcessor.getReturnValues(), is(empty()));
                 return eventProcessor.getBreakpointContexts().get(0).getStackFrameContexts().get(0);
             }
 
@@ -214,7 +220,7 @@ public class CollectorAPITest {
             String[] tests =
                     new String[] {"foo.CollectionsTest::test_canWeRepresentNestedCollection"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
+                    TestHelper.PATH_TO_INPUT
                             .resolve("collections")
                             .resolve("nested-collection.txt")
                             .toFile();
@@ -222,9 +228,14 @@ public class CollectorAPITest {
             // act
             EventProcessor eventProcessor =
                     Collector.invoke(
-                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(8));
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            setExecutionDepth(8).setSkipReturnValues(true));
 
             // assert
+            assertThat(eventProcessor.getReturnValues(), is(empty()));
+
             RuntimeValue onlyNestedSet =
                     eventProcessor
                             .getBreakpointContexts()
@@ -266,16 +277,23 @@ public class CollectorAPITest {
                     TestHelper.getMavenClasspathFromBuildDirectory(
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::justOneLevel"};
-            File methodName =
-                    TestHelper.PATH_TO_RETURN_INPUT
-                            .resolve("one-level-nested-object.json")
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("objects")
+                            .resolve("one-level-nesting.txt")
                             .toFile();
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(classpath, tests, null, methodName, setExecutionDepth(1));
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            setExecutionDepth(1).setSkipBreakpointValues(true));
 
             // assert
+            assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
+
             RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
             assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));
             assertThat(returnValue.getFields().size(), equalTo(1));
@@ -294,16 +312,22 @@ public class CollectorAPITest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::maybeTwoMoreLevels"};
             File classesAndBreakpoints =
-                    TestHelper.PATH_TO_BREAKPOINT_INPUT
-                            .resolve("multiple-level-nested-object.txt")
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("objects")
+                            .resolve("multiple-level-nesting.txt")
                             .toFile();
 
             // act
             EventProcessor eventProcessor =
                     Collector.invoke(
-                            classpath, tests, classesAndBreakpoints, null, setExecutionDepth(3));
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            setExecutionDepth(3).setSkipReturnValues(true));
 
             // assert
+            assertThat(eventProcessor.getReturnValues(), is(empty()));
+
             RuntimeValue field =
                     eventProcessor
                             .getBreakpointContexts()
@@ -336,13 +360,17 @@ public class CollectorAPITest {
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.VoidMethodTest::test_doNothing"};
-        File methodName = TestHelper.PATH_TO_RETURN_INPUT.resolve("void-method.json").toFile();
+        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("void-method.txt").toFile();
         // act
         EventProcessor eventProcessor =
                 Collector.invoke(
-                        classpath, tests, null, methodName, TestHelper.getDefaultOptions());
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
 
         // assert
+        assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
         RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
         assertThat(returnValue.getValue(), equalTo("<void value>"));
     }
@@ -356,18 +384,16 @@ public class CollectorAPITest {
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.AnonymousTest::test_implementAnonymousGreetings"};
         File classesAndBreakpoints =
-                TestHelper.PATH_TO_BREAKPOINT_INPUT.resolve("anonymous-class.txt").toFile();
+                TestHelper.PATH_TO_INPUT.resolve("anonymous-class.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
                 Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        null,
-                        TestHelper.getDefaultOptions());
+                        classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
 
         // assert
+        assertThat(eventProcessor.getReturnValues(), is(empty()));
+
         RuntimeValue hindiGreeting =
                 eventProcessor
                         .getBreakpointContexts()
@@ -399,12 +425,17 @@ public class CollectorAPITest {
                 TestHelper.getMavenClasspathFromBuildDirectory(
                         TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.AnonymousTest::test_printString"};
-        File methodName = TestHelper.PATH_TO_RETURN_INPUT.resolve("lambda.json").toFile();
+        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("lambda.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
                 Collector.invoke(
-                        classpath, tests, null, methodName, TestHelper.getDefaultOptions());
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+
+        assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
 
         RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
         assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));

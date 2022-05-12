@@ -33,9 +33,6 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
     private File classesAndBreakpoints = null;
 
-    @CommandLine.Option(names = "-m", description = "File containing method name")
-    private File methodForExitEvent = null;
-
     @CommandLine.Option(
             names = "--stack-trace-depth",
             description =
@@ -58,6 +55,16 @@ public class Collector implements Callable<Integer> {
             description = "Whether to collect field data or not")
     private boolean skipPrintingField = false;
 
+    @CommandLine.Option(
+            names = "--skip-breakpoint-values",
+            description = "Whether to collect breakpoint values")
+    private boolean skipBreakpointValues = false;
+
+    @CommandLine.Option(
+            names = "--skip-return-values",
+            description = "Whether to collect return values")
+    private boolean skipReturnValues = false;
+
     public static void main(String[] args) {
         new CommandLine(new Collector()).execute(args);
     }
@@ -66,12 +73,7 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(
-                        providedClasspath,
-                        tests,
-                        classesAndBreakpoints,
-                        methodForExitEvent,
-                        context);
+                invoke(providedClasspath, tests, classesAndBreakpoints, context);
         write(eventProcessor);
         return 0;
     }
@@ -80,12 +82,10 @@ public class Collector implements Callable<Integer> {
             String[] providedClasspath,
             String[] tests,
             File classesAndBreakpoints,
-            File methodForExitEvent,
             CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(
-                        providedClasspath, tests, classesAndBreakpoints, methodForExitEvent);
+                new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
         eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
@@ -97,6 +97,8 @@ public class Collector implements Callable<Integer> {
         context.setNumberOfArrayElements(numberOfArrayElements);
         context.setExecutionDepth(executionDepth);
         context.setSkipPrintingField(skipPrintingField);
+        context.setSkipBreakpointValues(skipBreakpointValues);
+        context.setSkipReturnValues(skipReturnValues);
 
         return context;
     }
@@ -110,7 +112,7 @@ public class Collector implements Callable<Integer> {
                         .create();
         JsonObject output = new JsonObject();
 
-        if (classesAndBreakpoints == null) {
+        if (skipBreakpointValues) {
             logger.info(
                     "Breakpoint data was not asked for. Please provide class names and line numbers if you desire otherwise.");
         } else if (!eventProcessor.getBreakpointContexts().isEmpty()) {
@@ -121,7 +123,7 @@ public class Collector implements Callable<Integer> {
             logger.info("Output file was not generated as breakpoints were not encountered.");
         }
 
-        if (methodForExitEvent == null) {
+        if (skipReturnValues) {
             logger.info(
                     "Return data was not asked for. Please provide method names if you desire otherwise.");
         } else if (!eventProcessor.getReturnValues().isEmpty()) {

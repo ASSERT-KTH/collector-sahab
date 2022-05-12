@@ -11,10 +11,8 @@ public class TestHelper {
     private static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES =
             PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("src").resolve("test").resolve("resources");
 
-    private static final Path PATH_TO_INPUT =
+    public static final Path PATH_TO_INPUT =
             PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("inputs");
-    public static final Path PATH_TO_BREAKPOINT_INPUT = PATH_TO_INPUT.resolve("breakpoint");
-    public static final Path PATH_TO_RETURN_INPUT = PATH_TO_INPUT.resolve("return");
 
     public static final Path PATH_TO_EXPECTED_OUTPUT =
             PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("expected-outputs");
