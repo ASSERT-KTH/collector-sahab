@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -213,7 +212,6 @@ public class CollectorTest {
     }
 
     @Nested
-    @Disabled
     class BothAttributeShouldBePresent {
         @Test
         void breakpointShouldBePresentEvenIfItsDataIsEmpty(@TempDir Path tempDir)
@@ -243,8 +241,7 @@ public class CollectorTest {
                 Object json = gson.fromJson(jsonReader, Object.class);
                 assertThat(((LinkedTreeMap<?, ?>) json).size(), equalTo(2));
                 assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("breakpoint")), is(empty()));
-                assertThat(
-                        (List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(not(empty())));
+                assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(empty()));
             }
         }
 
@@ -257,11 +254,11 @@ public class CollectorTest {
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_INPUT.resolve("void-method.txt").toString(),
+                TestHelper.PATH_TO_INPUT.resolve("collections").resolve("primitive.txt").toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
-                "foo.VoidMethodTest::test_doNothing",
+                "foo.CollectionsTest::test_canWePrintPrimitive",
                 "-o",
                 outputJson.toString()
             };
@@ -277,8 +274,7 @@ public class CollectorTest {
                 assertThat(
                         (List<?>) (((LinkedTreeMap<?, ?>) json).get("breakpoint")),
                         is(not(empty())));
-                assertThat(
-                        (List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(not(empty())));
+                assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(empty()));
             }
         }
     }
