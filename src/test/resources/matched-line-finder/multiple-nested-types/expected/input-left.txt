@@ -1,0 +1,20 @@
+[
+  {
+    "fileName": "MultipleTypes$FirstLevel1",
+    "breakpoints": [
+      10
+    ]
+  },
+  {
+    "fileName": "MultipleTypes",
+    "breakpoints": [
+      3
+    ]
+  },
+  {
+    "fileName": "MultipleTypes$FirstLevel2$SecondLevel1",
+    "breakpoints": [
+      17
+    ]
+  }
+]
