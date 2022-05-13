@@ -146,10 +146,14 @@ public class MatchedLineFinder {
 
     static class BlockFinder extends CtScanner {
         private final Set<Integer> diffLines;
+        // We do not want to go in other classes because they are registered in store separately, so
+        // they will be iterated upon in the future.
+        private final CtType<?> currentType;
         private final Set<Integer> lines = new HashSet<>();
 
-        private BlockFinder(Set<Integer> diffLines) {
+        private BlockFinder(Set<Integer> diffLines, CtType<?> currentType) {
             this.diffLines = diffLines;
+            this.currentType = currentType;
         }
 
         /**
@@ -160,7 +164,7 @@ public class MatchedLineFinder {
          */
         @Override
         public <R> void visitCtBlock(CtBlock<R> block) {
-            if (block.getParent(CtType.class).isAnonymous() && diffLines.isEmpty()) {
+            if (!block.getParent(CtType.class).equals(currentType)) {
                 return;
             }
             List<CtStatement> statements = block.getStatements();
@@ -185,7 +189,7 @@ public class MatchedLineFinder {
     }
 
     private static Set<Integer> getMatchedLines(Set<Integer> diffLines, CtMethod<?> method) {
-        BlockFinder blockTraversal = new BlockFinder(diffLines);
+        BlockFinder blockTraversal = new BlockFinder(diffLines, method.getDeclaringType());
         blockTraversal.scan(method);
         return blockTraversal.getLines();
     }
