@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "foo.breakpointAtEndCurlyBrace.Void",
+        "breakpoints": [6]
+    }
+]

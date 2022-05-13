@@ -3,6 +3,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import com.sun.jdi.AbsentInformationException;
 import java.io.File;
@@ -440,5 +441,73 @@ public class CollectorAPITest {
         RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
         assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));
         assertThat(returnValue.getValue(), equalTo("Hey!"));
+    }
+
+    @Nested
+    class BreakPointAtEndCurlyBrace {
+        @Test
+        void nonVoidMethod_throws_IndexOutOfBoundException() throws FileNotFoundException {
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests =
+                    new String[] {
+                        "foo.BreakpointAtEndCurlyBraceTest::test_shouldEndLineBeCollected_nonVoid"
+                    };
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("breakpoint-at-end-curly-brace")
+                            .resolve("non-void.txt")
+                            .toFile();
+
+            assertThrowsExactly(
+                    IndexOutOfBoundsException.class,
+                    () -> {
+                        Collector.invoke(
+                                classpath,
+                                tests,
+                                classesAndBreakpoints,
+                                TestHelper.getDefaultOptions());
+                    });
+        }
+
+        @Test
+        void voidMethod_voidIsCollected() throws FileNotFoundException, AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests =
+                    new String[] {
+                        "foo.BreakpointAtEndCurlyBraceTest::test_doNotReturnAnything_void"
+                    };
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("breakpoint-at-end-curly-brace")
+                            .resolve("void.txt")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            TestHelper.getDefaultOptions());
+
+            // assert
+            List<RuntimeValue> runtimeValuesFromBreakpoint =
+                    eventProcessor
+                            .getBreakpointContexts()
+                            .get(0)
+                            .getStackFrameContexts()
+                            .get(0)
+                            .getRuntimeValueCollection();
+            assertThat(runtimeValuesFromBreakpoint, is(empty()));
+
+            RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
+            assertThat(returnValue.getKind(), is(RuntimeValueKind.RETURN));
+            assertThat(returnValue.getValue(), equalTo("<void value>"));
+        }
     }
 }
