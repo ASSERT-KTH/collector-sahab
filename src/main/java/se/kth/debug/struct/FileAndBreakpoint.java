@@ -38,4 +38,9 @@ public class FileAndBreakpoint {
         result = prime * result + breakpoints.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "[" + fileName + ":" + breakpoints + "]";
+    }
 }
