@@ -1,8 +1,15 @@
 [
-  {
-    "fileName": "foo.AnonymousClass$1",
-    "breakpoints": [
-      9
-    ]
-  }
+    {
+        "fileName":"foo.AnonymousClass",
+        "breakpoints":[
+            5,
+            12
+        ]
+    },
+    {
+        "fileName":"foo.AnonymousClass$1",
+        "breakpoints":[
+            9
+        ]
+    }
 ]
