@@ -138,7 +138,7 @@
             <version>2.2</version>
             <scope>test</scope>
         </dependency>
-<!--        This dependency is used for instrumenting subprocesses -->
+<!--        This dependency is used for instrumenting subprocesses for coverage report. -->
         <dependency>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
