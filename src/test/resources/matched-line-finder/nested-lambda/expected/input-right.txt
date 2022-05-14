@@ -1,0 +1,6 @@
+[
+  {
+    "fileName": "NestedLambda",
+    "breakpoints": [3, 4, 7, 9]
+  }
+]
