@@ -8,24 +8,22 @@ import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
 import gumtree.spoon.diff.operations.InsertOperation;
 import gumtree.spoon.diff.operations.Operation;
-import gumtree.spoon.diff.support.SpoonSupport;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import se.kth.debug.struct.DebugeeType;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtStatement;
-import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.visitor.CtScanner;
 
 public class MatchedLineFinder {
-    private static final Logger LOGGER = Logger.getLogger("MatchedLineFinder");
-
     public static void main(String[] args) throws Exception {
         File project = new File(args[0]);
         File diffedFile = getAbsolutePathWithGivenBase(project, args[1]);
@@ -49,60 +47,113 @@ public class MatchedLineFinder {
      *
      * @param left previous version of source file
      * @param right revision of source file
-     * @return matched line for left and matched line for right
+     * @return matched lines for left and matched lines for right
      * @throws Exception raised from gumtree-spoon
      */
     public static Pair<String, String> invoke(File left, File right) throws Exception {
         Diff diff = new AstComparator().compare(left, right);
-        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
+        if (diff.getRootOperations().isEmpty()) {
+            throw new NoDiffException("No diff line is enclosed in method");
+        }
+        Pair<Set<DebugeeType>, Set<DebugeeType>> store =
+                initialiseStoreWithDiffLines(diff.getRootOperations());
 
-        CtMethod<?> methodLeft = findMethod(diff.getRootOperations());
-        CtMethod<?> methodRight =
-                (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
+        computeMatchedLines(store.getLeft());
+        computeMatchedLines(store.getRight());
 
-        Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methodLeft);
-        Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methodRight);
-        String fullyQualifiedNameOfContainerClass =
-                methodLeft.getParent(CtClass.class).getQualifiedName();
-
-        String breakpointsLeft =
-                serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
-        String breakpointsRight =
-                serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
+        String breakpointsLeft = serialiseBreakpoints(store.getLeft());
+        String breakpointsRight = serialiseBreakpoints(store.getRight());
 
         return Pair.of(breakpointsLeft, breakpointsRight);
     }
 
-    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(List<Operation> rootOperations) {
-        Set<Integer> src = new HashSet<>();
-        Set<Integer> dst = new HashSet<>();
+    /**
+     * Finds the enclosing methods of all the types in the store and computes breakpoints for the
+     * method which encloses the diff line.
+     *
+     * @param debugeeTypes the types that need to be debugged
+     */
+    private static void computeMatchedLines(Set<DebugeeType> debugeeTypes) {
+        for (DebugeeType store : debugeeTypes) {
+            Set<CtMethod<?>> methods = store.getType().getMethods();
+            for (CtMethod<?> method : methods) {
+                int start = method.getPosition().getLine();
+                int end = method.getPosition().getEndLine();
+
+                if (store.getDiffLines().isEmpty()
+                        || start <= Collections.min(store.getDiffLines())
+                                && end >= Collections.max(store.getDiffLines())) {
+                    store.getMatchedLines().addAll(getMatchedLines(store.getDiffLines(), method));
+                }
+            }
+        }
+    }
+
+    private static Pair<Set<DebugeeType>, Set<DebugeeType>> initialiseStoreWithDiffLines(
+            List<Operation> rootOperations) {
+        Set<DebugeeType> src = new HashSet<>();
+        Set<DebugeeType> dst = new HashSet<>();
         rootOperations.forEach(
                 operation -> {
                     if (operation.getSrcNode() != null) {
                         if (operation.getSrcNode().getPosition().isValidPosition()) {
+                            CtElement srcNode = operation.getSrcNode();
+                            CtType<?> diffedType = srcNode.getParent(CtType.class);
                             // Nodes of insert operation should be inserted in dst
                             if (operation instanceof InsertOperation) {
-                                dst.add(operation.getSrcNode().getPosition().getLine());
+                                appendOrCreateTypeAndBreakpointInStore(dst, diffedType, srcNode);
                             } else {
-                                src.add(operation.getSrcNode().getPosition().getLine());
+                                appendOrCreateTypeAndBreakpointInStore(src, diffedType, srcNode);
                             }
                         }
                     }
                     if (operation.getDstNode() != null) {
                         if (operation.getDstNode().getPosition().isValidPosition()) {
-                            dst.add(operation.getSrcNode().getPosition().getLine());
+                            CtElement dstNode = operation.getDstNode();
+                            CtType<?> diffedType = dstNode.getParent(CtType.class);
+                            appendOrCreateTypeAndBreakpointInStore(dst, diffedType, dstNode);
                         }
                     }
                 });
         return Pair.of(src, dst);
     }
 
+    /**
+     * Registers type in the debuggee type store. If the type already exists, the breakpoint is
+     * added to the type.
+     *
+     * <p>If the diffed type is an anonymous class, outer classes are also registered.
+     */
+    private static void appendOrCreateTypeAndBreakpointInStore(
+            Set<DebugeeType> revision, CtType<?> diffedType, CtElement diffedNode) {
+        Optional<DebugeeType> candidate =
+                revision.stream().filter(m -> m.getType().equals(diffedType)).findAny();
+        if (candidate.isPresent()) {
+            candidate.get().getDiffLines().add(diffedNode.getPosition().getLine());
+        } else {
+            DebugeeType store = new DebugeeType(diffedType);
+            store.getDiffLines().add(diffedNode.getPosition().getLine());
+            revision.add(store);
+        }
+        CtType<?> couldBeAnonymous = diffedType;
+        if (couldBeAnonymous.isAnonymous()) {
+            while (!couldBeAnonymous.isTopLevel()) {
+                couldBeAnonymous = couldBeAnonymous.getParent(CtType.class);
+                revision.add(new DebugeeType(couldBeAnonymous));
+            }
+        }
+    }
+
     static class BlockFinder extends CtScanner {
         private final Set<Integer> diffLines;
+        // We do not want to go in other classes because they are registered in store separately, so
+        // they will be iterated upon in the future.
+        private final CtType<?> currentType;
         private final Set<Integer> lines = new HashSet<>();
 
-        private BlockFinder(Set<Integer> diffLines) {
+        private BlockFinder(Set<Integer> diffLines, CtType<?> currentType) {
             this.diffLines = diffLines;
+            this.currentType = currentType;
         }
 
         /**
@@ -113,10 +164,14 @@ public class MatchedLineFinder {
          */
         @Override
         public <R> void visitCtBlock(CtBlock<R> block) {
+            if (!block.getParent(CtType.class).equals(currentType)) {
+                return;
+            }
             List<CtStatement> statements = block.getStatements();
             statements.forEach(
                     statement -> {
-                        if (!diffLines.contains(statement.getPosition().getLine())
+                        if (!statement.isImplicit()
+                                && !diffLines.contains(statement.getPosition().getLine())
                                 && !isStatementPartOfDiffedBlock(statement)) {
                             lines.add(statement.getPosition().getLine());
                         }
@@ -134,30 +189,9 @@ public class MatchedLineFinder {
     }
 
     private static Set<Integer> getMatchedLines(Set<Integer> diffLines, CtMethod<?> method) {
-        BlockFinder blockTraversal = new BlockFinder(diffLines);
+        BlockFinder blockTraversal = new BlockFinder(diffLines, method.getDeclaringType());
         blockTraversal.scan(method);
         return blockTraversal.getLines();
-    }
-
-    private static CtMethod<?> findMethod(List<Operation> rootOperations) {
-        // In an ideal case, srcNode of first root operation will give the method because APR
-        // patches usually have
-        // only one operation.
-        // We also return the first method we find because we assume there will a patch inside only
-        // one method.
-        for (Operation<?> operation : rootOperations) {
-            CtMethod<?> candidate = operation.getSrcNode().getParent(CtMethod.class);
-            if (candidate == null) {
-                LOGGER.warning(
-                        operation.getSrcNode()
-                                + ":"
-                                + operation.getSrcNode().getPosition().getLine()
-                                + " has no parent method.");
-            } else {
-                return candidate;
-            }
-        }
-        throw new NoDiffException("No diff line is enclosed in method");
     }
 
     public static class NoDiffException extends RuntimeException {
@@ -214,14 +248,15 @@ public class MatchedLineFinder {
         return new File(revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
     }
 
-    private static String serialiseBreakpoints(
-            String fullyQualifiedClassName, Set<Integer> breakpoints) {
+    private static String serialiseBreakpoints(Set<DebugeeType> debugeeTypes) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonArray array = new JsonArray();
-        JsonObject object = new JsonObject();
-        object.addProperty("fileName", fullyQualifiedClassName);
-        object.add("breakpoints", gson.toJsonTree(breakpoints));
-        array.add(object);
+        for (DebugeeType store : debugeeTypes) {
+            JsonObject object = new JsonObject();
+            object.addProperty("fileName", store.getType().getQualifiedName());
+            object.add("breakpoints", gson.toJsonTree(store.getMatchedLines()));
+            array.add(object);
+        }
 
         return gson.toJson(array);
     }

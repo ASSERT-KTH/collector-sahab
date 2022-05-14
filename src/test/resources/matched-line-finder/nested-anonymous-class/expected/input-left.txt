@@ -1,0 +1,27 @@
+[
+  {
+    "fileName": "NestedAnonymousClass$1$1$1",
+    "breakpoints": []
+  },
+  {
+    "fileName": "NestedAnonymousClass$1$1",
+    "breakpoints": [
+      19,
+      13
+    ]
+  },
+  {
+    "fileName": "NestedAnonymousClass$1",
+    "breakpoints": [
+      22,
+      10
+    ]
+  },
+  {
+    "fileName": "NestedAnonymousClass",
+    "breakpoints": [
+      7,
+      25
+    ]
+  }
+]
