@@ -14,4 +14,4 @@ parsers:
       method: no
       macro: no
 
-comment: true
+comment: false
