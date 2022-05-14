@@ -64,12 +64,13 @@ There are two ways to achieve this:
            -p [path/to/all/classes/required ...]
            -t [classname::testMethod ...]
            -i <path/to/input/breakpoint/file>
-           -m <path/to/input/return/file>
            -o <path/to/output>
            --execution-depth (default=0)
            --number-of-array-elements (default=10)
            --skip-printing-field (default=false)
            --stack-trace-depth (default=0)
+           --skip-breakpoint-values (default=false)
+           --skip-return-values (default=false)
       ```
          > `-i` and `-m` are arguments for collecting data for breakpoints and method exit
         respectively. One should provide _at least one_ of them to get some valuable output

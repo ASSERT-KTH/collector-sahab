@@ -52,17 +52,17 @@ public class Collector implements Callable<Integer> {
 
     @CommandLine.Option(
             names = "--skip-printing-field",
-            description = "Whether to collect field data or not")
+            description = "Whether to collect field data or not (default: ${DEFAULT-VALUE}).")
     private boolean skipPrintingField = false;
 
     @CommandLine.Option(
             names = "--skip-breakpoint-values",
-            description = "Whether to collect breakpoint values")
+            description = "Whether to collect breakpoint values (default: ${DEFAULT-VALUE}).")
     private boolean skipBreakpointValues = false;
 
     @CommandLine.Option(
             names = "--skip-return-values",
-            description = "Whether to collect return values")
+            description = "Whether to collect return values (default: ${DEFAULT-VALUE}).")
     private boolean skipReturnValues = false;
 
     public static void main(String[] args) {
