@@ -1,6 +1,7 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,16 +19,28 @@ class JUnitTestRunnerTest {
                     .resolve("resources")
                     .resolve("junit-test-runner-logs");
 
-    private String getActualLogs(String tests) throws IOException, InterruptedException {
+    private String getActualLogs(String tests)
+            throws IOException, InterruptedException, ClassNotFoundException {
         Path actualLog = Files.createFile(tempDir.resolve("log.txt"));
         String classpath =
                 Utility.getClasspathForRunningJUnit(
                         TestHelper.getMavenClasspathFromBuildDirectory(
                                 TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve(
                                         "without-debug")));
+
+        File jaCoCoJavaagentJar = Utility.getJaCoCoJavaagentJar();
+        String jaCoCoJavaagentArgument =
+                String.format(
+                        "-javaagent:%s=destfile=target/jacoco.exec",
+                        jaCoCoJavaagentJar.getAbsolutePath());
         ProcessBuilder processBuilder =
                 new ProcessBuilder(
-                        "java", "-cp", classpath, JUnitTestRunner.class.getCanonicalName(), tests);
+                        "java",
+                        jaCoCoJavaagentArgument,
+                        "-cp",
+                        classpath,
+                        JUnitTestRunner.class.getCanonicalName(),
+                        tests);
         processBuilder.redirectOutput(actualLog.toFile());
 
         Process p = processBuilder.start();
@@ -37,7 +50,7 @@ class JUnitTestRunnerTest {
     }
 
     @Test
-    void main_canRunJunit4And5() throws IOException, InterruptedException {
+    void main_canRunJunit4And5() throws IOException, InterruptedException, ClassNotFoundException {
         // assert
         String tests = "foo.junit.JUnit4Test foo.junit.JUnit5Test";
         Path expectedLogRegex = PATH_TO_JUNIT_LOGS.resolve("run-4-and-5.regex");
@@ -46,7 +59,8 @@ class JUnitTestRunnerTest {
     }
 
     @Test
-    void main_canRunTestMethodsAndClasses() throws IOException, InterruptedException {
+    void main_canRunTestMethodsAndClasses()
+            throws IOException, InterruptedException, ClassNotFoundException {
         String tests = "foo.junit.JUnit4Test::test_concat foo.junit.JUnit5Test";
         Path expectedLogRegex = PATH_TO_JUNIT_LOGS.resolve("mix-of-method-and-class.regex");
 

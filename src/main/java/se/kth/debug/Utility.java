@@ -3,7 +3,9 @@ package se.kth.debug;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -56,5 +58,28 @@ public class Utility {
     public static String parseTests(String[] tests) {
 
         return String.join(" ", tests);
+    }
+
+    /**
+     * Returns path to JaCoCo runtime jar. It is used to dynamically set the javaagent of
+     * subprocesses.
+     *
+     * @return org.jacoco.agent-runtime.jar
+     * @throws ClassNotFoundException thrown when JaCoCo is not provided as a test dependency
+     */
+    public static File getJaCoCoJavaagentJar() throws ClassNotFoundException {
+        String[] pathElements =
+                System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+        String jarPattern = "org\\.jacoco\\.agent-\\d\\.\\d\\.\\d-runtime\\.jar";
+        Optional<File> jaCoCoCandidate =
+                Arrays.stream(pathElements)
+                        .map(File::new)
+                        .filter(f -> f.getName().matches(jarPattern))
+                        .findFirst();
+
+        if (jaCoCoCandidate.isPresent()) {
+            return jaCoCoCandidate.get();
+        }
+        throw new ClassNotFoundException("JaCoCo is not provided as a test dependency");
     }
 }
