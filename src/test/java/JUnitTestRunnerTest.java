@@ -1,7 +1,6 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,19 +27,9 @@ class JUnitTestRunnerTest {
                                 TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve(
                                         "without-debug")));
 
-        File jaCoCoJavaagentJar = Utility.getJaCoCoJavaagentJar();
-        String jaCoCoJavaagentArgument =
-                String.format(
-                        "-javaagent:%s=destfile=target/jacoco.exec",
-                        jaCoCoJavaagentJar.getAbsolutePath());
         ProcessBuilder processBuilder =
                 new ProcessBuilder(
-                        "java",
-                        jaCoCoJavaagentArgument,
-                        "-cp",
-                        classpath,
-                        JUnitTestRunner.class.getCanonicalName(),
-                        tests);
+                        "java", "-cp", classpath, JUnitTestRunner.class.getCanonicalName(), tests);
         processBuilder.redirectOutput(actualLog.toFile());
 
         Process p = processBuilder.start();
