@@ -1,5 +1,6 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,5 +39,10 @@ public class UtilityTest {
         assertThat(
                 Arrays.asList(actualClasspath.split(File.pathSeparator)),
                 hasItems(expectedClasspath.split(File.pathSeparator)));
+    }
+
+    @Test
+    void getJaCoCoJavaagentJar_throws_ClassNotFoundException() {
+        assertThrowsExactly(ClassNotFoundException.class, Utility::getJaCoCoJavaagentJar);
     }
 }
