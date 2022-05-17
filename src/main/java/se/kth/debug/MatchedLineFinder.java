@@ -9,11 +9,11 @@ import gumtree.spoon.diff.Diff;
 import gumtree.spoon.diff.operations.InsertOperation;
 import gumtree.spoon.diff.operations.Operation;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import se.kth.debug.struct.DebugeeType;
 import spoon.reflect.code.CtBlock;
@@ -26,7 +26,7 @@ import spoon.reflect.visitor.CtScanner;
 public class MatchedLineFinder {
     public static void main(String[] args) throws Exception {
         File project = new File(args[0]);
-        File diffedFile = getAbsolutePathWithGivenBase(project, args[1]);
+        File diffedFile = resolveFilenameWithGivenBase(project, args[1]);
         String left = args[2];
         String right = args[3];
 
@@ -200,19 +200,15 @@ public class MatchedLineFinder {
         }
     }
 
-    private static File getAbsolutePathWithGivenBase(File base, String filename) {
-        List<File> absolutePath =
-                FileUtils.listFiles(new File(base, "src"), new String[] {"java"}, true).stream()
-                        .filter(file -> file.getName().equals(filename))
-                        .collect(Collectors.toList());
+    private static File resolveFilenameWithGivenBase(File base, String filename)
+            throws FileNotFoundException {
+        File absolutePath = Paths.get(base.getAbsolutePath()).resolve(filename).toFile();
 
-        if (absolutePath.isEmpty()) {
-            throw new RuntimeException(filename + " does not exist in " + base.getAbsolutePath());
+        if (!absolutePath.exists()) {
+            throw new FileNotFoundException(
+                    filename + " does not exist in " + base.getAbsolutePath());
         }
-        if (absolutePath.size() > 1) {
-            throw new RuntimeException("Use fully qualified names");
-        }
-        return absolutePath.get(0);
+        return absolutePath;
     }
 
     private static File prepareFileForGumtree(
