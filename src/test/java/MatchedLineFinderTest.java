@@ -1,12 +1,17 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -77,6 +83,57 @@ class MatchedLineFinderTest {
         assertThrowsExactly(
                 MatchedLineFinder.NoDiffException.class,
                 () -> MatchedLineFinder.invoke(left, right));
+    }
+
+    @Nested
+    class ResolveFilenameWithGivenBase {
+        private Object resolveFilename(String filename)
+                throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
+                        IllegalAccessException {
+            // arrange
+            File base = TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.toFile();
+
+            Class<?> mlf = Class.forName("se.kth.debug.MatchedLineFinder");
+            Method method =
+                    mlf.getDeclaredMethod("resolveFilenameWithGivenBase", File.class, String.class);
+            method.setAccessible(true);
+
+            return method.invoke(null, base, filename);
+        }
+
+        @Test
+        void resolveCorrectFile()
+                throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
+                        IllegalAccessException {
+            // arrange
+            String filename =
+                    String.join(
+                            File.separator,
+                            new String[] {
+                                "src", "main", "java", "foo", "collections", "Primitive.java"
+                            });
+
+            // act
+            File resolvedFile = (File) resolveFilename(filename);
+
+            // assert
+            assertThat(resolvedFile, anExistingFile());
+        }
+
+        @Test
+        void throws_FileNotFoundException() {
+            // arrange
+            String filename =
+                    String.join(
+                            File.separator,
+                            new String[] {"src", "main", "java", "foo", "blah", "Bar.java"});
+
+            // assert
+            Throwable exceptionWrapper =
+                    assertThrowsExactly(
+                            InvocationTargetException.class, () -> resolveFilename(filename));
+            assertThat(exceptionWrapper.getCause(), instanceOf(FileNotFoundException.class));
+        }
     }
 }
 
