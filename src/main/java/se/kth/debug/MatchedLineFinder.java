@@ -17,8 +17,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
-import spoon.reflect.code.CtBlock;
-import spoon.reflect.code.CtStatement;
+import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.CtScanner;
@@ -123,6 +122,19 @@ public class MatchedLineFinder {
                         }
                     });
             super.visitCtBlock(block);
+        }
+
+        @Override
+        public <S> void visitCtCase(CtCase<S> caseStatement) {
+            List<CtStatement> caseBlock = caseStatement.getStatements();
+            caseBlock.forEach(
+                    statement -> {
+                        if (!diffLines.contains(statement.getPosition().getLine())
+                                && !isStatementPartOfDiffedBlock(statement)) {
+                            lines.add(statement.getPosition().getLine());
+                        }
+                    });
+            super.visitCtCase(caseStatement);
         }
 
         private boolean isStatementPartOfDiffedBlock(CtStatement statement) {

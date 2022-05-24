@@ -510,4 +510,26 @@ public class CollectorAPITest {
             assertThat(returnValue.getValue(), equalTo("<void value>"));
         }
     }
+
+    @Test
+    void dataShouldBeCollectedInsideSwitchBlock()
+            throws FileNotFoundException, AbsentInformationException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.SwitchCaseTest::test"};
+        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("switch-case.json").toFile();
+
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+
+        // assert
+        assertThat(eventProcessor.getReturnValues().size(), equalTo(8));
+    }
 }
