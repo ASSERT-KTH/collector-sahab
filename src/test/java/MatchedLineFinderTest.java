@@ -35,6 +35,8 @@ class MatchedLineFinderTest {
 
     private static final List<String> IGNORE_TESTS =
             List.of(
+                    // ToDo: Can be fixed after
+                    // https://github.com/SpoonLabs/gumtree-spoon-ast-diff/issues/245
                     "nested-lambda",
                     "anonymous-class",
                     "nested-anonymous-class",
@@ -44,7 +46,6 @@ class MatchedLineFinderTest {
     @ArgumentsSource(ResourceProvider.Patch.class)
     void should_correctlyGenerateAllInputFilesForCollectorSahab(
             ResourceProvider.TestResource sources) throws Exception {
-        // ToDo: Can be fixed after https://github.com/SpoonLabs/gumtree-spoon-ast-diff/issues/245
         if (IGNORE_TESTS.contains(sources.dir)) {
             assumeTrue(false);
         }
