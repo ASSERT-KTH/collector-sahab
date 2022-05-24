@@ -3,7 +3,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import com.sun.jdi.AbsentInformationException;
 import java.io.File;
@@ -446,7 +445,9 @@ public class CollectorAPITest {
     @Nested
     class BreakPointAtEndCurlyBrace {
         @Test
-        void nonVoidMethod_throws_IndexOutOfBoundException() throws FileNotFoundException {
+        void nonVoidMethod_doesNotCollectAnything()
+                throws FileNotFoundException, AbsentInformationException {
+            // arrange
             String[] classpath =
                     TestHelper.getMavenClasspathFromBuildDirectory(
                             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
@@ -460,15 +461,17 @@ public class CollectorAPITest {
                             .resolve("non-void.txt")
                             .toFile();
 
-            assertThrowsExactly(
-                    IndexOutOfBoundsException.class,
-                    () -> {
-                        Collector.invoke(
-                                classpath,
-                                tests,
-                                classesAndBreakpoints,
-                                TestHelper.getDefaultOptions());
-                    });
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            TestHelper.getDefaultOptions());
+
+            // assert
+            assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
+            assertThat(eventProcessor.getReturnValues(), is(empty()));
         }
 
         @Test
