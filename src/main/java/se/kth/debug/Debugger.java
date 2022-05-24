@@ -118,9 +118,16 @@ public class Debugger {
                         .getBreakpoints();
 
         for (int lineNumber : breakpoints) {
-            List<Location> locations = event.referenceType().locationsOfLine(lineNumber);
-            BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
-            br.setEnabled(true);
+            try {
+                List<Location> locations = event.referenceType().locationsOfLine(lineNumber);
+                BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
+                br.setEnabled(true);
+            } catch (IndexOutOfBoundsException exception) {
+                logger.warning(
+                        String.format(
+                                "%d is not a valid breakpoint in %s",
+                                lineNumber, event.referenceType().name()));
+            }
         }
     }
 
