@@ -33,12 +33,19 @@ import se.kth.debug.struct.FileAndBreakpoint;
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
 
+    private static final List<String> IGNORE_TESTS =
+            List.of(
+                    "nested-lambda",
+                    "anonymous-class",
+                    "nested-anonymous-class",
+                    "multiple-nested-types");
+
     @ParameterizedTest
     @ArgumentsSource(ResourceProvider.Patch.class)
     void should_correctlyGenerateAllInputFilesForCollectorSahab(
             ResourceProvider.TestResource sources) throws Exception {
         // ToDo: Can be fixed after https://github.com/SpoonLabs/gumtree-spoon-ast-diff/issues/245
-        if (sources.dir.equals("nested-lambda")) {
+        if (IGNORE_TESTS.contains(sources.dir)) {
             assumeTrue(false);
         }
         Pair<String, String> inputsForCollectorSahab =
