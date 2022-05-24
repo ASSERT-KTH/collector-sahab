@@ -445,6 +445,36 @@ public class CollectorAPITest {
     @Nested
     class BreakPointAtEndCurlyBrace {
         @Test
+        void nonVoidMethod_doesNotCollectAnything()
+                throws FileNotFoundException, AbsentInformationException {
+            // arrange
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests =
+                    new String[] {
+                        "foo.BreakpointAtEndCurlyBraceTest::test_shouldEndLineBeCollected_nonVoid"
+                    };
+            File classesAndBreakpoints =
+                    TestHelper.PATH_TO_INPUT
+                            .resolve("breakpoint-at-end-curly-brace")
+                            .resolve("non-void.txt")
+                            .toFile();
+
+            // act
+            EventProcessor eventProcessor =
+                    Collector.invoke(
+                            classpath,
+                            tests,
+                            classesAndBreakpoints,
+                            TestHelper.getDefaultOptions());
+
+            // assert
+            assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
+            assertThat(eventProcessor.getReturnValues(), is(empty()));
+        }
+
+        @Test
         void voidMethod_voidIsCollected() throws FileNotFoundException, AbsentInformationException {
             // arrange
             String[] classpath =
