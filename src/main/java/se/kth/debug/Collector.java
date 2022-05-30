@@ -2,12 +2,14 @@ package se.kth.debug;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.sun.jdi.AbsentInformationException;
 import java.io.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import picocli.CommandLine;
+import se.kth.debug.struct.result.BreakPointContext;
+import se.kth.debug.struct.result.ReturnData;
 
 @CommandLine.Command(name = "collector", mixinStandardHelpOptions = true)
 public class Collector implements Callable<Integer> {
@@ -110,16 +112,30 @@ public class Collector implements Callable<Integer> {
                         .serializeNulls()
                         .serializeSpecialFloatingPointValues()
                         .create();
-        JsonObject output = new JsonObject();
+
+        File file = new File(collectedOutput);
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+
+        JsonWriter writer = new JsonWriter(new FileWriter(file));
+
+        writer.setIndent("  ");
+        writer.beginObject();
 
         if (skipBreakpointValues) {
             logger.info(
                     "Breakpoint data was not asked for. Please provide class names and line numbers if you desire otherwise.");
         } else if (!eventProcessor.getBreakpointContexts().isEmpty()) {
-            output.add("breakpoint", gson.toJsonTree(eventProcessor.getBreakpointContexts()));
+            writer.name("breakpoint");
+            writer.beginArray();
+            for (BreakPointContext bpc : eventProcessor.getBreakpointContexts()) {
+                gson.toJson(bpc, BreakPointContext.class, writer);
+            }
+            writer.endArray();
             logger.info("Breakpoints serialised!");
         } else {
-            output.add("breakpoint", gson.toJsonTree(eventProcessor.getBreakpointContexts()));
+            writer.name("breakpoint").beginArray().endArray();
             logger.info("Output file was not generated as breakpoints were not encountered.");
         }
 
@@ -127,20 +143,19 @@ public class Collector implements Callable<Integer> {
             logger.info(
                     "Return data was not asked for. Please provide method names if you desire otherwise.");
         } else if (!eventProcessor.getReturnValues().isEmpty()) {
-            output.add("return", gson.toJsonTree(eventProcessor.getReturnValues()));
+            writer.name("return");
+            writer.beginArray();
+            for (ReturnData rd : eventProcessor.getReturnValues()) {
+                gson.toJson(rd, ReturnData.class, writer);
+            }
+            writer.endArray();
             logger.info("Return values serialised!");
         } else {
-            output.add("return", gson.toJsonTree(eventProcessor.getReturnValues()));
+            writer.name("return").beginArray().endArray();
             logger.info("No method exits were encountered.");
         }
-
-        File file = new File(collectedOutput);
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
-        }
-        try (FileWriter writer = new FileWriter(collectedOutput)) {
-            writer.write(gson.toJson(output));
-            logger.info("File output to: " + file.getAbsolutePath());
-        }
+        writer.endObject();
+        writer.close();
+        logger.info("File output to: " + file.getAbsolutePath());
     }
 }
