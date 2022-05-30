@@ -56,7 +56,7 @@ public class MatchedLineFinder {
         Diff diff = new AstComparator().compare(left, right);
         Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
 
-        CtMethod<?> methodLeft = findMethod(diff.getRootOperations());
+        CtMethod<?> methodLeft = findMethod(diff);
         CtMethod<?> methodRight =
                 (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
 
@@ -90,7 +90,7 @@ public class MatchedLineFinder {
                     }
                     if (operation.getDstNode() != null) {
                         if (operation.getDstNode().getPosition().isValidPosition()) {
-                            dst.add(operation.getSrcNode().getPosition().getLine());
+                            dst.add(operation.getDstNode().getPosition().getLine());
                         }
                     }
                 });
@@ -146,14 +146,25 @@ public class MatchedLineFinder {
         return blockTraversal.getLines();
     }
 
-    private static CtMethod<?> findMethod(List<Operation> rootOperations) {
+    private static CtMethod<?> findMethod(Diff diff) {
         // In an ideal case, srcNode of first root operation will give the method because APR
         // patches usually have
         // only one operation.
         // We also return the first method we find because we assume there will a patch inside only
         // one method.
-        for (Operation<?> operation : rootOperations) {
-            CtMethod<?> candidate = operation.getSrcNode().getParent(CtMethod.class);
+        for (Operation<?> operation : diff.getRootOperations()) {
+            CtMethod<?> candidate;
+            if (operation instanceof InsertOperation) {
+                candidate =
+                        (CtMethod<?>)
+                                new SpoonSupport()
+                                        .getMappedElement(
+                                                diff,
+                                                operation.getSrcNode().getParent(CtMethod.class),
+                                                false);
+            } else {
+                candidate = operation.getSrcNode().getParent(CtMethod.class);
+            }
             if (candidate == null) {
                 LOGGER.warning(
                         operation.getSrcNode()
