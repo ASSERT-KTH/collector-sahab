@@ -535,4 +535,36 @@ public class CollectorAPITest {
         // assert
         assertThat(eventProcessor.getReturnValues().size(), equalTo(8));
     }
+
+    @Test
+    void returnDataShouldBeCollected_evenIfThereAreNoBreakpoints()
+            throws FileNotFoundException, AbsentInformationException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.RecordMyReturnButWithoutBreakpointsTest::abba"};
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_INPUT
+                        .resolve("return-value-without-breakpoints")
+                        .resolve("input.txt")
+                        .toFile();
+        File methodsForExitEvent =
+                TestHelper.PATH_TO_INPUT
+                        .resolve("return-value-without-breakpoints")
+                        .resolve("methods.json")
+                        .toFile();
+
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        methodsForExitEvent,
+                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+
+        // assert
+        assertThat(eventProcessor.getReturnValues().size(), equalTo(1));
+    }
 }
