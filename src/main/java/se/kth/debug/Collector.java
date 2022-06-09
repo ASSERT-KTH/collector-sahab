@@ -19,20 +19,25 @@ public class Collector implements Callable<Integer> {
             names = "-p",
             arity = "0..*",
             description = "Classpath required to run JUnit",
-            split = " ")
+            split = " ",
+            required = true)
     private String[] providedClasspath;
 
     @CommandLine.Option(
             names = "-t",
             arity = "1..*",
             description = "List of test methods",
-            split = " ")
+            split = " ",
+            required = true)
     private String[] tests;
 
-    @CommandLine.Option(names = "-o", description = "Path to output file (JSON)")
+    @CommandLine.Option(names = "-o", description = "Path to output file (JSON)", required = true)
     private String collectedOutput;
 
-    @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints")
+    @CommandLine.Option(
+            names = "-i",
+            description = "File containing class names and breakpoints",
+            required = true)
     private File classesAndBreakpoints = null;
 
     @CommandLine.Option(
