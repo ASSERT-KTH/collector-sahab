@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -49,13 +49,14 @@ class MatchedLineFinderTest {
         if (IGNORE_TESTS.contains(sources.dir)) {
             assumeTrue(false);
         }
-        Pair<String, String> inputsForCollectorSahab =
+        Triple<String, String, String> inputsForCollectorSahab =
                 MatchedLineFinder.invoke(sources.left, sources.right);
         assertInputsAreAsExpected(inputsForCollectorSahab, sources.expected);
     }
 
     private void assertInputsAreAsExpected(
-            Pair<String, String> input, Path dirContainingExpectedFiles) throws IOException {
+            Triple<String, String, String> input, Path dirContainingExpectedFiles)
+            throws IOException {
         List<FileAndBreakpoint> actualBreakpointLeft =
                 deserialiseFileAndBreakpoint(input.getLeft());
         List<FileAndBreakpoint> actualBreakpointRight =

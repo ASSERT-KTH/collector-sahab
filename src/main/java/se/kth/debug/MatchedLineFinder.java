@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
@@ -38,10 +39,11 @@ public class MatchedLineFinder {
         File leftJava = prepareFileForGumtree(project, left, diffedFile, LEFT_FOLDER_NAME);
         File rightJava = prepareFileForGumtree(project, right, diffedFile, RIGHT_FOLDER_NAME);
 
-        Pair<String, String> output = invoke(leftJava, rightJava);
+        Triple<String, String, String> output = invoke(leftJava, rightJava);
 
         createInputFile(output.getLeft(), "input-left.txt");
         createInputFile(output.getRight(), "input-right.txt");
+        createInputFile(output.getMiddle(), "methods.json");
     }
 
     /**
@@ -52,7 +54,7 @@ public class MatchedLineFinder {
      * @return matched line for left and matched line for right
      * @throws Exception raised from gumtree-spoon
      */
-    public static Pair<String, String> invoke(File left, File right) throws Exception {
+    public static Triple<String, String, String> invoke(File left, File right) throws Exception {
         Diff diff = new AstComparator().compare(left, right);
         Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
 
@@ -70,7 +72,16 @@ public class MatchedLineFinder {
         String breakpointsRight =
                 serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
 
-        return Pair.of(breakpointsLeft, breakpointsRight);
+        if (methodLeft.getSignature().equals(methodRight.getSignature())) {
+            // This file is particularly useful for patches where there are no matched lines, but we
+            // need to record the return values.
+            String methods =
+                    serialiseMethods(
+                            fullyQualifiedNameOfContainerClass, methodLeft.getSimpleName());
+            return Triple.of(breakpointsLeft, methods, breakpointsRight);
+        }
+        throw new RuntimeException(
+                "Either the patch is changing the method signature or it could be a problem with GumTree mappings.");
     }
 
     private static Pair<Set<Integer>, Set<Integer>> getDiffLines(List<Operation> rootOperations) {
@@ -237,6 +248,16 @@ public class MatchedLineFinder {
         object.add("breakpoints", gson.toJsonTree(breakpoints));
         array.add(object);
 
+        return gson.toJson(array);
+    }
+
+    private static String serialiseMethods(String fullyQualifiedClassName, String methodName) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonArray array = new JsonArray();
+        JsonObject object = new JsonObject();
+        object.addProperty("className", fullyQualifiedClassName);
+        object.addProperty("name", methodName);
+        array.add(object);
         return gson.toJson(array);
     }
 

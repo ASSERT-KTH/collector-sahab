@@ -40,6 +40,9 @@ public class Collector implements Callable<Integer> {
             required = true)
     private File classesAndBreakpoints = null;
 
+    @CommandLine.Option(names = "-m", description = "File containing method names")
+    private File methodsForExitEvent = null;
+
     @CommandLine.Option(
             names = "--stack-trace-depth",
             description =
@@ -80,7 +83,12 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(providedClasspath, tests, classesAndBreakpoints, context);
+                invoke(
+                        providedClasspath,
+                        tests,
+                        classesAndBreakpoints,
+                        methodsForExitEvent,
+                        context);
         write(eventProcessor);
         return 0;
     }
@@ -89,13 +97,24 @@ public class Collector implements Callable<Integer> {
             String[] providedClasspath,
             String[] tests,
             File classesAndBreakpoints,
+            File methodsForExitEvent,
             CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(providedClasspath, tests, classesAndBreakpoints);
+                new EventProcessor(
+                        providedClasspath, tests, classesAndBreakpoints, methodsForExitEvent);
         eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
+    }
+
+    public static EventProcessor invoke(
+            String[] providedClasspath,
+            String[] tests,
+            File classesAndBreakpoints,
+            CollectorOptions context)
+            throws AbsentInformationException {
+        return invoke(providedClasspath, tests, classesAndBreakpoints, null, context);
     }
 
     private CollectorOptions getCollectorOptions() {
