@@ -108,6 +108,15 @@ public class Collector implements Callable<Integer> {
         return eventProcessor;
     }
 
+    public static EventProcessor invoke(
+            String[] providedClasspath,
+            String[] tests,
+            File classesAndBreakpoints,
+            CollectorOptions context)
+            throws AbsentInformationException {
+        return invoke(providedClasspath, tests, classesAndBreakpoints, null, context);
+    }
+
     private CollectorOptions getCollectorOptions() {
         CollectorOptions context = new CollectorOptions();
         context.setStackTraceDepth(stackTraceDepth);

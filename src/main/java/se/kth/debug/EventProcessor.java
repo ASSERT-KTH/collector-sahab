@@ -97,7 +97,7 @@ public class EventProcessor {
 
     private List<MethodForExitEvent> parseMethodsForExitEvent(File methodsForExitEvent) {
         if (methodsForExitEvent == null) {
-            return null;
+            return List.of();
         }
         try (JsonReader jr = new JsonReader(new FileReader(methodsForExitEvent))) {
             Gson gson = new Gson();
