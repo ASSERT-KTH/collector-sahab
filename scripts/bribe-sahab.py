@@ -66,7 +66,7 @@ def _run_collector_sahab(project, tests, revision, ref):
     f"-p {' '.join(project_dependencies)} "
     f"-t {test_methods} "
     f"-o {collector_sahab_output} "
-    "--execution-depth 1"
+    f"-m methods.json"
   )
 
   subprocess.run(cmd, shell=True)

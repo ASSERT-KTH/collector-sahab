@@ -214,7 +214,8 @@ public class Debugger {
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
         if (!isReturnWithinBreakpoints(
-                mee.location().lineNumber(), mee.method().declaringType().name())) {
+                        mee.location().lineNumber(), mee.method().declaringType().name())
+                && !isMethodExplicitlyAskedFor(mee.method())) {
             return null;
         }
         String location = mee.location().toString();
@@ -254,6 +255,16 @@ public class Debugger {
                     continue;
                 }
                 return fNB.getBreakpoints().contains(lineNumber);
+            }
+        }
+        return false;
+    }
+
+    private boolean isMethodExplicitlyAskedFor(Method method) {
+        for (MethodForExitEvent candidate : methodForExitEvents) {
+            if (candidate.getName().equals(method.name())
+                    && candidate.getClassName().equals(method.declaringType().name())) {
+                return true;
             }
         }
         return false;
