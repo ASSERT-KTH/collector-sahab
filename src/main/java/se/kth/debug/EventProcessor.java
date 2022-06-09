@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.MethodForExitEvent;
 import se.kth.debug.struct.result.BreakPointContext;
 import se.kth.debug.struct.result.ReturnData;
 import se.kth.debug.struct.result.StackFrameContext;
@@ -23,10 +24,17 @@ public class EventProcessor {
     private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
 
-    EventProcessor(String[] providedClasspath, String[] tests, File classesAndBreakpoints) {
+    EventProcessor(
+            String[] providedClasspath,
+            String[] tests,
+            File classesAndBreakpoints,
+            File methodsForExitEvent) {
         debugger =
                 new Debugger(
-                        providedClasspath, tests, parseFileAndBreakpoints(classesAndBreakpoints));
+                        providedClasspath,
+                        tests,
+                        parseFileAndBreakpoints(classesAndBreakpoints),
+                        parseMethodsForExitEvent(methodsForExitEvent));
     }
 
     /** Monitor events triggered by JDB. */
@@ -82,6 +90,18 @@ public class EventProcessor {
         try (JsonReader jr = new JsonReader(new FileReader(classesAndBreakpoints))) {
             Gson gson = new Gson();
             return gson.fromJson(jr, new TypeToken<List<FileAndBreakpoint>>() {}.getType());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private List<MethodForExitEvent> parseMethodsForExitEvent(File methodsForExitEvent) {
+        if (methodsForExitEvent == null) {
+            return null;
+        }
+        try (JsonReader jr = new JsonReader(new FileReader(methodsForExitEvent))) {
+            Gson gson = new Gson();
+            return gson.fromJson(jr, new TypeToken<List<MethodForExitEvent>>() {}.getType());
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
