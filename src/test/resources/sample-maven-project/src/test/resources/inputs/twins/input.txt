@@ -1,0 +1,10 @@
+[
+  {
+    "fileName": "foo.twins.A",
+    "breakpoints": []
+  },
+  {
+     "fileName": "foo.twins.B",
+     "breakpoints": []
+  }
+]
