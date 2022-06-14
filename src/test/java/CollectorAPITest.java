@@ -567,4 +567,34 @@ public class CollectorAPITest {
         // assert
         assertThat(eventProcessor.getReturnValues().size(), equalTo(1));
     }
+
+    @Test
+    void recordReturnValueOfMethod_ifFullyQualifiedName_andMethodName_matches()
+            throws FileNotFoundException, AbsentInformationException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.TwinsTest::executeBothMethods"};
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_INPUT.resolve("twins").resolve("input.txt").toFile();
+        File methodsForExitEvent =
+                TestHelper.PATH_TO_INPUT.resolve("twins").resolve("methods.json").toFile();
+
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        methodsForExitEvent,
+                        TestHelper.getDefaultOptions());
+
+        // assert
+        // return value from foo.twin.B#getValue is ignored
+        assertThat(eventProcessor.getReturnValues().size(), equalTo(1));
+        ReturnData returnData = eventProcessor.getReturnValues().get(0);
+
+        assertThat(returnData.getValue(), equalTo("a"));
+    }
 }
