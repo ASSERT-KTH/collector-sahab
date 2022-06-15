@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import se.kth.debug.MatchedLineFinder;
 import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.MethodForExitEvent;
 
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
@@ -69,6 +70,18 @@ class MatchedLineFinderTest {
                 deserialiseFileAndBreakpoint(
                         Files.readString(dirContainingExpectedFiles.resolve("input-right.txt")));
 
+        if (dirContainingExpectedFiles.resolve("methods.json").toFile().exists()) {
+            List<MethodForExitEvent> actualMethods =
+                    deserialiseMethodForExitEvent(input.getMiddle());
+            List<MethodForExitEvent> expectedMethods =
+                    deserialiseMethodForExitEvent(
+                            Files.readString(dirContainingExpectedFiles.resolve("methods.json")));
+
+            assertThat(
+                    actualMethods,
+                    containsInAnyOrder(expectedMethods.toArray(new MethodForExitEvent[0])));
+        }
+
         assertThat(
                 actualBreakpointLeft,
                 containsInAnyOrder(expectedBreakpointLeft.toArray(new FileAndBreakpoint[0])));
@@ -80,6 +93,11 @@ class MatchedLineFinderTest {
     private List<FileAndBreakpoint> deserialiseFileAndBreakpoint(String json) {
         final Gson gson = new Gson();
         return gson.fromJson(json, new TypeToken<List<FileAndBreakpoint>>() {}.getType());
+    }
+
+    private List<MethodForExitEvent> deserialiseMethodForExitEvent(String json) {
+        final Gson gson = new Gson();
+        return gson.fromJson(json, new TypeToken<List<MethodForExitEvent>>() {}.getType());
     }
 
     @Test
