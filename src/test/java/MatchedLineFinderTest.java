@@ -41,7 +41,9 @@ class MatchedLineFinderTest {
                     "nested-lambda",
                     "anonymous-class",
                     "nested-anonymous-class",
-                    "multiple-nested-types");
+                    "multiple-nested-types",
+                    // https://github.com/GumTreeDiff/gumtree/issues/285
+                    "patch1-Math-20-Elixir-plausible");
 
     @ParameterizedTest
     @ArgumentsSource(ResourceProvider.Patch.class)
