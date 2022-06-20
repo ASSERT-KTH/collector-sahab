@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+from glob import glob
 
 from revision import REVISION
 from compile_target import compile
@@ -50,11 +51,13 @@ def _get_or_create_directory_for_creating_output_files(ref):
   return output_directory
 
 def _run_collector_sahab(project, tests, revision, ref):
-  project_dependencies = [
-    os.path.join(project, revision.value.get_output_directory(), 'classes'),
-    os.path.join(project, revision.value.get_output_directory(), 'test-classes'),
-    os.path.join(project, revision.value.get_output_directory(), 'dependency'),
-  ]
+  all_targets = glob(f"{project}/**/{revision.value.get_output_directory()}/", recursive=True)
+  project_dependencies = []
+  for build_dir in all_targets:
+    project_dependencies.append(os.path.join(build_dir, 'classes'))
+    project_dependencies.append(os.path.join(build_dir, 'test-classes'))
+    project_dependencies.append(os.path.join(build_dir, 'dependency'))
+
   test_methods = " ".join(tests)
   output_directory = _get_or_create_directory_for_creating_output_files(ref)
   collector_sahab_output = os.path.join(output_directory, f"{revision.name.lower()}.json")
@@ -68,6 +71,7 @@ def _run_collector_sahab(project, tests, revision, ref):
     f"-o {collector_sahab_output} "
     f"-m methods.json"
   )
+  print(cmd)
 
   subprocess.run(cmd, shell=True)
 
