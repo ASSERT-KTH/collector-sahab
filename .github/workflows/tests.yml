@@ -11,6 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Set up JDK 11 for running tests
         uses: actions/setup-java@v1
         with:
