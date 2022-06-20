@@ -1,5 +1,6 @@
 import argparse
 import os
+import shlex
 import subprocess
 from glob import glob
 
@@ -39,7 +40,7 @@ def _find_matched_lines(project, filename, left, right):
     "java "
     f"-classpath {COLLECTOR_JAR} "
     "se.kth.debug.MatchedLineFinder "
-    f"{project} {filename} {left} {right}"
+    f"{project} {shlex.quote(filename)} {left} {right}"
   )
   subprocess.run(cmd, shell=True)
 
