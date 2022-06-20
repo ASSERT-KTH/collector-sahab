@@ -20,8 +20,6 @@ class Command:
       "test-compile",
       "-Dmaven.compiler.debug=true",
       "-Dmaven.compiler.debuglevel=lines,vars,source",
-      "-Dmaven.compiler.source=1.6",
-      "-Dmaven.compiler.target=1.6",
     ], cwd=self.cwd)
 
   def mvn_copy_dependencies(self):
