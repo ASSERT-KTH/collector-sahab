@@ -1,0 +1,8 @@
+[
+  {
+    "fileName": "StatementInsideInsertedIf",
+    "breakpoints": [
+      3
+    ]
+  }
+]

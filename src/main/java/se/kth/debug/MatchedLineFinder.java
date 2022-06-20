@@ -56,7 +56,7 @@ public class MatchedLineFinder {
      */
     public static Triple<String, String, String> invoke(File left, File right) throws Exception {
         Diff diff = new AstComparator().compare(left, right);
-        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getRootOperations());
+        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getAllOperations());
 
         CtMethod<?> methodLeft = findMethod(diff);
         CtMethod<?> methodRight =
