@@ -21,7 +21,7 @@ def compile(project, commit, revision):
   
   driver = Command(project)
   driver.remove(os.path.join(os.getcwd(), revision.value.get_input_file()))
-  driver.remove(revision.value.get_output_directory())
+  driver.clean(revision)
 
   driver.git_checkout(commit)
 

@@ -1,5 +1,6 @@
 import os
 import subprocess
+from glob import glob
 
 class Command:
 
@@ -37,12 +38,18 @@ class Command:
     ], cwd=self.cwd)
 
   def rename(self, renamed_directory):
-    subprocess.run([
-      "mv",
-      "target",
-      renamed_directory,
-    ], cwd=self.cwd)
+    all_targets = glob(f"{self.cwd}/**/target/", recursive=True)
+    for build_dir in all_targets:
+      subprocess.run([
+        "mv",
+        build_dir,
+        os.path.dirname(os.path.dirname(build_dir)) + f"/{renamed_directory}",
+      ], cwd=self.cwd)
 
+  def clean(self, revision):
+    all_targets = glob(f"{self.cwd}/**/{revision.value.get_output_directory()}/", recursive=True)
+    for build_dir in all_targets:
+      self.remove(build_dir)
 
   def _replace_plugin_properties(self):
     # We replace them to empty strings because we are using user properties
