@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import se.kth.debug.Collector;
@@ -600,6 +601,7 @@ public class CollectorAPITest {
         assertThat(returnData.getValue(), equalTo("a"));
     }
 
+    @Disabled("Shall be fixed after #86")
     @Test
     void dataShouldBeCollectedAtSpecifiedBreakpoint()
             throws FileNotFoundException, AbsentInformationException {
