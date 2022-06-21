@@ -1,0 +1,12 @@
+[
+  {
+    "fileName": "com.google.gson.stream.JsonWriter",
+    "breakpoints": [
+      497,
+      498,
+      499,
+      500,
+      495
+    ]
+  }
+]
