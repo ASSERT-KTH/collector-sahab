@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
+import gumtree.spoon.diff.operations.DeleteOperation;
 import gumtree.spoon.diff.operations.InsertOperation;
 import gumtree.spoon.diff.operations.Operation;
 import gumtree.spoon.diff.support.SpoonSupport;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.CtScanner;
 
@@ -56,7 +58,7 @@ public class MatchedLineFinder {
      */
     public static Triple<String, String, String> invoke(File left, File right) throws Exception {
         Diff diff = new AstComparator().compare(left, right);
-        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff.getAllOperations());
+        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff);
 
         CtMethod<?> methodLeft = findMethod(diff);
         CtMethod<?> methodRight =
@@ -84,16 +86,18 @@ public class MatchedLineFinder {
                 "Either the patch is changing the method signature or it could be a problem with GumTree mappings.");
     }
 
-    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(List<Operation> rootOperations) {
+    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(Diff diff) {
         Set<Integer> src = new HashSet<>();
         Set<Integer> dst = new HashSet<>();
-        rootOperations.forEach(
+        diff.getAllOperations().forEach(
                 operation -> {
                     if (operation.getSrcNode() != null) {
                         if (operation.getSrcNode().getPosition().isValidPosition()) {
                             // Nodes of insert operation should be inserted in dst
                             if (operation instanceof InsertOperation) {
                                 dst.add(operation.getSrcNode().getPosition().getLine());
+                                Set<Integer> x = linesAffectedInOtherTree(operation, diff, operation.getSrcNode().getPosition().getLine());
+                                src.addAll(x);
                             } else {
                                 src.add(operation.getSrcNode().getPosition().getLine());
                             }
@@ -106,6 +110,27 @@ public class MatchedLineFinder {
                     }
                 });
         return Pair.of(src, dst);
+    }
+
+    private static Set<Integer> linesAffectedInOtherTree(Operation operation, Diff diff, int lineNumber) {
+        boolean isFromSource = operation instanceof DeleteOperation;
+        CtElement srcNode = operation.getSrcNode();
+        Set<Integer> lines = new HashSet<>();
+
+        while (srcNode.getPosition().getLine() == lineNumber) {
+            srcNode = srcNode.getParent();
+            CtElement nodeInOtherTree =
+                    new SpoonSupport()
+                            .getMappedElement(
+                                    diff,
+                                    srcNode,
+                                    isFromSource);
+            int candidatePosition = nodeInOtherTree.getPosition().getLine();
+            if (candidatePosition == lineNumber) {
+                lines.add(candidatePosition);
+            }
+        }
+        return lines;
     }
 
     static class BlockFinder extends CtScanner {
