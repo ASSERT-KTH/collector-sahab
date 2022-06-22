@@ -89,30 +89,54 @@ public class MatchedLineFinder {
     private static Pair<Set<Integer>, Set<Integer>> getDiffLines(Diff diff) {
         Set<Integer> src = new HashSet<>();
         Set<Integer> dst = new HashSet<>();
-        diff.getAllOperations().forEach(
-                operation -> {
-                    if (operation.getSrcNode() != null) {
-                        if (operation.getSrcNode().getPosition().isValidPosition()) {
-                            // Nodes of insert operation should be inserted in dst
-                            if (operation instanceof InsertOperation) {
-                                dst.add(operation.getSrcNode().getPosition().getLine());
-                                Set<Integer> x = linesAffectedInOtherTree(operation, diff, operation.getSrcNode().getPosition().getLine());
-                                src.addAll(x);
-                            } else {
-                                src.add(operation.getSrcNode().getPosition().getLine());
+        diff.getAllOperations()
+                .forEach(
+                        operation -> {
+                            if (operation.getSrcNode() != null) {
+                                if (operation.getSrcNode().getPosition().isValidPosition()) {
+                                    // Nodes of insert operation should be inserted in dst
+                                    if (operation instanceof InsertOperation) {
+                                        dst.add(operation.getSrcNode().getPosition().getLine());
+                                        src.addAll(
+                                                linesAffectedInOtherTree(
+                                                        operation,
+                                                        diff,
+                                                        operation
+                                                                .getSrcNode()
+                                                                .getPosition()
+                                                                .getLine()));
+                                    } else {
+                                        src.add(operation.getSrcNode().getPosition().getLine());
+                                        dst.addAll(
+                                                linesAffectedInOtherTree(
+                                                        operation,
+                                                        diff,
+                                                        operation
+                                                                .getSrcNode()
+                                                                .getPosition()
+                                                                .getLine()));
+                                    }
+                                }
                             }
-                        }
-                    }
-                    if (operation.getDstNode() != null) {
-                        if (operation.getDstNode().getPosition().isValidPosition()) {
-                            dst.add(operation.getDstNode().getPosition().getLine());
-                        }
-                    }
-                });
+                            if (operation.getDstNode() != null) {
+                                if (operation.getDstNode().getPosition().isValidPosition()) {
+                                    dst.add(operation.getDstNode().getPosition().getLine());
+                                    src.addAll(
+                                            linesAffectedInOtherTree(
+                                                    operation,
+                                                    diff,
+                                                    operation
+                                                            .getDstNode()
+                                                            .getPosition()
+                                                            .getLine()));
+                                }
+                            }
+                        });
         return Pair.of(src, dst);
     }
 
-    private static Set<Integer> linesAffectedInOtherTree(Operation operation, Diff diff, int lineNumber) {
+    private static Set<Integer> linesAffectedInOtherTree(
+            Operation operation, Diff diff, int lineNumber) {
         boolean isFromSource = operation instanceof DeleteOperation;
         CtElement srcNode = operation.getSrcNode();
         Set<Integer> lines = new HashSet<>();
@@ -120,14 +144,12 @@ public class MatchedLineFinder {
         while (srcNode.getPosition().getLine() == lineNumber) {
             srcNode = srcNode.getParent();
             CtElement nodeInOtherTree =
-                    new SpoonSupport()
-                            .getMappedElement(
-                                    diff,
-                                    srcNode,
-                                    isFromSource);
-            int candidatePosition = nodeInOtherTree.getPosition().getLine();
-            if (candidatePosition == lineNumber) {
-                lines.add(candidatePosition);
+                    new SpoonSupport().getMappedElement(diff, srcNode, isFromSource);
+            if (nodeInOtherTree != null) {
+                int candidatePosition = nodeInOtherTree.getPosition().getLine();
+                if (candidatePosition == lineNumber) {
+                    lines.add(candidatePosition);
+                }
             }
         }
         return lines;
