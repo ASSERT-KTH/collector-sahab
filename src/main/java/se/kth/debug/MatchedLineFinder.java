@@ -135,6 +135,10 @@ public class MatchedLineFinder {
         return Pair.of(src, dst);
     }
 
+    /**
+     * Returns lines affected by operations in other file. For example, <code> - int a = x; + int a
+     * = (int) x; </code> Pure insertion of `int` also adds a deletion in case of line-based diff.
+     */
     private static Set<Integer> linesAffectedInOtherTree(
             Operation operation, Diff diff, int lineNumber) {
         boolean isFromSource = operation instanceof DeleteOperation;
