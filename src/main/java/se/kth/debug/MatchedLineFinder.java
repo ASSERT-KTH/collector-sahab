@@ -4,25 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import gumtree.spoon.AstComparator;
-import gumtree.spoon.diff.Diff;
-import gumtree.spoon.diff.operations.DeleteOperation;
-import gumtree.spoon.diff.operations.InsertOperation;
-import gumtree.spoon.diff.operations.Operation;
-import gumtree.spoon.diff.support.SpoonSupport;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import spoon.Launcher;
 import spoon.reflect.code.*;
-import spoon.reflect.declaration.CtClass;
-import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.*;
 import spoon.reflect.visitor.CtScanner;
 
 public class MatchedLineFinder {
@@ -56,107 +48,59 @@ public class MatchedLineFinder {
      * @return matched line for left and matched line for right
      * @throws Exception raised from gumtree-spoon
      */
-    public static Triple<String, String, String> invoke(File left, File right) throws Exception {
-        Diff diff = new AstComparator().compare(left, right);
-        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(diff);
+    public static Triple<String, String, String> invoke(File left, File right) throws IOException {
+        Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(left, right);
 
-        CtMethod<?> methodLeft = findMethod(diff);
-        CtMethod<?> methodRight =
-                (CtMethod<?>) new SpoonSupport().getMappedElement(diff, methodLeft, true);
+        Pair<CtTypeMember, CtTypeMember> methods = findMethods(left, right, diffLines);
 
-        Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methodLeft);
-        Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methodRight);
+        Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methods.getLeft());
+        Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methods.getRight());
         String fullyQualifiedNameOfContainerClass =
-                methodLeft.getParent(CtClass.class).getQualifiedName();
+                methods.getLeft().getParent(CtClass.class).getQualifiedName();
 
         String breakpointsLeft =
                 serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
         String breakpointsRight =
                 serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
 
-        if (methodLeft.getSignature().equals(methodRight.getSignature())) {
+        if (((CtExecutable<?>) methods.getLeft())
+                .getSignature()
+                .equals(((CtExecutable<?>) methods.getRight()).getSignature())) {
             // This file is particularly useful for patches where there are no matched lines, but we
             // need to record the return values.
-            String methods =
+            String serialisedMethods =
                     serialiseMethods(
-                            fullyQualifiedNameOfContainerClass, methodLeft.getSimpleName());
-            return Triple.of(breakpointsLeft, methods, breakpointsRight);
+                            fullyQualifiedNameOfContainerClass, methods.getLeft().getSimpleName());
+            return Triple.of(breakpointsLeft, serialisedMethods, breakpointsRight);
         }
         throw new RuntimeException(
                 "Either the patch is changing the method signature or it could be a problem with GumTree mappings.");
     }
 
-    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(Diff diff) {
+    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(File left, File right)
+            throws IOException {
         Set<Integer> src = new HashSet<>();
         Set<Integer> dst = new HashSet<>();
-        diff.getAllOperations()
-                .forEach(
-                        operation -> {
-                            if (operation.getSrcNode() != null) {
-                                if (operation.getSrcNode().getPosition().isValidPosition()) {
-                                    // Nodes of insert operation should be inserted in dst
-                                    if (operation instanceof InsertOperation) {
-                                        dst.add(operation.getSrcNode().getPosition().getLine());
-                                        src.addAll(
-                                                linesAffectedInOtherTree(
-                                                        operation,
-                                                        diff,
-                                                        operation
-                                                                .getSrcNode()
-                                                                .getPosition()
-                                                                .getLine()));
-                                    } else {
-                                        src.add(operation.getSrcNode().getPosition().getLine());
-                                        dst.addAll(
-                                                linesAffectedInOtherTree(
-                                                        operation,
-                                                        diff,
-                                                        operation
-                                                                .getSrcNode()
-                                                                .getPosition()
-                                                                .getLine()));
-                                    }
-                                }
-                            }
-                            if (operation.getDstNode() != null) {
-                                if (operation.getDstNode().getPosition().isValidPosition()) {
-                                    dst.add(operation.getDstNode().getPosition().getLine());
-                                    src.addAll(
-                                            linesAffectedInOtherTree(
-                                                    operation,
-                                                    diff,
-                                                    operation
-                                                            .getDstNode()
-                                                            .getPosition()
-                                                            .getLine()));
-                                }
-                            }
-                        });
-        return Pair.of(src, dst);
-    }
-
-    /**
-     * Returns lines affected by operations in other file. For example, <code> - int a = x; + int a
-     * = (int) x; </code> Pure insertion of `int` also adds a deletion in case of line-based diff.
-     */
-    private static Set<Integer> linesAffectedInOtherTree(
-            Operation operation, Diff diff, int lineNumber) {
-        boolean isFromSource = operation instanceof DeleteOperation;
-        CtElement srcNode = operation.getSrcNode();
-        Set<Integer> lines = new HashSet<>();
-
-        while (srcNode.getPosition().getLine() == lineNumber) {
-            srcNode = srcNode.getParent();
-            CtElement nodeInOtherTree =
-                    new SpoonSupport().getMappedElement(diff, srcNode, isFromSource);
-            if (nodeInOtherTree != null) {
-                int candidatePosition = nodeInOtherTree.getPosition().getLine();
-                if (candidatePosition == lineNumber) {
-                    lines.add(candidatePosition);
-                }
+        ProcessBuilder pb =
+                new ProcessBuilder(
+                        "./scripts/diffn.sh",
+                        "--no-index",
+                        left.getAbsolutePath(),
+                        right.getAbsolutePath());
+        Process p = pb.start();
+        InputStreamReader isr = new InputStreamReader(p.getInputStream());
+        BufferedReader rdr = new BufferedReader(isr);
+        String line;
+        while ((line = rdr.readLine()) != null) {
+            String[] lineContents = line.split(":");
+            if (lineContents[0].equals("Left")) {
+                src.add(Integer.parseInt(lineContents[1]));
+            }
+            if (lineContents[0].equals("Right")) {
+                dst.add(Integer.parseInt(lineContents[1]));
             }
         }
-        return lines;
+        return Pair.of(src, dst);
     }
 
     static class BlockFinder extends CtScanner {
@@ -202,42 +146,89 @@ public class MatchedLineFinder {
         }
     }
 
-    private static Set<Integer> getMatchedLines(Set<Integer> diffLines, CtMethod<?> method) {
+    private static Set<Integer> getMatchedLines(Set<Integer> diffLines, CtTypeMember method) {
         BlockFinder blockTraversal = new BlockFinder(diffLines);
         blockTraversal.scan(method);
         return blockTraversal.getLines();
     }
 
-    private static CtMethod<?> findMethod(Diff diff) {
+    private static Pair<CtTypeMember, CtTypeMember> findMethods(
+            File left, File right, Pair<Set<Integer>, Set<Integer>> diffLines) throws IOException {
         // In an ideal case, srcNode of first root operation will give the method because APR
         // patches usually have
         // only one operation.
         // We also return the first method we find because we assume there will a patch inside only
         // one method.
-        for (Operation<?> operation : diff.getRootOperations()) {
-            CtMethod<?> candidate;
-            if (operation instanceof InsertOperation) {
-                candidate =
-                        (CtMethod<?>)
-                                new SpoonSupport()
-                                        .getMappedElement(
-                                                diff,
-                                                operation.getSrcNode().getParent(CtMethod.class),
-                                                false);
-            } else {
-                candidate = operation.getSrcNode().getParent(CtMethod.class);
+        CtType<?> leftType = getType(left);
+        CtType<?> rightType = getType(right);
+
+        List<CtTypeMember> leftTypeMembers = getTypeMembers(leftType);
+        List<CtTypeMember> rightTypeMembers = getTypeMembers(rightType);
+
+        CtTypeMember leftDiffedTypeMember =
+                findDiffedTypeMember(leftTypeMembers, diffLines.getLeft());
+        CtTypeMember rightDiffedTypeMember =
+                findDiffedTypeMember(rightTypeMembers, diffLines.getRight());
+
+        if (leftDiffedTypeMember == null && rightDiffedTypeMember == null) {
+            throw new RuntimeException("Neither left nor right diffed type member could be found.");
+        }
+
+        if (leftDiffedTypeMember == null) {
+            leftDiffedTypeMember = findMapping(rightDiffedTypeMember, leftTypeMembers);
+        }
+
+        if (rightDiffedTypeMember == null) {
+            rightDiffedTypeMember = findMapping(leftDiffedTypeMember, rightTypeMembers);
+        }
+
+        return Pair.of(leftDiffedTypeMember, rightDiffedTypeMember);
+    }
+
+    private static CtType<?> getType(File file) throws IOException {
+        return Launcher.parseClass(Files.readString(file.toPath()));
+    }
+
+    private static List<CtTypeMember> getTypeMembers(CtType<?> type) {
+        return type.getTypeMembers().stream()
+                .filter(
+                        typeMember ->
+                                typeMember instanceof CtMethod<?>
+                                        || typeMember instanceof CtConstructor<?>)
+                .collect(Collectors.toList());
+    }
+
+    private static CtTypeMember findDiffedTypeMember(
+            List<CtTypeMember> typeMembers, Set<Integer> diffLines) {
+        Set<CtTypeMember> candidates = new HashSet<>();
+        for (CtTypeMember typeMember : typeMembers) {
+            if (typeMember.isImplicit()) {
+                continue;
             }
-            if (candidate == null) {
-                LOGGER.warning(
-                        operation.getSrcNode()
-                                + ":"
-                                + operation.getSrcNode().getPosition().getLine()
-                                + " has no parent method.");
-            } else {
-                return candidate;
+            for (Integer position : diffLines) {
+                if (typeMember.getPosition().getLine() < position
+                        && position < typeMember.getPosition().getEndLine()) {
+                    candidates.add(typeMember);
+                }
             }
         }
-        throw new NoDiffException("No diff line is enclosed in method");
+        if (candidates.size() > 1) {
+            throw new RuntimeException("More than 1 diffedTypeMember found");
+        }
+        if (candidates.size() == 0) {
+            return null;
+        }
+        return candidates.stream().findFirst().get();
+    }
+
+    private static CtTypeMember findMapping(
+            CtTypeMember whoseMapping, List<CtTypeMember> candidateMappings) {
+        int expectedStartLine = whoseMapping.getPosition().getLine();
+        return candidateMappings.stream()
+                .filter(typeMember -> !typeMember.isImplicit())
+                .filter(typeMember -> typeMember.getPosition().getLine() == expectedStartLine)
+                .findFirst()
+                .get();
     }
 
     public static class NoDiffException extends RuntimeException {
