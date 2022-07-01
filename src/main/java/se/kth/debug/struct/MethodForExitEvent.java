@@ -34,4 +34,9 @@ public class MethodForExitEvent {
         result = prime * result + className.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "[" + className + ":" + name + "]";
+    }
 }
