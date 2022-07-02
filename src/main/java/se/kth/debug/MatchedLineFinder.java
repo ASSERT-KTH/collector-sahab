@@ -124,8 +124,8 @@ public class MatchedLineFinder {
             List<CtStatement> statements = block.getStatements();
             statements.forEach(
                     statement -> {
-                        if (!diffLines.contains(statement.getPosition().getLine())
-                                && !shouldBeIgnored(statement)) {
+                        if (!shouldBeIgnored(statement)
+                                && !diffLines.contains(statement.getPosition().getLine())) {
                             lines.add(statement.getPosition().getLine());
                         }
                     });
@@ -146,7 +146,7 @@ public class MatchedLineFinder {
         }
 
         private static boolean shouldBeIgnored(CtElement element) {
-            return element instanceof CtComment;
+            return element instanceof CtComment || element.isImplicit();
         }
 
         public Set<Integer> getLines() {
