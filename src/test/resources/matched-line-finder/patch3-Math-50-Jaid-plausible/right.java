@@ -186,7 +186,7 @@ public abstract class BaseSecantSolver
                         // Nothing.
                         if (x == x1) {
                             if(!((f0 > x0 + x1) == true)){
-                                x0 = 0.5 * (x0 + x1 - FastMath.max(rtol * FastMath.abs(x1), atol));
+                            x0 = 0.5 * (x0 + x1 - FastMath.max(rtol * FastMath.abs(x1), atol));
                             }
                             f0 = computeObjectiveValue(x0);
                         }
