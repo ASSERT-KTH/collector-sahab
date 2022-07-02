@@ -100,6 +100,9 @@ public class MatchedLineFinder {
                 dst.add(Integer.parseInt(lineContents[1]));
             }
         }
+        if (src.size() == 0 && dst.size() == 0) {
+            throw new NoDiffException("There is no diff between original and patched version");
+        }
         return Pair.of(src, dst);
     }
 
