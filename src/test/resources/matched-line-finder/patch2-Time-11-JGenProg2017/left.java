@@ -108,19 +108,19 @@ public class DateTimeZoneBuilder {
      */
     public static DateTimeZone readFrom(DataInput in, String id) throws IOException {
         switch (in.readUnsignedByte()) {
-            case 'F':
-                DateTimeZone fixed = new FixedDateTimeZone
-                        (id, in.readUTF(), (int)readMillis(in), (int)readMillis(in));
-                if (fixed.equals(DateTimeZone.UTC)) {
-                    fixed = DateTimeZone.UTC;
-                }
-                return fixed;
-            case 'C':
-                return CachedDateTimeZone.forZone(PrecalculatedZone.readFrom(in, id));
-            case 'P':
-                return PrecalculatedZone.readFrom(in, id);
-            default:
-                throw new IOException("Invalid encoding");
+        case 'F':
+            DateTimeZone fixed = new FixedDateTimeZone
+                (id, in.readUTF(), (int)readMillis(in), (int)readMillis(in));
+            if (fixed.equals(DateTimeZone.UTC)) {
+                fixed = DateTimeZone.UTC;
+            }
+            return fixed;
+        case 'C':
+            return CachedDateTimeZone.forZone(PrecalculatedZone.readFrom(in, id));
+        case 'P':
+            return PrecalculatedZone.readFrom(in, id);
+        default:
+            throw new IOException("Invalid encoding");
         }
     }
 
@@ -182,38 +182,38 @@ public class DateTimeZoneBuilder {
     static long readMillis(DataInput in) throws IOException {
         int v = in.readUnsignedByte();
         switch (v >> 6) {
-            case 0: default:
-                // Form 00 (6 bits effective precision)
-                v = (v << (32 - 6)) >> (32 - 6);
-                return v * (30 * 60000L);
+        case 0: default:
+            // Form 00 (6 bits effective precision)
+            v = (v << (32 - 6)) >> (32 - 6);
+            return v * (30 * 60000L);
 
-            case 1:
-                // Form 01 (30 bits effective precision)
-                v = (v << (32 - 6)) >> (32 - 30);
-                v |= (in.readUnsignedByte()) << 16;
-                v |= (in.readUnsignedByte()) << 8;
-                v |= (in.readUnsignedByte());
-                return v * 60000L;
+        case 1:
+            // Form 01 (30 bits effective precision)
+            v = (v << (32 - 6)) >> (32 - 30);
+            v |= (in.readUnsignedByte()) << 16;
+            v |= (in.readUnsignedByte()) << 8;
+            v |= (in.readUnsignedByte());
+            return v * 60000L;
 
-            case 2:
-                // Form 10 (38 bits effective precision)
-                long w = (((long)v) << (64 - 6)) >> (64 - 38);
-                w |= (in.readUnsignedByte()) << 24;
-                w |= (in.readUnsignedByte()) << 16;
-                w |= (in.readUnsignedByte()) << 8;
-                w |= (in.readUnsignedByte());
-                return w * 1000L;
+        case 2:
+            // Form 10 (38 bits effective precision)
+            long w = (((long)v) << (64 - 6)) >> (64 - 38);
+            w |= (in.readUnsignedByte()) << 24;
+            w |= (in.readUnsignedByte()) << 16;
+            w |= (in.readUnsignedByte()) << 8;
+            w |= (in.readUnsignedByte());
+            return w * 1000L;
 
-            case 3:
-                // Form 11 (64 bits effective precision)
-                return in.readLong();
+        case 3:
+            // Form 11 (64 bits effective precision)
+            return in.readLong();
         }
     }
 
     private static DateTimeZone buildFixedZone(String id, String nameKey,
                                                int wallOffset, int standardOffset) {
         if ("UTC".equals(id) && id.equals(nameKey) &&
-                wallOffset == 0 && standardOffset == 0) {
+            wallOffset == 0 && standardOffset == 0) {
             return DateTimeZone.UTC;
         }
         return new FixedDateTimeZone(id, nameKey, wallOffset, standardOffset);
@@ -251,7 +251,7 @@ public class DateTimeZoneBuilder {
     {
         if (iRuleSets.size() > 0) {
             OfYear ofYear = new OfYear
-                    (mode, monthOfYear, dayOfMonth, dayOfWeek, advanceDayOfWeek, millisOfDay);
+                (mode, monthOfYear, dayOfMonth, dayOfWeek, advanceDayOfWeek, millisOfDay);
             RuleSet lastRuleSet = iRuleSets.get(iRuleSets.size() - 1);
             lastRuleSet.setUpperLimit(year, ofYear);
         }
@@ -308,7 +308,7 @@ public class DateTimeZoneBuilder {
     {
         if (fromYear <= toYear) {
             OfYear ofYear = new OfYear
-                    (mode, monthOfYear, dayOfMonth, dayOfWeek, advanceDayOfWeek, millisOfDay);
+                (mode, monthOfYear, dayOfMonth, dayOfWeek, advanceDayOfWeek, millisOfDay);
             Recurrence recurrence = new Recurrence(ofYear, nameKey, saveMillis);
             Rule rule = new Rule(recurrence, fromYear, toYear);
             getLastRuleSet().addRule(rule);
@@ -390,7 +390,7 @@ public class DateTimeZoneBuilder {
         if (transitions.size() == 1 && tailZone == null) {
             Transition tr = transitions.get(0);
             return buildFixedZone(id, tr.getNameKey(),
-                    tr.getWallOffset(), tr.getStandardOffset());
+                                  tr.getWallOffset(), tr.getStandardOffset());
         }
 
         PrecalculatedZone zone = PrecalculatedZone.create(id, outputID, transitions, tailZone);
@@ -480,11 +480,11 @@ public class DateTimeZoneBuilder {
     private static final class OfYear {
         static OfYear readFrom(DataInput in) throws IOException {
             return new OfYear((char)in.readUnsignedByte(),
-                    (int)in.readUnsignedByte(),
-                    (int)in.readByte(),
-                    (int)in.readUnsignedByte(),
-                    in.readBoolean(),
-                    (int)readMillis(in));
+                              (int)in.readUnsignedByte(),
+                              (int)in.readByte(),
+                              (int)in.readUnsignedByte(),
+                              in.readBoolean(),
+                              (int)readMillis(in));
         }
 
         // Is 'u', 'w', or 's'.
@@ -632,12 +632,12 @@ public class DateTimeZoneBuilder {
             if (obj instanceof OfYear) {
                 OfYear other = (OfYear)obj;
                 return
-                        iMode == other.iMode &&
-                                iMonthOfYear == other.iMonthOfYear &&
-                                iDayOfMonth == other.iDayOfMonth &&
-                                iDayOfWeek == other.iDayOfWeek &&
-                                iAdvance == other.iAdvance &&
-                                iMillisOfDay == other.iMillisOfDay;
+                    iMode == other.iMode &&
+                    iMonthOfYear == other.iMonthOfYear &&
+                    iDayOfMonth == other.iDayOfMonth &&
+                    iDayOfWeek == other.iDayOfWeek &&
+                    iAdvance == other.iAdvance &&
+                    iMillisOfDay == other.iMillisOfDay;
             }
             return false;
         }
@@ -783,9 +783,9 @@ public class DateTimeZoneBuilder {
             if (obj instanceof Recurrence) {
                 Recurrence other = (Recurrence)obj;
                 return
-                        iSaveMillis == other.iSaveMillis &&
-                                iNameKey.equals(other.iNameKey) &&
-                                iOfYear.equals(other.iOfYear);
+                    iSaveMillis == other.iSaveMillis &&
+                    iNameKey.equals(other.iNameKey) &&
+                    iOfYear.equals(other.iOfYear);
             }
             return false;
         }
@@ -930,9 +930,9 @@ public class DateTimeZoneBuilder {
                 return true;
             }
             return iMillis > other.iMillis &&
-                    (iWallOffset != other.iWallOffset ||
-                            //iStandardOffset != other.iStandardOffset ||
-                            !(iNameKey.equals(other.iNameKey)));
+                (iWallOffset != other.iWallOffset ||
+                 //iStandardOffset != other.iStandardOffset ||
+                 !(iNameKey.equals(other.iNameKey)));
         }
     }
 
@@ -1011,7 +1011,7 @@ public class DateTimeZoneBuilder {
             if (iInitialNameKey != null) {
                 // Initial zone info explicitly set, so don't search the rules.
                 return new Transition(firstMillis, iInitialNameKey,
-                        iStandardOffset + iInitialSaveMillis, iStandardOffset);
+                                      iStandardOffset + iInitialSaveMillis, iStandardOffset);
             }
 
             // Make a copy before we destroy the rules.
@@ -1051,7 +1051,7 @@ public class DateTimeZoneBuilder {
                         // with no savings anyhow, and use the best available
                         // name key.
                         first = new Transition(firstMillis, next.getNameKey(),
-                                iStandardOffset, iStandardOffset);
+                                               iStandardOffset, iStandardOffset);
                     }
                     break;
                 }
@@ -1114,7 +1114,7 @@ public class DateTimeZoneBuilder {
             // Check if upper limit reached or passed.
             if (iUpperYear < Integer.MAX_VALUE) {
                 long upperMillis =
-                        iUpperOfYear.setInstant(iUpperYear, iStandardOffset, saveMillis);
+                    iUpperOfYear.setInstant(iUpperYear, iStandardOffset, saveMillis);
                 if (nextMillis >= upperMillis) {
                     // At or after upper limit.
                     return null;
@@ -1142,7 +1142,7 @@ public class DateTimeZoneBuilder {
                 Rule startRule = iRules.get(0);
                 Rule endRule = iRules.get(1);
                 if (startRule.getToYear() == Integer.MAX_VALUE &&
-                        endRule.getToYear() == Integer.MAX_VALUE) {
+                    endRule.getToYear() == Integer.MAX_VALUE) {
 
                     // With exactly two infinitely recurring rules left, a
                     // simple DSTZone can be formed.
@@ -1152,7 +1152,7 @@ public class DateTimeZoneBuilder {
                     // which is chosen the 'end'. DSTZone works properly either
                     // way.
                     return new DSTZone(id, iStandardOffset,
-                            startRule.iRecurrence, endRule.iRecurrence);
+                                       startRule.iRecurrence, endRule.iRecurrence);
                 }
             }
             return null;
@@ -1164,7 +1164,7 @@ public class DateTimeZoneBuilder {
 
         static DSTZone readFrom(DataInput in, String id) throws IOException {
             return new DSTZone(id, (int)readMillis(in),
-                    Recurrence.readFrom(in), Recurrence.readFrom(in));
+                               Recurrence.readFrom(in), Recurrence.readFrom(in));
         }
 
         final int iStandardOffset;
@@ -1204,7 +1204,7 @@ public class DateTimeZoneBuilder {
 
             try {
                 start = startRecurrence.next
-                        (instant, standardOffset, endRecurrence.getSaveMillis());
+                    (instant, standardOffset, endRecurrence.getSaveMillis());
                 if (instant > 0 && start < 0) {
                     // Overflowed.
                     start = instant;
@@ -1219,7 +1219,7 @@ public class DateTimeZoneBuilder {
 
             try {
                 end = endRecurrence.next
-                        (instant, standardOffset, startRecurrence.getSaveMillis());
+                    (instant, standardOffset, startRecurrence.getSaveMillis());
                 if (instant > 0 && end < 0) {
                     // Overflowed.
                     end = instant;
@@ -1248,7 +1248,7 @@ public class DateTimeZoneBuilder {
 
             try {
                 start = startRecurrence.previous
-                        (instant, standardOffset, endRecurrence.getSaveMillis());
+                    (instant, standardOffset, endRecurrence.getSaveMillis());
                 if (instant < 0 && start > 0) {
                     // Overflowed.
                     start = instant;
@@ -1263,7 +1263,7 @@ public class DateTimeZoneBuilder {
 
             try {
                 end = endRecurrence.previous
-                        (instant, standardOffset, startRecurrence.getSaveMillis());
+                    (instant, standardOffset, startRecurrence.getSaveMillis());
                 if (instant < 0 && end > 0) {
                     // Overflowed.
                     end = instant;
@@ -1286,10 +1286,10 @@ public class DateTimeZoneBuilder {
             if (obj instanceof DSTZone) {
                 DSTZone other = (DSTZone)obj;
                 return
-                        getID().equals(other.getID()) &&
-                                iStandardOffset == other.iStandardOffset &&
-                                iStartRecurrence.equals(other.iStartRecurrence) &&
-                                iEndRecurrence.equals(other.iEndRecurrence);
+                    getID().equals(other.getID()) &&
+                    iStandardOffset == other.iStandardOffset &&
+                    iStartRecurrence.equals(other.iStartRecurrence) &&
+                    iEndRecurrence.equals(other.iEndRecurrence);
             }
             return false;
         }
@@ -1309,7 +1309,7 @@ public class DateTimeZoneBuilder {
 
             try {
                 start = startRecurrence.next
-                        (instant, standardOffset, endRecurrence.getSaveMillis());
+                    (instant, standardOffset, endRecurrence.getSaveMillis());
             } catch (IllegalArgumentException e) {
                 // Overflowed.
                 start = instant;
@@ -1320,7 +1320,7 @@ public class DateTimeZoneBuilder {
 
             try {
                 end = endRecurrence.next
-                        (instant, standardOffset, startRecurrence.getSaveMillis());
+                    (instant, standardOffset, startRecurrence.getSaveMillis());
             } catch (IllegalArgumentException e) {
                 // Overflowed.
                 end = instant;
@@ -1373,7 +1373,7 @@ public class DateTimeZoneBuilder {
             }
 
             return new PrecalculatedZone
-                    (id, transitions, wallOffsets, standardOffsets, nameKeys, tailZone);
+                (id, transitions, wallOffsets, standardOffsets, nameKeys, tailZone);
         }
 
         /**
@@ -1443,7 +1443,7 @@ public class DateTimeZoneBuilder {
                     if (ZoneInfoCompiler.verbose()) {
                         System.out.println("Fixing duplicate name key - " + nextNameKey);
                         System.out.println("     - " + new DateTime(trans[i], chrono) +
-                                " - " + new DateTime(trans[i + 1], chrono));
+                                           " - " + new DateTime(trans[i + 1], chrono));
                     }
                     if (curOffset > nextOffset) {
                         nameKeys[i] = (curNameKey + "-Summer").intern();
@@ -1456,29 +1456,29 @@ public class DateTimeZoneBuilder {
 
             if (tailZone != null) {
                 if (tailZone.iStartRecurrence.getNameKey()
-                        .equals(tailZone.iEndRecurrence.getNameKey())) {
+                    .equals(tailZone.iEndRecurrence.getNameKey())) {
                     if (ZoneInfoCompiler.verbose()) {
                         System.out.println("Fixing duplicate recurrent name key - " +
-                                tailZone.iStartRecurrence.getNameKey());
+                                           tailZone.iStartRecurrence.getNameKey());
                     }
                     if (tailZone.iStartRecurrence.getSaveMillis() > 0) {
                         tailZone = new DSTZone(
-                                tailZone.getID(),
-                                tailZone.iStandardOffset,
-                                tailZone.iStartRecurrence.renameAppend("-Summer"),
-                                tailZone.iEndRecurrence);
+                            tailZone.getID(),
+                            tailZone.iStandardOffset,
+                            tailZone.iStartRecurrence.renameAppend("-Summer"),
+                            tailZone.iEndRecurrence);
                     } else {
                         tailZone = new DSTZone(
-                                tailZone.getID(),
-                                tailZone.iStandardOffset,
-                                tailZone.iStartRecurrence,
-                                tailZone.iEndRecurrence.renameAppend("-Summer"));
+                            tailZone.getID(),
+                            tailZone.iStandardOffset,
+                            tailZone.iStartRecurrence,
+                            tailZone.iEndRecurrence.renameAppend("-Summer"));
                     }
                 }
             }
 
             return new PrecalculatedZone
-                    ((outputID ? id : ""), trans, wallOffsets, standardOffsets, nameKeys, tailZone);
+                ((outputID ? id : ""), trans, wallOffsets, standardOffsets, nameKeys, tailZone);
         }
 
         // All array fields have the same length.
@@ -1495,7 +1495,7 @@ public class DateTimeZoneBuilder {
          * Constructor used ONLY for valid input, loaded via static methods.
          */
         private PrecalculatedZone(String id, long[] transitions, int[] wallOffsets,
-                                  int[] standardOffsets, String[] nameKeys, DSTZone tailZone)
+                          int[] standardOffsets, String[] nameKeys, DSTZone tailZone)
         {
             super(id);
             iTransitions = transitions;
@@ -1622,14 +1622,14 @@ public class DateTimeZoneBuilder {
             if (obj instanceof PrecalculatedZone) {
                 PrecalculatedZone other = (PrecalculatedZone)obj;
                 return
-                        getID().equals(other.getID()) &&
-                                Arrays.equals(iTransitions, other.iTransitions) &&
-                                Arrays.equals(iNameKeys, other.iNameKeys) &&
-                                Arrays.equals(iWallOffsets, other.iWallOffsets) &&
-                                Arrays.equals(iStandardOffsets, other.iStandardOffsets) &&
-                                ((iTailZone == null)
-                                        ? (null == other.iTailZone)
-                                        : (iTailZone.equals(other.iTailZone)));
+                    getID().equals(other.getID()) &&
+                    Arrays.equals(iTransitions, other.iTransitions) &&
+                    Arrays.equals(iNameKeys, other.iNameKeys) &&
+                    Arrays.equals(iWallOffsets, other.iWallOffsets) &&
+                    Arrays.equals(iStandardOffsets, other.iStandardOffsets) &&
+                    ((iTailZone == null)
+                     ? (null == other.iTailZone)
+                     : (iTailZone.equals(other.iTailZone)));
             }
             return false;
         }

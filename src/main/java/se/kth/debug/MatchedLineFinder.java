@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import spoon.Launcher;
@@ -199,12 +198,17 @@ public class MatchedLineFinder {
     }
 
     private static List<CtTypeMember> getTypeMembers(CtType<?> type) {
-        return type.getTypeMembers().stream()
-                .filter(
-                        typeMember ->
-                                typeMember instanceof CtMethod<?>
-                                        || typeMember instanceof CtConstructor<?>)
-                .collect(Collectors.toList());
+        List<CtTypeMember> typeMembers = new ArrayList<>();
+        for (CtTypeMember candidateTypeMember : type.getTypeMembers()) {
+            if (candidateTypeMember instanceof CtMethod<?>
+                    || candidateTypeMember instanceof CtConstructor<?>) {
+                typeMembers.add(candidateTypeMember);
+            }
+            if (candidateTypeMember instanceof CtClass<?>) {
+                typeMembers.addAll(getTypeMembers((CtType<?>) candidateTypeMember));
+            }
+        }
+        return typeMembers;
     }
 
     private static CtTypeMember findDiffedTypeMember(
