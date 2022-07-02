@@ -7,6 +7,13 @@ CLI to collect runtime context of a Java class.
 
 ## Execution
 
+### Prerequisites
+
+Please install `gawk` before proceeding. Use the following command.
+```shell
+$ sudo apt install gawk
+```
+
 ### Setup project for collecting runtime statistics
 
 The exact steps varies for each project because of multiple development
