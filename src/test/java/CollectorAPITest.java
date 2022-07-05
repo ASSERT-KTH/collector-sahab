@@ -601,7 +601,7 @@ public class CollectorAPITest {
         assertThat(returnData.getValue(), equalTo("a"));
     }
 
-    @Disabled("Shall be fixed after #86")
+//    @Disabled("Shall be fixed after #86")
     @Test
     void dataShouldBeCollectedAtSpecifiedBreakpoint()
             throws FileNotFoundException, AbsentInformationException {
