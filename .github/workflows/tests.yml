@@ -17,8 +17,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Style check using spotless
-        run: 'mvn spotless:check'
       - name: Run test phase
         run: |
           ./src/test/resources/sample-maven-project/with-debug.sh
