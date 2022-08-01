@@ -22,10 +22,11 @@ class Command:
       "-Dmaven.compiler.debuglevel=lines,vars,source",
     ], cwd=self.cwd)
 
-  def mvn_copy_dependencies(self):
+  def mvn_build_classpath(self):
     subprocess.run([
       "mvn",
-      "dependency:copy-dependencies"
+      "dependency:build-classpath",
+      "-Dmdep.outputFile=target/cp.txt"
     ], cwd=self.cwd)
 
   def remove(self, dir):
