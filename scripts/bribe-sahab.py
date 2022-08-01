@@ -57,7 +57,9 @@ def _run_collector_sahab(project, tests, revision, ref):
   for build_dir in all_targets:
     project_dependencies.append(os.path.join(build_dir, 'classes'))
     project_dependencies.append(os.path.join(build_dir, 'test-classes'))
-    project_dependencies.append(os.path.join(build_dir, 'dependency'))
+    with open(os.path.join(build_dir, 'cp.txt')) as cp:
+      classpath = cp.read().strip()
+      project_dependencies.extend(classpath.split(':'))
 
   test_methods = " ".join(tests)
   output_directory = _get_or_create_directory_for_creating_output_files(ref)

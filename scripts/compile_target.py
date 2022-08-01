@@ -26,7 +26,7 @@ def compile(project, commit, revision):
   driver.git_checkout(commit)
 
   driver.mvn_test_compile()
-  driver.mvn_copy_dependencies()
+  driver.mvn_build_classpath()
 
   driver.rename(revision.value.get_output_directory())
 
