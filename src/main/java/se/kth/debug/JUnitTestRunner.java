@@ -1,5 +1,8 @@
 package se.kth.debug;
 
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectMethod;
+
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.concurrent.*;
@@ -39,7 +42,7 @@ public class JUnitTestRunner {
         String method = classAndMethod[1];
 
         CommandLineOptions options = new CommandLineOptions();
-        options.setSelectedMethods(Collections.singletonList(clazz + "#" + method));
+        options.setSelectedMethods(Collections.singletonList(selectMethod(clazz + "#" + method)));
         options.setFailIfNoTests(true);
         options.setAnsiColorOutputDisabled(true);
         new ConsoleTestExecutor(options).execute(new PrintWriter(System.out));
@@ -47,7 +50,7 @@ public class JUnitTestRunner {
 
     private static void runTestClass(String test) throws Exception {
         CommandLineOptions options = new CommandLineOptions();
-        options.setSelectedClasses(Collections.singletonList(test));
+        options.setSelectedClasses(Collections.singletonList(selectClass(test)));
         options.setFailIfNoTests(true);
         options.setAnsiColorOutputDisabled(true);
         new ConsoleTestExecutor(options).execute(new PrintWriter(System.out));
