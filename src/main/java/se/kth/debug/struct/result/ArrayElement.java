@@ -5,7 +5,7 @@ import java.util.List;
 public class ArrayElement implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.ARRAY_ELEMENT;
     private final String type;
-    private final Object value;
+    private Object value;
     private List<FieldData> fields = null;
     private List<ArrayElement> arrayElements = null;
 
@@ -37,6 +37,11 @@ public class ArrayElement implements RuntimeValue {
     @Override
     public String getName() {
         return null;
+    }
+
+    @Override
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public void setArrayElements(List<ArrayElement> arrayElements) {
