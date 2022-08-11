@@ -1,8 +1,12 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import se.kth.debug.CollectorOptions;
 
 public class TestHelper {
@@ -26,11 +30,18 @@ public class TestHelper {
             throw new FileNotFoundException(buildDirectory + " does not exist");
         }
         List<String> classpath =
-                List.of(
-                        buildDirectory.resolve("classes").toString(),
-                        buildDirectory.resolve("test-classes").toString(),
-                        buildDirectory.resolve("dependency").toString());
-        return classpath.toArray(new String[] {});
+                new ArrayList<>(
+                        List.of(
+                                buildDirectory.resolve("classes").toString(),
+                                buildDirectory.resolve("test-classes").toString()));
+        try {
+            String additionalClasspath = Files.readString(buildDirectory.resolve("cp.txt"));
+            classpath.addAll(
+                    Arrays.stream(additionalClasspath.split(":")).collect(Collectors.toList()));
+            return classpath.toArray(new String[] {});
+        } catch (IOException e) {
+            throw new RuntimeException("Classpath of " + buildDirectory + " could not be read.");
+        }
     }
 
     public static CollectorOptions getDefaultOptions() {
