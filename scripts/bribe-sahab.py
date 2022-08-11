@@ -53,13 +53,23 @@ def _get_or_create_directory_for_creating_output_files(ref):
 
 def _run_collector_sahab(project, tests, revision, ref):
   all_targets = glob(f"{project}/**/{revision.value.get_output_directory()}/", recursive=True)
-  project_dependencies = []
+  all_dependencies = []
+  project_maven_dependencies = []
   for build_dir in all_targets:
-    project_dependencies.append(os.path.join(build_dir, 'classes'))
-    project_dependencies.append(os.path.join(build_dir, 'test-classes'))
+    # We put our dependencies first in the list so that our built classes get
+    # precedence.
+    all_dependencies.append(os.path.join(build_dir, 'classes'))
+    all_dependencies.append(os.path.join(build_dir, 'test-classes'))
+
+    # google-java-format has a module called 'eclipse_plugin' which has dependencies that
+    # override classes in the module core. This prevents out JUnitTestRunner from running tests.
+    if 'google-java-format/eclipse_plugin' in build_dir:
+        continue
     with open(os.path.join(build_dir, 'cp.txt')) as cp:
       classpath = cp.read().strip()
-      project_dependencies.extend(classpath.split(':'))
+      project_maven_dependencies.extend(classpath.split(':'))
+
+  all_dependencies.extend(project_maven_dependencies)
 
   test_methods = " ".join(tests)
   output_directory = _get_or_create_directory_for_creating_output_files(ref)
@@ -69,7 +79,7 @@ def _run_collector_sahab(project, tests, revision, ref):
     "java "
     f"-jar {COLLECTOR_JAR} "
     f"-i {revision.value.get_input_file()} "
-    f"-p {' '.join(project_dependencies)} "
+    f"-p {' '.join(all_dependencies)} "
     f"-t {test_methods} "
     f"-o {collector_sahab_output} "
     f"-m methods.json"

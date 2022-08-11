@@ -4,7 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -22,7 +22,7 @@ public class Utility {
      * @return concatenated string of classpath
      */
     public static String getClasspathForRunningJUnit(String[] providedClasspath) {
-        Set<String> classpathCollection = new HashSet<>();
+        Set<String> classpathCollection = new LinkedHashSet<>();
 
         String[] pathElements =
                 System.getProperty("java.class.path").split(System.getProperty("path.separator"));
@@ -34,7 +34,7 @@ public class Utility {
     }
 
     private static Set<String> verifyAndGetClasspath(String[] classpath) {
-        Set<String> classpathCollection = new HashSet<>();
+        Set<String> classpathCollection = new LinkedHashSet<>();
         for (String cp : classpath) {
             URI uri = new File(cp).toURI();
             try {
