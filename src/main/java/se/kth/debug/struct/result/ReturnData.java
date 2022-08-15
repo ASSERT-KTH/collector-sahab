@@ -65,4 +65,24 @@ public class ReturnData implements RuntimeValue {
     public void setValue(String value) {
         this.value = value;
     }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public List<String> getStackTrace() {
+        return stackTrace;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public List<LocalVariableData> getParameterValues() {
+        return parameterValues;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

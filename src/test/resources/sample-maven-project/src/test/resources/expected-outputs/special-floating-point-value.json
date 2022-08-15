@@ -81,11 +81,11 @@
         "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
       ],
       "type": "java.lang.Double",
-      "value": "NaN",
       "location": "foo.SpecialFloatingPointValue:7",
       "parameterValues": [],
       "fields": null,
-      "arrayElements": null
+      "arrayElements": null,
+      "value": "NaN"
     }
   ]
 }

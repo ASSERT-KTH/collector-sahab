@@ -135,6 +135,7 @@ public class Collector implements Callable<Integer> {
                         .setPrettyPrinting()
                         .serializeNulls()
                         .serializeSpecialFloatingPointValues()
+                        .registerTypeAdapter(ReturnData.class, new ReturnDataAdapter())
                         .create();
 
         File file = new File(collectedOutput);
