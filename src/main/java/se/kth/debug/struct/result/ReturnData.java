@@ -1,7 +1,10 @@
 package se.kth.debug.struct.result;
 
+import com.google.gson.annotations.JsonAdapter;
 import java.util.List;
+import se.kth.debug.RuntimeValueAdapter;
 
+@JsonAdapter(RuntimeValueAdapter.class)
 public class ReturnData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.RETURN;
     private final String methodName;
@@ -64,25 +67,5 @@ public class ReturnData implements RuntimeValue {
     @Override
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public List<String> getStackTrace() {
-        return stackTrace;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public List<LocalVariableData> getParameterValues() {
-        return parameterValues;
-    }
-
-    public String getType() {
-        return type;
     }
 }

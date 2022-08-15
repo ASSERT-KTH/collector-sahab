@@ -1,7 +1,10 @@
 package se.kth.debug.struct.result;
 
+import com.google.gson.annotations.JsonAdapter;
 import java.util.List;
+import se.kth.debug.RuntimeValueAdapter;
 
+@JsonAdapter(RuntimeValueAdapter.class)
 public class ArrayElement implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.ARRAY_ELEMENT;
     private final String type;

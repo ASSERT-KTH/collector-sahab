@@ -70,6 +70,38 @@
           ]
         }
       ]
+    },
+    {
+      "file": "foo/SpecialFloatingPointValue.java",
+      "lineNumber": 11,
+      "stackFrameContexts": [
+        {
+          "positionFromTopInStackTrace": 1,
+          "location": "foo.SpecialFloatingPointValue:11",
+          "stackTrace": [
+            "generateNaNFromFloat:11, foo.SpecialFloatingPointValue",
+            "test_generateNaNFromFloat:16, foo.SpecialFloatingPointValueTest"
+          ],
+          "runtimeValueCollection": [
+            {
+              "kind": "LOCAL_VARIABLE",
+              "name": "x",
+              "type": "java.lang.Float",
+              "value": "Infinity",
+              "fields": null,
+              "arrayElements": null
+            },
+            {
+              "kind": "LOCAL_VARIABLE",
+              "name": "y",
+              "type": "java.lang.Float",
+              "value": "-Infinity",
+              "fields": null,
+              "arrayElements": null
+            }
+          ]
+        }
+      ]
     }
   ],
   "return": [
@@ -81,11 +113,42 @@
         "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
       ],
       "type": "java.lang.Double",
+      "value": "NaN",
       "location": "foo.SpecialFloatingPointValue:7",
       "parameterValues": [],
       "fields": null,
-      "arrayElements": null,
-      "value": "NaN"
+      "arrayElements": null
+    },
+    {
+      "kind": "RETURN",
+      "methodName": "generateNaNFromFloat",
+      "stackTrace": [
+        "generateNaNFromFloat:11, foo.SpecialFloatingPointValue",
+        "test_generateNaNFromFloat:16, foo.SpecialFloatingPointValueTest"
+      ],
+      "type": "java.lang.Float",
+      "value": "NaN",
+      "location": "foo.SpecialFloatingPointValue:11",
+      "parameterValues": [
+        {
+          "kind": "LOCAL_VARIABLE",
+          "name": "x",
+          "type": "java.lang.Float",
+          "value": "Infinity",
+          "fields": null,
+          "arrayElements": null
+        },
+        {
+          "kind": "LOCAL_VARIABLE",
+          "name": "y",
+          "type": "java.lang.Float",
+          "value": "-Infinity",
+          "fields": null,
+          "arrayElements": null
+        }
+      ],
+      "fields": null,
+      "arrayElements": null
     }
   ]
 }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonWriter;
 import com.sun.jdi.AbsentInformationException;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import picocli.CommandLine;
@@ -134,8 +135,7 @@ public class Collector implements Callable<Integer> {
                 new GsonBuilder()
                         .setPrettyPrinting()
                         .serializeNulls()
-                        .serializeSpecialFloatingPointValues()
-                        .registerTypeAdapter(ReturnData.class, new ReturnDataAdapter())
+                        .registerTypeAdapter(ArrayList.class, new SpecialFloatingValueAdapter())
                         .create();
 
         File file = new File(collectedOutput);

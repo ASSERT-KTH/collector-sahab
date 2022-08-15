@@ -10,4 +10,14 @@ public class SpecialFloatingPointValueTest {
     void test_generateNaN() {
         assertTrue(Double.isNaN(SpecialFloatingPointValue.generateNaN()));
     }
+
+    @Test
+    void test_generateNaNFromFloat() {
+        assertTrue(Float.isNaN(SpecialFloatingPointValue.generateNaNFromFloat(Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY)));
+    }
+
+    @Test
+    void test_giveMeNan() {
+        assertTrue(Double.isNaN(SpecialFloatingPointValue.giveMeNan()[0][0]));
+    }
 }
