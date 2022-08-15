@@ -16,6 +16,13 @@ public class RuntimeValueAdapter implements JsonSerializer<List<? extends Runtim
         }
         JsonArray result = new JsonArray();
         for (var runtimeValue : runtimeValues) {
+            if (runtimeValue != null
+                    && runtimeValue.getValue() != null
+                    && (runtimeValue.getValue().equals(Double.POSITIVE_INFINITY)
+                            || runtimeValue.getValue().equals(Double.NEGATIVE_INFINITY)
+                            || runtimeValue.getValue().equals(Double.NaN))) {
+                runtimeValue.setValue(runtimeValue.getValue().toString());
+            }
             JsonElement jsonElement = context.serialize(runtimeValue);
             result.add(jsonElement);
         }

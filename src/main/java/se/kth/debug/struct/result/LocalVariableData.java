@@ -6,7 +6,7 @@ public class LocalVariableData implements RuntimeValue {
     private final RuntimeValueKind kind = RuntimeValueKind.LOCAL_VARIABLE;
     private final String name;
     private final String type;
-    private final Object value;
+    private Object value;
     private List<FieldData> fields = null;
     private List<ArrayElement> arrayElements = null;
 
@@ -47,5 +47,10 @@ public class LocalVariableData implements RuntimeValue {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void setValue(String value) {
+        this.value = value;
     }
 }

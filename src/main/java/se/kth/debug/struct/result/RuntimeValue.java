@@ -12,4 +12,6 @@ public interface RuntimeValue {
     List<ArrayElement> getArrayElements();
 
     String getName();
+
+    void setValue(String value);
 }

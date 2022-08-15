@@ -7,7 +7,7 @@ public class ReturnData implements RuntimeValue {
     private final String methodName;
     private final List<String> stackTrace;
     private final String type;
-    private final Object value;
+    private Object value;
     private final String location;
     private final List<LocalVariableData> parameterValues;
     private List<FieldData> fields = null;
@@ -59,5 +59,30 @@ public class ReturnData implements RuntimeValue {
     @Override
     public String getName() {
         return methodName;
+    }
+
+    @Override
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public List<String> getStackTrace() {
+        return stackTrace;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public List<LocalVariableData> getParameterValues() {
+        return parameterValues;
+    }
+
+    public String getType() {
+        return type;
     }
 }

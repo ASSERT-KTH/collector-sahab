@@ -31,7 +31,7 @@
               "kind": "LOCAL_VARIABLE",
               "name": "positiveInfinity",
               "type": "java.lang.Double",
-              "value": Infinity,
+              "value": "Infinity",
               "fields": null,
               "arrayElements": null
             }
@@ -55,7 +55,7 @@
               "kind": "LOCAL_VARIABLE",
               "name": "positiveInfinity",
               "type": "java.lang.Double",
-              "value": Infinity,
+              "value": "Infinity",
               "fields": null,
               "arrayElements": null
             },
@@ -63,7 +63,7 @@
               "kind": "LOCAL_VARIABLE",
               "name": "negativeInfinity",
               "type": "java.lang.Double",
-              "value": -Infinity,
+              "value": "-Infinity",
               "fields": null,
               "arrayElements": null
             }
@@ -81,11 +81,11 @@
         "test_generateNaN:11, foo.SpecialFloatingPointValueTest"
       ],
       "type": "java.lang.Double",
-      "value": NaN,
       "location": "foo.SpecialFloatingPointValue:7",
       "parameterValues": [],
       "fields": null,
-      "arrayElements": null
+      "arrayElements": null,
+      "value": "NaN"
     }
   ]
 }
