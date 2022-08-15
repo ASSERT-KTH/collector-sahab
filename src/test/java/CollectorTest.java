@@ -279,34 +279,78 @@ public class CollectorTest {
         }
     }
 
-    @Test
-    void gson_shouldBeAbleToSerialise_specialFloatingPointValue(@TempDir Path tempDir)
-            throws IOException {
-        // arrange
-        Path outputJson = tempDir.resolve("output.json");
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-        String[] args = {
-            "-i",
-            TestHelper.PATH_TO_INPUT.resolve("special-floating-point-value.txt").toString(),
-            "-p",
-            StringUtils.join(classpath, " "),
-            "-t",
-            "foo.SpecialFloatingPointValueTest::test_generateNaN foo.SpecialFloatingPointValueTest::test_generateNaNFromFloat",
-            "-o",
-            outputJson.toString()
-        };
+    @Nested
+    class SpecialFloatingPointValues {
+        @Test
+        void shouldBeAbleToSerialise_specialFloatingPointValue(@TempDir Path tempDir)
+                throws IOException {
+            // arrange
+            Path outputJson = tempDir.resolve("output.json");
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] args = {
+                "-i",
+                TestHelper.PATH_TO_INPUT
+                        .resolve("special-floating-point-value")
+                        .resolve("linear.txt")
+                        .toString(),
+                "-p",
+                StringUtils.join(classpath, " "),
+                "-t",
+                "foo.SpecialFloatingPointValueTest::test_generateNaN foo.SpecialFloatingPointValueTest::test_generateNaNFromFloat",
+                "-o",
+                outputJson.toString()
+            };
 
-        // act
-        Collector.main(args);
+            // act
+            Collector.main(args);
 
-        // assert
-        String expectedOutput =
-                Files.readString(
-                        TestHelper.PATH_TO_EXPECTED_OUTPUT.resolve(
-                                "special-floating-point-value.json"));
-        String actualOutput = Files.readString(outputJson);
-        assertThat(actualOutput, equalTo(expectedOutput));
+            // assert
+            String expectedOutput =
+                    Files.readString(
+                            TestHelper.PATH_TO_EXPECTED_OUTPUT
+                                    .resolve("special-floating-values")
+                                    .resolve("linear.json"));
+            String actualOutput = Files.readString(outputJson);
+            assertThat(actualOutput, equalTo(expectedOutput));
+        }
+
+        @Test
+        void shouldBeAbleToSerialise_nestedSpecialFloatingPointValue(@TempDir Path tempDir)
+                throws IOException {
+            // arrange
+            Path outputJson = tempDir.resolve("output.json");
+            String[] classpath =
+                    TestHelper.getMavenClasspathFromBuildDirectory(
+                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] args = {
+                "-i",
+                TestHelper.PATH_TO_INPUT
+                        .resolve("special-floating-point-value")
+                        .resolve("nested.txt")
+                        .toString(),
+                "-p",
+                StringUtils.join(classpath, " "),
+                "-t",
+                "foo.SpecialFloatingPointValueTest::test_giveMeNan",
+                "-o",
+                outputJson.toString(),
+                "--skip-breakpoint-values",
+                "--execution-depth=2"
+            };
+
+            // act
+            Collector.main(args);
+
+            // assert
+            String expectedOutput =
+                    Files.readString(
+                            TestHelper.PATH_TO_EXPECTED_OUTPUT
+                                    .resolve("special-floating-values")
+                                    .resolve("nested.json"));
+            String actualOutput = Files.readString(outputJson);
+            assertThat(actualOutput, equalTo(expectedOutput));
+        }
     }
 }

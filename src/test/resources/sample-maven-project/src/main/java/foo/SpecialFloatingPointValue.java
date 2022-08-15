@@ -10,4 +10,8 @@ public class SpecialFloatingPointValue {
     public static Float generateNaNFromFloat(Float x, Float y) {
         return x + y;
     }
+
+    public static Double[][] giveMeNan() {
+        return new Double[][]{{Double.NaN}};
+    }
 }
