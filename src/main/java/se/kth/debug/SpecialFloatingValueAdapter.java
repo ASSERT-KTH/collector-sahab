@@ -1,3 +1,7 @@
+/**
+ * I have no idea how this works, but the tests pass. I hope Khashayar never finds bug in
+ * serialisation again, because I don't want to delve further into this.
+ */
 package se.kth.debug;
 
 import com.google.gson.*;
