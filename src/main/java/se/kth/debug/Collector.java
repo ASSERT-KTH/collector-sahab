@@ -130,13 +130,7 @@ public class Collector implements Callable<Integer> {
     }
 
     public void write(EventProcessor eventProcessor) throws IOException {
-        final Gson gson =
-                new GsonBuilder()
-                        .setPrettyPrinting()
-                        .serializeNulls()
-                        .serializeSpecialFloatingPointValues()
-                        .registerTypeAdapter(ReturnData.class, new ReturnDataAdapter())
-                        .create();
+        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
         File file = new File(collectedOutput);
         if (file.getParentFile() != null) {

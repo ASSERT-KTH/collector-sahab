@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -81,5 +82,17 @@ public class Utility {
             return jaCoCoCandidate.get();
         }
         throw new ClassNotFoundException("JaCoCo is not provided as a test dependency");
+    }
+
+    public static Object escapeSpecialFloatingValues(Object runtimeValue) {
+        if (Objects.equals(runtimeValue, Double.NaN)
+                || Objects.equals(runtimeValue, Double.POSITIVE_INFINITY)
+                || Objects.equals(runtimeValue, Double.NEGATIVE_INFINITY)
+                || Objects.equals(runtimeValue, Float.NaN)
+                || Objects.equals(runtimeValue, Float.NEGATIVE_INFINITY)
+                || Objects.equals(runtimeValue, Float.POSITIVE_INFINITY)) {
+            return runtimeValue.toString();
+        }
+        return runtimeValue;
     }
 }
