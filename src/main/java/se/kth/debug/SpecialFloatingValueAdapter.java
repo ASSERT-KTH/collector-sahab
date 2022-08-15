@@ -16,10 +16,10 @@ public class SpecialFloatingValueAdapter implements JsonSerializer<ArrayList<?>>
             return array;
         }
         for (Object element : number) {
-            if (!(element.getClass().isAssignableFrom(ArrayList.class))) {
-                array.add(context.serialize(Utility.escapeSpecialFloatingValues(element)));
-            } else {
+            if (element.getClass().isAssignableFrom(ArrayList.class)) {
                 array.add(context.serialize(element));
+            } else {
+                array.add(context.serialize(Utility.escapeSpecialFloatingValues(element)));
             }
         }
         return array;
