@@ -6,4 +6,8 @@ public class SpecialFloatingPointValue {
         Double negativeInfinity = Double.NEGATIVE_INFINITY;
         return positiveInfinity + negativeInfinity;
     }
+
+    public static Float generateNaNFromFloat(Float x, Float y) {
+        return x + y;
+    }
 }

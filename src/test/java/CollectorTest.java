@@ -293,7 +293,7 @@ public class CollectorTest {
             "-p",
             StringUtils.join(classpath, " "),
             "-t",
-            "foo.SpecialFloatingPointValueTest::test_generateNaN",
+            "foo.SpecialFloatingPointValueTest::test_generateNaN foo.SpecialFloatingPointValueTest::test_generateNaNFromFloat",
             "-o",
             outputJson.toString()
         };
