@@ -65,9 +65,12 @@ def _run_collector_sahab(project, tests, revision, ref):
     # override classes in the module core. This prevents out JUnitTestRunner from running tests.
     if 'google-java-format/eclipse_plugin' in build_dir:
         continue
-    with open(os.path.join(build_dir, 'cp.txt')) as cp:
-      classpath = cp.read().strip()
-      project_maven_dependencies.extend(classpath.split(':'))
+    try:
+        with open(os.path.join(build_dir, 'cp.txt')) as cp:
+          classpath = cp.read().strip()
+          project_maven_dependencies.extend(classpath.split(':'))
+    except FileNotFoundError:
+        print(f'No cp.txt found in {build_dir}')
 
   all_dependencies.extend(project_maven_dependencies)
 
