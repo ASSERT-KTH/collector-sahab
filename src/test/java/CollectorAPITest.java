@@ -597,4 +597,33 @@ public class CollectorAPITest {
 
         assertThat(returnData.getValue(), equalTo("a"));
     }
+
+    @Test
+    void recordDataOfMethod_RunByNestedTest()
+            throws FileNotFoundException, AbsentInformationException {
+        // arrange
+        String[] classpath =
+                TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] tests = new String[] {"foo.NestedTest$NestedClass::test_add"};
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_INPUT.resolve("nested").resolve("input.txt").toFile();
+        File methodsForExitEvent =
+                TestHelper.PATH_TO_INPUT.resolve("nested").resolve("methods.json").toFile();
+
+        // act
+        EventProcessor eventProcessor =
+                Collector.invoke(
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        methodsForExitEvent,
+                        TestHelper.getDefaultOptions());
+
+        // assert
+        assertThat(eventProcessor.getReturnValues().size(), equalTo(1));
+        ReturnData returnData = eventProcessor.getReturnValues().get(0);
+
+        assertThat(returnData.getValue(), equalTo(3));
+    }
 }
