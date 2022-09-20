@@ -14,5 +14,5 @@ class _Revision:
 
 
 class REVISION(Enum):
-  LEFT = _Revision("input-left.txt", "sahab-left")
-  RIGHT = _Revision("input-right.txt", "sahab-right")
+  LEFT = _Revision("input-left", "sahab-left")
+  RIGHT = _Revision("input-right", "sahab-right")
