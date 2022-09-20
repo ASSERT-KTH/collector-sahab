@@ -34,9 +34,9 @@ public class MatchedLineFinder {
 
         Triple<String, String, String> output = invoke(leftJava, rightJava);
 
-        createInputFile(output.getLeft(), "input-left_" + right +".txt");
-        createInputFile(output.getRight(), "input-right_" + right +".txt");
-        createInputFile(output.getMiddle(), "methods_" + right +".json");
+        createInputFile(output.getLeft(), "input-left_" + right + ".txt");
+        createInputFile(output.getRight(), "input-right_" + right + ".txt");
+        createInputFile(output.getMiddle(), "methods_" + right + ".json");
     }
 
     /**
