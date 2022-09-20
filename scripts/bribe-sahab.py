@@ -25,6 +25,7 @@ parser = argparse.ArgumentParser("Bribe sahab")
 parser.add_argument("-p", "--project", action=VerifyDirectory, required=True, help="Path to project")
 parser.add_argument("-l", "--left", required=True, help="Left revision")
 parser.add_argument("-r", "--right", required=True, help="Right revision")
+parser.add_argument("--execution-depth", type=int, default=0, help="Execution depth")
 
 # Specifically for finding matched lines
 parser.add_argument("-c", "--class-filename", required=True, help="Name of the file which contains the patch")
@@ -34,8 +35,8 @@ parser.add_argument("-t", "--tests", required=True, nargs="+", help="Tests execu
 
 
 def _compile_target(project, left, right):
-  compile(project, left, REVISION.LEFT)
-  compile(project, right, REVISION.RIGHT)
+  compile(project, left, REVISION.LEFT, right)
+  compile(project, right, REVISION.RIGHT, right)
 
 
 def _find_matched_lines(project, filename, left, right):
@@ -54,8 +55,8 @@ def _get_or_create_directory_for_creating_output_files(ref):
     os.makedirs(os.path.join(OUTPUT_DIRECTORY, "sahab-reports", ref))
   return output_directory
 
-def _run_collector_sahab(project, tests, revision, ref):
-  all_targets = glob(f"{project}/**/{revision.value.get_output_directory()}/", recursive=True)
+def _run_collector_sahab(project, tests, revision, ref, execution_depth):
+  all_targets = glob(f"{project}/**/{revision.value.get_output_directory()}_{ref}/", recursive=True)
   all_dependencies = []
   project_maven_dependencies = []
   for build_dir in all_targets:
@@ -84,11 +85,12 @@ def _run_collector_sahab(project, tests, revision, ref):
   cmd = (
     "java "
     f"-jar {COLLECTOR_JAR} "
-    f"-i {revision.value.get_input_file()} "
+    f"-i {revision.value.get_input_file()}_{ref}.txt "
     f"-p {' '.join(all_dependencies)} "
     f"-t {test_methods} "
     f"-o {collector_sahab_output} "
-    f"-m methods.json"
+    f"-m methods_{ref}.json "
+    f"--execution-depth={execution_depth}"
   )
   print(cmd)
 
@@ -101,14 +103,16 @@ def main():
   left_revision_ref = args.left
   right_revision_ref = args.right
 
+  execution_depth = args.execution_depth
+
   classname = args.class_filename
 
   tests = args.tests
 
   _compile_target(project, left_revision_ref, right_revision_ref)
   _find_matched_lines(project, classname, left_revision_ref, right_revision_ref)
-  _run_collector_sahab(project, tests, REVISION.LEFT, right_revision_ref)
-  _run_collector_sahab(project, tests, REVISION.RIGHT, right_revision_ref)
+  _run_collector_sahab(project, tests, REVISION.LEFT, right_revision_ref, execution_depth)
+  _run_collector_sahab(project, tests, REVISION.RIGHT, right_revision_ref, execution_depth)
 
 if __name__ == "__main__":
   main()

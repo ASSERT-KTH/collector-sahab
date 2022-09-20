@@ -17,10 +17,9 @@ parser.add_argument("-p", "--project", action=VerifyDirectory, required=True, he
 parser.add_argument("-c", "--commits", nargs=2, required=True, help="Revisions of the project")
 
 
-def compile(project, commit, revision):
+def compile(project, commit, revision, dir_name):
   
   driver = Command(project)
-  driver.remove(os.path.join(os.getcwd(), revision.value.get_input_file()))
   driver.clean(revision)
 
   driver.git_checkout(commit)
@@ -28,7 +27,7 @@ def compile(project, commit, revision):
   driver.mvn_test_compile()
   driver.mvn_build_classpath()
 
-  driver.rename(revision.value.get_output_directory())
+  driver.rename(f"{revision.value.get_output_directory()}_{dir_name}")
 
 
 def main():
@@ -36,8 +35,8 @@ def main():
   project_path = args.project
   commits = args.commits
 
-  compile(project_path, commits[0], REVISION.LEFT)
-  compile(project_path, commits[1], REVISION.RIGHT)
+  compile(project_path, commits[0], REVISION.LEFT, commits[1])
+  compile(project_path, commits[1], REVISION.RIGHT, commits[1])
 
 if __name__ == "__main__":
   main()
