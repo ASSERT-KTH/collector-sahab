@@ -3,3 +3,6 @@
 
 # Build files
 target
+
+# Automation files
+scripts/config.json
