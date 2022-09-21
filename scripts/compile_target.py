@@ -20,7 +20,7 @@ parser.add_argument("-c", "--commits", nargs=2, required=True, help="Revisions o
 def compile(project, commit, revision, dir_name):
   
   driver = Command(project)
-  driver.clean(revision)
+  driver.clean(revision, dir_name)
 
   driver.git_checkout(commit)
 

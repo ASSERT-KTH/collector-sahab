@@ -41,12 +41,13 @@ class Command:
     for build_dir in all_targets:
       subprocess.run([
         "mv",
+        "-T",
         build_dir,
         os.path.dirname(os.path.dirname(build_dir)) + f"/{renamed_directory}",
       ], cwd=self.cwd)
 
-  def clean(self, revision):
-    all_targets = glob(f"{self.cwd}/**/{revision.value.get_output_directory()}/", recursive=True)
+  def clean(self, revision, dir_name):
+    all_targets = glob(f"{self.cwd}/**/{revision.value.get_output_directory()}_{dir_name}/", recursive=True)
     for build_dir in all_targets:
       self.remove(build_dir)
 
