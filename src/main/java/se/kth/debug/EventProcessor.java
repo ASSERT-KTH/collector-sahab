@@ -19,7 +19,7 @@ import se.kth.debug.struct.result.StackFrameContext;
 public class EventProcessor {
     private static final Logger logger = Logger.getLogger(EventProcessor.class.getName());
 
-    private static final int TIMEOUT = 5000; // milliseconds;
+    private static final int TIMEOUT = 900000; // milliseconds;
     private final List<BreakPointContext> breakpointContexts = new ArrayList<>();
     private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
@@ -44,7 +44,7 @@ public class EventProcessor {
         vm.resume();
         try {
             EventSet eventSet;
-            while ((eventSet = vm.eventQueue().remove()) != null) {
+            while ((eventSet = vm.eventQueue().remove(TIMEOUT)) != null) {
                 for (Event event : eventSet) {
                     if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
                         debugger.getProcess().destroy();
