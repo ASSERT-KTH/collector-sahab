@@ -82,15 +82,24 @@ def _run_collector_sahab(project, tests, revision, ref, execution_depth):
   output_directory = _get_or_create_directory_for_creating_output_files(ref)
   collector_sahab_output = os.path.join(output_directory, f"{revision.name.lower()}.json")
 
-  cmd = (
-    "java "
-    f"-jar {COLLECTOR_JAR} "
+  body_of_argument_file = (
     f"-i {revision.value.get_input_file()}_{ref}.txt "
     f"-p {' '.join(all_dependencies)} "
     f"-t {test_methods} "
     f"-o {collector_sahab_output} "
     f"-m methods_{ref}.json "
     f"--execution-depth={execution_depth}"
+  )
+
+  path_to_argument_file = f"{project}_af.txt"
+
+  with open(path_to_argument_file, "w+") as f:
+    f.write(body_of_argument_file)
+
+  cmd = (
+    "java "
+    f"-jar {COLLECTOR_JAR} "
+    f"@{path_to_argument_file}"
   )
   print(cmd)
 
