@@ -67,4 +67,13 @@ class JUnitTestRunnerTest {
 
         assertThat(getActualLogs(tests), matchesPattern(Files.readString(expectedLogRegex)));
     }
+
+    @Test
+    void main_canDiscoverTest_withoutItsNameStartingOrEndingInTest()
+            throws IOException, InterruptedException, ClassNotFoundException {
+        String tests = "foo.junit.IDoNotFollowConventions::sum";
+        Path expectedLogRegex = PATH_TO_JUNIT_LOGS.resolve("disobey-conventions.regex");
+
+        assertThat(getActualLogs(tests), matchesPattern(Files.readString(expectedLogRegex)));
+    }
 }
