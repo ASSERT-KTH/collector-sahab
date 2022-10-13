@@ -55,4 +55,16 @@ class JUnitTestRunnerTest {
 
         assertThat(getActualLogs(tests), matchesPattern(Files.readString(expectedLogRegex)));
     }
+
+    @Test
+    void main_cannotDiscoverAbstractTest()
+            throws IOException, InterruptedException, ClassNotFoundException {
+        // Read under 'Jupiter Concepts':
+        // https://junit.org/junit5/docs/current/user-guide/#running-tests-console-launcher
+        String tests =
+                "foo.junit.AbstractTest::test_junit4 foo.junit.AbstractTestForJUnit5::test_junit5";
+        Path expectedLogRegex = PATH_TO_JUNIT_LOGS.resolve("abstract-test.regex");
+
+        assertThat(getActualLogs(tests), matchesPattern(Files.readString(expectedLogRegex)));
+    }
 }
