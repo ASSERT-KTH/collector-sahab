@@ -1,0 +1,6 @@
+[
+  {
+    "className": "jmri.jmrix.openlcb.swing.monitor.MonitorPane",
+    "name": "format"
+  }
+]
