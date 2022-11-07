@@ -1,0 +1,8 @@
+[
+  {
+    "fileName": "org.apache.iotdb.commons.partition.SchemaPartition",
+    "breakpoints": [
+      68, 69, 75
+    ]
+  }
+]

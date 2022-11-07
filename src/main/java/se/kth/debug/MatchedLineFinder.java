@@ -237,11 +237,30 @@ public class MatchedLineFinder {
     private static CtTypeMember findMapping(
             CtTypeMember whoseMapping, List<CtTypeMember> candidateMappings) {
         int expectedStartLine = whoseMapping.getPosition().getLine();
-        return candidateMappings.stream()
-                .filter(typeMember -> !typeMember.isImplicit())
-                .filter(typeMember -> typeMember.getPosition().getLine() == expectedStartLine)
-                .findFirst()
-                .get();
+        for (CtTypeMember candidateMapping : candidateMappings) {
+            if (isPlausibleMapping(whoseMapping, candidateMapping)) {
+                return candidateMapping;
+            }
+        }
+        throw new RuntimeException(
+                "Could not find mapping for "
+                        + whoseMapping.getSimpleName()
+                        + " with start line "
+                        + expectedStartLine);
+    }
+
+    /** Compare method equality based on name, parameters, and return type. */
+    private static boolean isPlausibleMapping(CtTypeMember first, CtTypeMember second) {
+        if (first instanceof CtMethod && second instanceof CtMethod) {
+            CtMethod<?> firstMethod = (CtMethod<?>) first;
+            CtMethod<?> secondMethod = (CtMethod<?>) second;
+
+            return firstMethod.getParameters().size() == secondMethod.getParameters().size()
+                    && firstMethod.getType().equals(secondMethod.getType())
+                    && firstMethod.getSimpleName().equals(secondMethod.getSimpleName());
+        }
+
+        return false;
     }
 
     public static class NoDiffException extends RuntimeException {

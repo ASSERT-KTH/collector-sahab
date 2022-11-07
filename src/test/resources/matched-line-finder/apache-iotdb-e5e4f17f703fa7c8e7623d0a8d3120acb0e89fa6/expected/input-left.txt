@@ -1,0 +1,19 @@
+[
+  {
+    "fileName": "org.apache.iotdb.db.query.context.QueryContext",
+    "breakpoints": [
+      112,
+      98,
+      99,
+      100,
+      101,
+      103,
+      104,
+      105,
+      107,
+      108,
+      93,
+      95
+    ]
+  }
+]
