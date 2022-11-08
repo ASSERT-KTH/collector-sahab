@@ -5,13 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import spoon.Launcher;
+import spoon.reflect.CtModel;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.*;
 import spoon.reflect.visitor.CtScanner;
@@ -55,7 +55,7 @@ public class MatchedLineFinder {
         Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methods.getLeft());
         Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methods.getRight());
         String fullyQualifiedNameOfContainerClass =
-                methods.getLeft().getParent(CtClass.class).getQualifiedName();
+                methods.getLeft().getParent(CtType.class).getQualifiedName();
 
         String breakpointsLeft =
                 serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
@@ -193,8 +193,11 @@ public class MatchedLineFinder {
         return Pair.of(leftDiffedTypeMember, rightDiffedTypeMember);
     }
 
-    private static CtType<?> getType(File file) throws IOException {
-        return Launcher.parseClass(Files.readString(file.toPath()));
+    private static CtType<?> getType(File file) {
+        Launcher launcher = new Launcher();
+        launcher.addInputResource(file.getAbsolutePath());
+        CtModel model = launcher.buildModel();
+        return model.getAllTypes().stream().findFirst().get();
     }
 
     private static List<CtTypeMember> getTypeMembers(CtType<?> type) {
