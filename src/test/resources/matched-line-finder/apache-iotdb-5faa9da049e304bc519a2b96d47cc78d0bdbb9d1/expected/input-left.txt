@@ -1,0 +1,9 @@
+[
+  {
+    "fileName": "org.apache.iotdb.db.mpp.transformation.dag.memory.LayerMemoryAssigner",
+    "breakpoints": [
+      51, 52, 58,
+      59
+    ]
+  }
+]

@@ -132,6 +132,24 @@ public class MatchedLineFinder {
             super.visitCtBlock(block);
         }
 
+        /** Put breakpoints at variable read when it is part of a multi-variable declaration. */
+        @Override
+        public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
+            if (!diffLines.contains(variableRead.getPosition().getLine())) {
+                lines.add(variableRead.getPosition().getLine());
+            }
+            super.visitCtVariableRead(variableRead);
+        }
+
+        /** Put breakpoints at variable write when it is part of a multi-variable declaration. */
+        @Override
+        public <T> void visitCtVariableWrite(CtVariableWrite<T> variableWrite) {
+            if (!diffLines.contains(variableWrite.getPosition().getLine())) {
+                lines.add(variableWrite.getPosition().getLine());
+            }
+            super.visitCtVariableWrite(variableWrite);
+        }
+
         @Override
         public <S> void visitCtCase(CtCase<S> caseStatement) {
             List<CtStatement> caseBlock = caseStatement.getStatements();
