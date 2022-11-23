@@ -80,6 +80,8 @@ public class EventProcessor {
         } catch (InterruptedException e) {
             logger.warning(e.toString());
             Thread.currentThread().interrupt();
+        } finally {
+            debugger.getProcess().destroy();
         }
     }
 
