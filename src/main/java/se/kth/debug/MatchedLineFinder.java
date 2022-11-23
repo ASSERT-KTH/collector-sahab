@@ -133,6 +133,22 @@ public class MatchedLineFinder {
         }
 
         @Override
+        public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
+            if (!diffLines.contains(variableRead.getPosition().getLine())) {
+                lines.add(variableRead.getPosition().getLine());
+            }
+            super.visitCtVariableRead(variableRead);
+        }
+
+        @Override
+        public <T> void visitCtVariableWrite(CtVariableWrite<T> variableWrite) {
+            if (!diffLines.contains(variableWrite.getPosition().getLine())) {
+                lines.add(variableWrite.getPosition().getLine());
+            }
+            super.visitCtVariableWrite(variableWrite);
+        }
+
+        @Override
         public <S> void visitCtCase(CtCase<S> caseStatement) {
             List<CtStatement> caseBlock = caseStatement.getStatements();
             caseBlock.forEach(
