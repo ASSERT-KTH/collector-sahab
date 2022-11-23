@@ -2,7 +2,7 @@
   {
     "fileName": "org.apache.iotdb.db.query.context.QueryContext",
     "breakpoints": [
-      112,
+      96,
       98,
       99,
       100,
@@ -12,7 +12,9 @@
       105,
       107,
       108,
+      112,
       93,
+      94,
       95
     ]
   }
