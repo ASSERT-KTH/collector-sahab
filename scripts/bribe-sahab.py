@@ -91,7 +91,7 @@ def _run_collector_sahab(project, tests, revision, ref, execution_depth):
     f"--execution-depth={execution_depth}"
   )
 
-  path_to_argument_file = f"{project}_af.txt"
+  path_to_argument_file = os.path.join(project, f'{revision.value.get_output_directory()}_af.txt')
 
   with open(path_to_argument_file, "w+") as f:
     f.write(body_of_argument_file)
