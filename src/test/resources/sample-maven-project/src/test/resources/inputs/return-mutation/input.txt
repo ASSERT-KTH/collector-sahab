@@ -1,0 +1,6 @@
+[
+  {
+    "fileName": "foo.ReturnMutation",
+    "breakpoints": [7]
+  }
+]

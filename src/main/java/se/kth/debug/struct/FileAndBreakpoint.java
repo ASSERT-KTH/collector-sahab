@@ -1,10 +1,16 @@
 package se.kth.debug.struct;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.HashSet;
 import java.util.List;
 
 public class FileAndBreakpoint {
+
+    @JsonProperty("fileName")
     private final String fileName;
+
+    @JsonProperty("breakpoints")
     private final List<Integer> breakpoints;
 
     public FileAndBreakpoint(String fileName, List<Integer> breakpoints) {
