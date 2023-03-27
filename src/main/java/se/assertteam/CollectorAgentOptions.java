@@ -74,8 +74,13 @@ public class CollectorAgentOptions {
 
     private List<FileAndBreakpoint> parseFileAndBreakpoints(File classesAndBreakpoints) {
 
-            return List.of(new FileAndBreakpoint("foo.BasicMath", List.of(5, 9)));
-//            return mapper.readValue(classesAndBreakpoints, new TypeReference<List<FileAndBreakpoint>>() {});
+        try {
+
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(classesAndBreakpoints, new TypeReference<>() {});
+        }  catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     public List<MethodForExitEvent> getMethodsForExitEvent() {

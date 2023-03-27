@@ -7,13 +7,11 @@ import java.util.List;
 
 public class FileAndBreakpoint {
 
-    @JsonProperty("fileName")
     private final String fileName;
 
-    @JsonProperty("breakpoints")
     private final List<Integer> breakpoints;
 
-    public FileAndBreakpoint(String fileName, List<Integer> breakpoints) {
+    public FileAndBreakpoint(@JsonProperty("fileName") String fileName, @JsonProperty("breakpoints") List<Integer> breakpoints) {
         this.fileName = fileName;
         this.breakpoints = breakpoints;
     }

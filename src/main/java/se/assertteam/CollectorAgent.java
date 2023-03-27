@@ -44,6 +44,7 @@ public class CollectorAgent {
     public static void premain(String arguments, Instrumentation instrumentation) {
         options = new CollectorAgentOptions(arguments);
         ContextCollector.setExecutionDepth(options.getExecutionDepth());
+        List<String> classesAllowed = getClassesAllowed();
         instrumentation.addTransformer(
                 new ClassFileTransformer() {
                     @Override
@@ -54,7 +55,7 @@ public class CollectorAgent {
                             ProtectionDomain protectionDomain,
                             byte[] classfileBuffer) {
                         try {
-                            return getBytes(className, classfileBuffer);
+                            return getBytes(className, classfileBuffer, classesAllowed);
                         } catch (Throwable t) {
                             t.printStackTrace();
                             throw new RuntimeException(t);
@@ -97,9 +98,9 @@ public class CollectorAgent {
         return new ArrayList<>();
     }
 
-    private static byte[] getBytes(String className, byte[] classfileBuffer)
+    private static byte[] getBytes(String className, byte[] classfileBuffer, List<String> classesAllowed)
             throws NoSuchMethodException {
-        if (!getClassesAllowed().contains(className)) {
+        if (!classesAllowed.contains(className)) {
             return classfileBuffer;
         }
         List<Integer> breakpointsAllowed = getBreakpointsAllowed(className);
