@@ -22,7 +22,6 @@
                 <configuration>
                     <argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -javaagent:/home/aman/assert-achievements/collector-sahab/target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt</argLine>
                 </configuration>
-
             </plugin>
         </plugins>
     </build>
