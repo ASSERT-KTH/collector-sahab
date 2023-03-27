@@ -138,8 +138,7 @@ public class CollectorAgent {
             }
         }
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        classNode.accept(new TraceClassVisitor(writer, new PrintWriter(System.out)));
-
+        classNode.accept(new TraceClassVisitor(writer, null));
         return writer.toByteArray();
     }
 

@@ -20,7 +20,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 -javaagent:/home/aman/assert-achievements/collector-sahab/target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt</argLine>
+                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -javaagent:/home/aman/assert-achievements/collector-sahab/target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt</argLine>
                 </configuration>
 
             </plugin>
