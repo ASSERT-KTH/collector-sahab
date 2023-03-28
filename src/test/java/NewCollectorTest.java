@@ -40,13 +40,13 @@ class NewCollectorTest {
         SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
         assertThat(output.getBreakpoint().size(), equalTo(2));
 
-        LineSnapshot snapshot1 = output.getBreakpoint().get(0);
-        LineSnapshot snapshot2 = output.getBreakpoint().get(1);
-        assertThat(snapshot1.getLineNumber(), equalTo(5));
-        assertThat(snapshot2.getLineNumber(), equalTo(9));
+        LineSnapshot snapshot0 = output.getBreakpoint().get(0);
+        LineSnapshot snapshot1 = output.getBreakpoint().get(1);
+        assertThat(snapshot0.getLineNumber(), equalTo(5));
+        assertThat(snapshot1.getLineNumber(), equalTo(9));
 
         // StackFrameContext
-        StackFrameContext theOnlyStackFrameContext = snapshot1.getStackFrameContext().get(0);
+        StackFrameContext theOnlyStackFrameContext = snapshot0.getStackFrameContext().get(0);
         List<RuntimeValue> runtimeValues = theOnlyStackFrameContext.getRuntimeValueCollection();
         RuntimeValue runtimeValue0 = runtimeValues.get(0);
         assertThat(runtimeValue0.getValue(), equalTo(23));
