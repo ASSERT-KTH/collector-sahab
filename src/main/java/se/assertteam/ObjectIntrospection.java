@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static se.assertteam.Classes.isBasicallyPrimitive;
+
 public class ObjectIntrospection {
 
     public static int executionDepth = 3;
@@ -62,7 +64,18 @@ public class ObjectIntrospection {
         List<RuntimeValue> fields = introspectFields(object, depth);
         List<Object> arrayElements = introspectArrayValues(object, depth);
 
-        return new RuntimeValue(kind, name, type, Objects.toString(object), fields, arrayElements);
+        return new RuntimeValue(kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
+    }
+
+    private static Object getJSONCompatibleValue(Object object) {
+        if(isBasicallyPrimitive(object.getClass())) {
+            if(object instanceof Number || object instanceof Boolean)
+                return object;
+            else
+                return object.toString();
+        } else {
+            return object.getClass().getName();
+        }
     }
 
     private List<RuntimeValue> introspectFields(Object object, int depth)
@@ -70,7 +83,7 @@ public class ObjectIntrospection {
         if (object == null) {
             return List.of();
         }
-        if (depth > executionDepth || Classes.isBasicallyPrimitive(object.getClass())) {
+        if (depth > executionDepth || isBasicallyPrimitive(object.getClass())) {
             return List.of();
         }
 
@@ -109,7 +122,7 @@ public class ObjectIntrospection {
         Class<?> componentType = array.getClass().getComponentType();
 
         for (int i = 0; i < Array.getLength(array) && i < 10; i++) {
-            if (Classes.isBasicallyPrimitive(componentType)) {
+            if (isBasicallyPrimitive(componentType)) {
                 arrayElements.add(Array.get(array, i));
             } else {
                 arrayElements.add(
