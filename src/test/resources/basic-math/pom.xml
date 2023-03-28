@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>test-maven</artifactId>
+    <artifactId>basic-math</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -20,7 +20,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -javaagent:/home/aman/assert-achievements/collector-sahab/target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt</argLine>
+                    <!-- To debug: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -->
+                    <argLine>-javaagent:../../../../target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt</argLine>
                 </configuration>
             </plugin>
         </plugins>
