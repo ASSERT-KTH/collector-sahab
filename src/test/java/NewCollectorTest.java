@@ -17,8 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -157,6 +159,66 @@ class NewCollectorTest {
         }
     }
 
+    @Nested
+    class RepresentingCollections {
+        @Test
+        void invoke_recordValuesFromArrayFieldInsideCollection() throws MavenInvocationException, IOException {
+            // arrange
+            InvocationRequest request = new DefaultInvocationRequest();
+            request.setPomFile(new File("src/test/resources/collections/pom.xml"));
+            request.setGoals(List.of("clean", "test"));
+            List<String> agentOptions = List.of(
+                    "classesAndBreakpoints=src/test/resources/one-level.txt",
+                    "output=target/one-level-collection.json",
+                    "executionDepth=1"
+            );
+            String testArg = "-Dtest=foo.CollectionsTest#test_returnTruthy";
+            request.addArg(testArg);
+            request.addArg("-DargLine=-javaagent:../../../../target/collector-sahab.jar=" + String.join(",", agentOptions));
+
+            // act
+            Invoker invoker = new DefaultInvoker();
+            InvocationResult result = invoker.execute(request);
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/collections/target/one-level-collection.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint().size(), equalTo(1));
+
+            StackFrameContext theOnlyStackTraceContext = output.getBreakpoint().get(0).getStackFrameContext().get(0);
+            RuntimeValue arrayDequeue = theOnlyStackTraceContext.getRuntimeValueCollection().get(0);
+            assertThat(arrayDequeue.getName(), equalTo("q"));
+
+            // elementsOfQueue ("elements") is an array inside the ArrayDeque
+            RuntimeValue elementsOfQueue = arrayDequeue.getFields().get(0);
+            assertThat(elementsOfQueue.getName(), equalTo("elements"));
+
+            RuntimeValue firstElement = elementsOfQueue.getArrayElements().get(0);
+            assertThat(firstElement.getValue(), equalTo("Added at runtime"));
+
+            // static fields
+            // list
+            RuntimeValue list = theOnlyStackTraceContext.getRuntimeValueCollection().get(1);
+            assertThat(list.getName(), equalTo("list"));
+            RuntimeValue elementsOfList = list.getFields().get(0);
+
+            List<Object> atomicValue =  elementsOfList.getArrayElements().stream().map(RuntimeValue::getValue).collect(Collectors.toList());
+            assertThat(atomicValue, equalTo(List.of(1, 2, 3, 4, 5)));
+
+            // set
+            RuntimeValue set = theOnlyStackTraceContext.getRuntimeValueCollection().get(2);
+            assertThat(set.getName(), equalTo("set"));
+            RuntimeValue elementsOfSet = set.getFields().get(0);
+
+            List<Object> atomicValueOfSet =  elementsOfSet.getArrayElements().stream().map(RuntimeValue::getValue).collect(Collectors.toList());
+            // null are pre-allocated buffers in HashSet
+            assertThat(atomicValueOfSet, containsInAnyOrder("aman", "sharma", "sahab", null, null, null));
+        }
+    }
 
 
 }

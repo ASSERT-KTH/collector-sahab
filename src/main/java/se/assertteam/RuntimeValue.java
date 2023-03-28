@@ -11,7 +11,7 @@ public class RuntimeValue {
     private final Class<?> type;
     private final Object value;
     private final List<RuntimeValue> fields;
-    private final List<Object> arrayElements;
+    private final List<RuntimeValue> arrayElements;
 
     RuntimeValue(
             @JsonProperty("kind") Kind kind,
@@ -19,7 +19,7 @@ public class RuntimeValue {
             @JsonProperty("type") Class<?> type,
             @JsonProperty("value") Object value,
             @JsonProperty("fields") List<RuntimeValue> fields,
-            @JsonProperty("arrayElements") List<Object> arrayElements) {
+            @JsonProperty("arrayElements") List<RuntimeValue> arrayElements) {
         this.kind = kind;
         this.name = name;
         this.type = type;
@@ -48,7 +48,7 @@ public class RuntimeValue {
         return fields;
     }
 
-    public List<Object> getArrayElements() {
+    public List<RuntimeValue> getArrayElements() {
         return arrayElements;
     }
 

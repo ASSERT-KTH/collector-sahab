@@ -1,6 +1,0 @@
-[
-    {
-        "fileName": "foo.collections.NestedArray",
-        "breakpoints": [7]
-    }
-]

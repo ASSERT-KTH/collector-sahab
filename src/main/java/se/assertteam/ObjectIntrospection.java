@@ -1,7 +1,10 @@
 package se.assertteam;
 
+import se.assertteam.module.ModuleCracker;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,9 +13,11 @@ import static se.assertteam.Classes.isBasicallyPrimitive;
 
 public class ObjectIntrospection {
 
-    public static int executionDepth = 3;
+    public static int executionDepth = 0;
 
     private final ObjectGraph objectGraph;
+
+    private final ModuleCracker moduleCracker = CollectorAgent.moduleCracker;
 
     public ObjectIntrospection() {
         this.objectGraph = new ObjectGraph();
@@ -31,8 +36,9 @@ public class ObjectIntrospection {
                 0);
     }
 
-    public List<RuntimeValue> introspectReceiver(Object receiver) throws IllegalAccessException {
-        return introspectFields(receiver, 0);
+    public List<RuntimeValue> introspectReceiver(Object receiver, Class<?> receiverClass) throws IllegalAccessException {
+        // Depth is -1 because we are introspecting fields which are one level deeper than the receiver
+        return introspectFields(receiver, -1, receiverClass);
     }
 
     public RuntimeReturnedValue introspectReturnValue(
@@ -40,10 +46,11 @@ public class ObjectIntrospection {
             Object returned,
             List<Object> parameters,
             List<String> stacktrace,
-            String location)
+            String location,
+            Class<?> receiverClass)
             throws IllegalAccessException {
-        List<RuntimeValue> fields = introspectFields(returned, 0);
-        List<Object> arrayValues = introspectArrayValues(returned, 0);
+        List<RuntimeValue> fields = introspectFields(returned, 0, receiverClass);
+        List<RuntimeValue> arrayValues = introspectArrayValues(returned, 0);
 
         return new RuntimeReturnedValue(
                 // FIXME: Use method return type
@@ -61,13 +68,16 @@ public class ObjectIntrospection {
     private RuntimeValue introspect(
             RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth)
             throws IllegalAccessException {
-        List<RuntimeValue> fields = introspectFields(object, depth);
-        List<Object> arrayElements = introspectArrayValues(object, depth);
+        List<RuntimeValue> fields = introspectFields(object, depth, type);
+        List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
 
         return new RuntimeValue(kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
     }
 
     private static Object getJSONCompatibleValue(Object object) {
+        if (object == null) {
+            return null;
+        }
         if(isBasicallyPrimitive(object.getClass())) {
             if(object instanceof Number || object instanceof Boolean)
                 return object;
@@ -78,24 +88,35 @@ public class ObjectIntrospection {
         }
     }
 
-    private List<RuntimeValue> introspectFields(Object object, int depth)
+    private List<RuntimeValue> introspectFields(Object object, int depth, Class<?> receiverClass)
             throws IllegalAccessException {
+        if (depth >= executionDepth || isBasicallyPrimitive(receiverClass)) {
+            return List.of();
+        }
         if (object == null) {
-            return List.of();
-        }
-        if (depth > executionDepth || isBasicallyPrimitive(object.getClass())) {
-            return List.of();
+            return traverseFields(null, depth, receiverClass);
         }
 
-        ObjectGraph.ObjectNode node = objectGraph.getNode(object.getClass());
+        return traverseFields(object, depth, object.getClass());
+    }
+
+    private List<RuntimeValue> traverseFields(Object object, int depth, Class<?> typeOfObject) throws IllegalAccessException {
         List<RuntimeValue> fields = new ArrayList<>();
-
+        ObjectGraph.ObjectNode node = objectGraph.getNode(typeOfObject);
         for (Field field : node.getFields()) {
+            if (object == null && !Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             if (field.isSynthetic()) {
                 continue;
             }
             if (field.getName().startsWith("CGLIB$")) {
                 continue;
+            }
+            if (!field.trySetAccessible()) {
+                System.out.println("Cracking " + field);
+                moduleCracker.crack(field.getDeclaringClass());
+                moduleCracker.crack(field.getType());
             }
             if (!field.trySetAccessible()) {
                 throw new AssertionError("Could not crack type " + field.getDeclaringClass());
@@ -108,22 +129,29 @@ public class ObjectIntrospection {
                             field.get(object),
                             depth + 1));
         }
-
         return fields;
     }
 
-    private List<Object> introspectArrayValues(Object array, int depth)
+    private List<RuntimeValue> introspectArrayValues(Object array, int depth)
             throws IllegalAccessException {
         if (array == null || !array.getClass().isArray()) {
             return List.of();
         }
 
-        List<Object> arrayElements = new ArrayList<>();
+        List<RuntimeValue> arrayElements = new ArrayList<>();
         Class<?> componentType = array.getClass().getComponentType();
 
         for (int i = 0; i < Array.getLength(array) && i < 10; i++) {
             if (isBasicallyPrimitive(componentType)) {
-                arrayElements.add(Array.get(array, i));
+                arrayElements.add(
+                        new RuntimeValue(
+                                RuntimeValue.Kind.ARRAY_ELEMENT,
+                                null,
+                                componentType,
+                                Array.get(array, i),
+                                List.of(),
+                                List.of())
+                );
             } else {
                 arrayElements.add(
                         introspect(

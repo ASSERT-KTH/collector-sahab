@@ -15,7 +15,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
             Class<?> type,
             String valueAsString,
             List<RuntimeValue> fields,
-            List<Object> arrayElements,
+            List<RuntimeValue> arrayElements,
             List<Object> parameters,
             List<String> stackTrace,
             String location) {

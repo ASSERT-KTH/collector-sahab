@@ -35,7 +35,7 @@ public class CollectorAgentOptions {
                 case "output":
                     output = new File(value);
                     break;
-                case "stackTraceDepth":
+                case "executionDepth":
                     executionDepth = Integer.parseInt(value);
                     break;
                 case "numberOfArrayElements":

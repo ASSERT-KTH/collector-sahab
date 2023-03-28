@@ -17,25 +17,23 @@ public class ContextCollector {
         INTROSPECTOR.setExecutionDepth(depth);
     }
     public static void logLine(
-            String className, int lineNumber, Object receiver, LocalVariable[] localVariables) {
+            String className, int lineNumber, Object receiver, LocalVariable[] localVariables, String receiverClass) {
         try {
-            logLineImpl(className, lineNumber, receiver, localVariables);
+            logLineImpl(className, lineNumber, receiver, localVariables, Class.forName(receiverClass));
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
     }
 
     private static void logLineImpl(
-            String className, int lineNumber, Object receiver, LocalVariable[] localVariables)
+            String className, int lineNumber, Object receiver, LocalVariable[] localVariables, Class<?> receiverClass)
             throws ReflectiveOperationException {
         List<RuntimeValue> values = new ArrayList<>();
         for (LocalVariable variable : localVariables) {
             values.add(INTROSPECTOR.introspect(variable));
         }
 
-        if (receiver != null) {
-            values.addAll(INTROSPECTOR.introspectReceiver(receiver));
-        }
+        values.addAll(INTROSPECTOR.introspectReceiver(receiver, receiverClass));
 
         StackFrameContext stackFrameContext = StackFrameContext.forValues(values);
         LineSnapshot lineSnapshot =
@@ -55,7 +53,7 @@ public class ContextCollector {
                             stacktrace.stream()
                                     .map(StackFrameContext::stackFrameToString)
                                     .collect(Collectors.toList()),
-                            StackFrameContext.getLocation(stacktrace));
+                            StackFrameContext.getLocation(stacktrace), Class.forName(className));
 
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {

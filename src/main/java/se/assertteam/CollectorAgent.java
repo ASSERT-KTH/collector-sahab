@@ -25,6 +25,7 @@ import net.bytebuddy.implementation.bytecode.constant.NullConstant;
 import net.bytebuddy.implementation.bytecode.constant.TextConstant;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
+import org.eclipse.jdt.internal.compiler.impl.StringConstant;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -35,12 +36,16 @@ import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.TraceClassVisitor;
+import se.assertteam.module.ModuleCracker;
 import se.kth.debug.struct.FileAndBreakpoint;
 
 public class CollectorAgent {
+
+    public static ModuleCracker moduleCracker;
     private static CollectorAgentOptions options;
 
     public static void premain(String arguments, Instrumentation instrumentation) {
+        moduleCracker = ModuleCracker.getApplicable(instrumentation);
         options = new CollectorAgentOptions(arguments);
         ContextCollector.setExecutionDepth(options.getExecutionDepth());
         List<String> classesAllowed = getClassesAllowed();
@@ -179,16 +184,15 @@ public class CollectorAgent {
                                 TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(
                                         LocalVariable.class))
                         .withValues(values));
+        //    Class<?> receiverClass
+        manipulations.add(new TextConstant(className.replace('/', '.')));
         //  );
+
         manipulations.add(
                 MethodInvocation.invoke(
                         new MethodDescription.ForLoadedMethod(
                                 ContextCollector.class.getMethod(
-                                        "logLine",
-                                        String.class,
-                                        int.class,
-                                        Object.class,
-                                        LocalVariable[].class))));
+                                        "logLine", String.class, int.class, Object.class, LocalVariable[].class, String.class))));
 
         return new StackManipulation.Compound(manipulations);
     }
