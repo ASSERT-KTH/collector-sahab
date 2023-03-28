@@ -1,5 +1,7 @@
 package se.assertteam;
 
+import java.lang.reflect.Array;
+
 public class Classes {
 
     public static String className(Class<?> type) {
@@ -55,10 +57,24 @@ public class Classes {
                 return void.class;
             default:
                 try {
+                    if (className.endsWith("[]")) {
+                        int indexOfFirstBracket = className.indexOf('[');
+                        int dimensions = (className.length() - indexOfFirstBracket) / 2;
+                        return getArrayClass(
+                                getClassFromString(className.substring(0, indexOfFirstBracket)),
+                                dimensions);
+                    }
                     return Class.forName(className);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
         }
+    }
+
+    private static Class<?> getArrayClass(Class<?> componentType, int dimensions) {
+        if (dimensions == 1) {
+            return Array.newInstance(componentType, 0).getClass();
+        }
+        return getArrayClass(Array.newInstance(componentType, 0).getClass(), dimensions - 1);
     }
 }

@@ -39,7 +39,7 @@ public class ObjectIntrospection {
             throws IllegalAccessException {
         // Depth is -1 because we are introspecting fields which are one level deeper than the
         // receiver
-        return introspectFields(receiver, -1, receiverClass);
+        return introspectFields(receiver, 0, receiverClass);
     }
 
     public RuntimeReturnedValue introspectReturnValue(
@@ -69,11 +69,15 @@ public class ObjectIntrospection {
     private RuntimeValue introspect(
             RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth)
             throws IllegalAccessException {
-        List<RuntimeValue> fields = introspectFields(object, depth, type);
-        List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
+        if (depth < executionDepth) {
+            List<RuntimeValue> fields = introspectFields(object, depth, type);
+            List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
 
+            return new RuntimeValue(
+                    kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
+        }
         return new RuntimeValue(
-                kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
+                kind, name, type, getJSONCompatibleValue(object), List.of(), List.of());
     }
 
     private static Object getJSONCompatibleValue(Object object) {
@@ -90,7 +94,7 @@ public class ObjectIntrospection {
 
     private List<RuntimeValue> introspectFields(Object object, int depth, Class<?> receiverClass)
             throws IllegalAccessException {
-        if (depth >= executionDepth || isBasicallyPrimitive(receiverClass)) {
+        if (isBasicallyPrimitive(receiverClass)) {
             return List.of();
         }
         if (object == null) {
@@ -142,7 +146,7 @@ public class ObjectIntrospection {
         List<RuntimeValue> arrayElements = new ArrayList<>();
         Class<?> componentType = array.getClass().getComponentType();
 
-        for (int i = 0; i < Array.getLength(array) && i < 10; i++) {
+        for (int i = 0; i < Array.getLength(array) && i < 20; i++) {
             if (isBasicallyPrimitive(componentType)) {
                 arrayElements.add(
                         new RuntimeValue(
