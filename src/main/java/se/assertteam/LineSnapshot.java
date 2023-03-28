@@ -10,7 +10,7 @@ public class LineSnapshot {
     private final int lineNumber;
     private final List<StackFrameContext> stackFrameContext;
 
-    public LineSnapshot(@JsonProperty("line") String file, @JsonProperty("lineNumber") int lineNumber, @JsonProperty("stackFrameContext") List<StackFrameContext> stackFrameContext) {
+    public LineSnapshot(@JsonProperty("file") String file, @JsonProperty("lineNumber") int lineNumber, @JsonProperty("stackFrameContext") List<StackFrameContext> stackFrameContext) {
         this.file = file;
         this.lineNumber = lineNumber;
         this.stackFrameContext = stackFrameContext;
