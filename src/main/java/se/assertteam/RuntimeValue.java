@@ -1,5 +1,7 @@
 package se.assertteam;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class RuntimeValue {
@@ -12,12 +14,12 @@ public class RuntimeValue {
     private final List<Object> arrayElements;
 
     RuntimeValue(
-            Kind kind,
-            String name,
-            Class<?> type,
-            String value,
-            List<RuntimeValue> fields,
-            List<Object> arrayElements) {
+            @JsonProperty("kind") Kind kind,
+            @JsonProperty("name") String name,
+            @JsonProperty("type") Class<?> type,
+            @JsonProperty("value") String value,
+            @JsonProperty("fields") List<RuntimeValue> fields,
+            @JsonProperty("arrayElements") List<Object> arrayElements) {
         this.kind = kind;
         this.name = name;
         this.type = type;

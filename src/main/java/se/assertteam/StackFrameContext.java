@@ -1,5 +1,7 @@
 package se.assertteam;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.lang.StackWalker.StackFrame;
 import java.util.List;
 import java.util.function.Predicate;
@@ -12,8 +14,15 @@ public class StackFrameContext {
     private final List<String> stackTrace;
     private final List<RuntimeValue> runtimeValueCollection;
 
-    private StackFrameContext(
-            List<StackFrame> stackTrace, List<RuntimeValue> runtimeValueCollection) {
+    @JsonCreator
+    private StackFrameContext(@JsonProperty("positionFromTopInStackTrace") int positionFromTopInStackTrace, @JsonProperty("location") String location, @JsonProperty("stackTrace") List<String> stackTrace, @JsonProperty("runtimeValueCollection") List<RuntimeValue> runtimeValueCollection) {
+        this.positionFromTopInStackTrace = positionFromTopInStackTrace;
+        this.location = location;
+        this.stackTrace = stackTrace;
+        this.runtimeValueCollection = runtimeValueCollection;
+    }
+
+    private StackFrameContext(List<StackFrame> stackTrace, List<RuntimeValue> runtimeValueCollection) {
         this.positionFromTopInStackTrace = 1;
         this.stackTrace =
                 stackTrace.stream()

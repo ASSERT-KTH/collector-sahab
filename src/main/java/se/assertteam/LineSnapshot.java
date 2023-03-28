@@ -1,5 +1,7 @@
 package se.assertteam;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class LineSnapshot {
@@ -8,7 +10,7 @@ public class LineSnapshot {
     private final int lineNumber;
     private final List<StackFrameContext> stackFrameContext;
 
-    public LineSnapshot(String file, int lineNumber, List<StackFrameContext> stackFrameContext) {
+    public LineSnapshot(@JsonProperty("line") String file, @JsonProperty("lineNumber") int lineNumber, @JsonProperty("stackFrameContext") List<StackFrameContext> stackFrameContext) {
         this.file = file;
         this.lineNumber = lineNumber;
         this.stackFrameContext = stackFrameContext;
