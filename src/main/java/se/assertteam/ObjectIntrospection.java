@@ -94,7 +94,7 @@ public class ObjectIntrospection {
 
     private List<RuntimeValue> introspectFields(Object object, int depth, Class<?> receiverClass)
             throws IllegalAccessException {
-        if (isBasicallyPrimitive(receiverClass)) {
+        if (isBasicallyPrimitive(object != null ? object.getClass() : receiverClass)) {
             return List.of();
         }
         if (object == null) {
@@ -147,24 +147,13 @@ public class ObjectIntrospection {
         Class<?> componentType = array.getClass().getComponentType();
 
         for (int i = 0; i < Array.getLength(array) && i < 20; i++) {
-            if (isBasicallyPrimitive(componentType)) {
-                arrayElements.add(
-                        new RuntimeValue(
-                                RuntimeValue.Kind.ARRAY_ELEMENT,
-                                null,
-                                componentType,
-                                Array.get(array, i),
-                                List.of(),
-                                List.of()));
-            } else {
-                arrayElements.add(
-                        introspect(
-                                RuntimeValue.Kind.ARRAY_ELEMENT,
-                                null,
-                                componentType,
-                                Array.get(array, i),
-                                depth + 1));
-            }
+            arrayElements.add(
+                    introspect(
+                            RuntimeValue.Kind.ARRAY_ELEMENT,
+                            null,
+                            componentType,
+                            Array.get(array, i),
+                            depth + 1));
         }
 
         return arrayElements;

@@ -1,8 +1,15 @@
 package se.assertteam;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.IOException;
 import java.util.List;
+import se.assertteam.RuntimeValue.RuntimeValueSerializer;
 
+@JsonSerialize(using = RuntimeValueSerializer.class)
 public class RuntimeValue {
 
     private final Kind kind;
@@ -57,4 +64,26 @@ public class RuntimeValue {
         RETURN,
         ARRAY_ELEMENT,
     }
+
+    static class RuntimeValueSerializer extends JsonSerializer<RuntimeValue> {
+
+        @Override
+        public void serialize(RuntimeValue value, JsonGenerator gen, SerializerProvider serializers)
+            throws IOException {
+            if (value.kind == Kind.ARRAY_ELEMENT && Classes.isBasicallyPrimitive(value.type)) {
+                // Value is enough for values in arrays
+                serializers.defaultSerializeValue(value.value, gen);
+                return;
+            }
+            gen.writeStartObject();
+            serializers.defaultSerializeField("kind", value.kind, gen);
+            serializers.defaultSerializeField("name", value.name, gen);
+            serializers.defaultSerializeField("type", value.type, gen);
+            serializers.defaultSerializeField("value", value.value, gen);
+            serializers.defaultSerializeField("fields", value.fields, gen);
+            serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
+            gen.writeEndObject();
+        }
+    }
+
 }
