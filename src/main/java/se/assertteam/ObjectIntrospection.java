@@ -69,7 +69,7 @@ public class ObjectIntrospection {
     private RuntimeValue introspect(
             RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth)
             throws IllegalAccessException {
-        if (depth < executionDepth) {
+        if (depth <= executionDepth) {
             List<RuntimeValue> fields = introspectFields(object, depth, type);
             List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
 
