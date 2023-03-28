@@ -15,7 +15,7 @@ public class CollectorAgentOptions {
     private File methodsForExitEvent;
 
     private int numberOfArrayElements = 10;
-    private File output = new File("trace.json");
+    private File output = new File("target/output.json");
     private int executionDepth = 0;
 
     public CollectorAgentOptions(String javaAgentArgs) {
