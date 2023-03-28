@@ -1,6 +1,6 @@
 package se.assertteam;
 
-import se.assertteam.module.ModuleCracker;
+import static se.assertteam.Classes.isBasicallyPrimitive;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -8,8 +8,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static se.assertteam.Classes.isBasicallyPrimitive;
+import se.assertteam.module.ModuleCracker;
 
 public class ObjectIntrospection {
 
@@ -36,8 +35,10 @@ public class ObjectIntrospection {
                 0);
     }
 
-    public List<RuntimeValue> introspectReceiver(Object receiver, Class<?> receiverClass) throws IllegalAccessException {
-        // Depth is -1 because we are introspecting fields which are one level deeper than the receiver
+    public List<RuntimeValue> introspectReceiver(Object receiver, Class<?> receiverClass)
+            throws IllegalAccessException {
+        // Depth is -1 because we are introspecting fields which are one level deeper than the
+        // receiver
         return introspectFields(receiver, -1, receiverClass);
     }
 
@@ -71,18 +72,17 @@ public class ObjectIntrospection {
         List<RuntimeValue> fields = introspectFields(object, depth, type);
         List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
 
-        return new RuntimeValue(kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
+        return new RuntimeValue(
+                kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
     }
 
     private static Object getJSONCompatibleValue(Object object) {
         if (object == null) {
             return null;
         }
-        if(isBasicallyPrimitive(object.getClass())) {
-            if(object instanceof Number || object instanceof Boolean)
-                return object;
-            else
-                return object.toString();
+        if (isBasicallyPrimitive(object.getClass())) {
+            if (object instanceof Number || object instanceof Boolean) return object;
+            else return object.toString();
         } else {
             return object.getClass().getName();
         }
@@ -100,7 +100,8 @@ public class ObjectIntrospection {
         return traverseFields(object, depth, object.getClass());
     }
 
-    private List<RuntimeValue> traverseFields(Object object, int depth, Class<?> typeOfObject) throws IllegalAccessException {
+    private List<RuntimeValue> traverseFields(Object object, int depth, Class<?> typeOfObject)
+            throws IllegalAccessException {
         List<RuntimeValue> fields = new ArrayList<>();
         ObjectGraph.ObjectNode node = objectGraph.getNode(typeOfObject);
         for (Field field : node.getFields()) {
@@ -150,8 +151,7 @@ public class ObjectIntrospection {
                                 componentType,
                                 Array.get(array, i),
                                 List.of(),
-                                List.of())
-                );
+                                List.of()));
             } else {
                 arrayElements.add(
                         introspect(

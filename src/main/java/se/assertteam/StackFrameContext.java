@@ -15,14 +15,19 @@ public class StackFrameContext {
     private final List<RuntimeValue> runtimeValueCollection;
 
     @JsonCreator
-    private StackFrameContext(@JsonProperty("positionFromTopInStackTrace") int positionFromTopInStackTrace, @JsonProperty("location") String location, @JsonProperty("stackTrace") List<String> stackTrace, @JsonProperty("runtimeValueCollection") List<RuntimeValue> runtimeValueCollection) {
+    private StackFrameContext(
+            @JsonProperty("positionFromTopInStackTrace") int positionFromTopInStackTrace,
+            @JsonProperty("location") String location,
+            @JsonProperty("stackTrace") List<String> stackTrace,
+            @JsonProperty("runtimeValueCollection") List<RuntimeValue> runtimeValueCollection) {
         this.positionFromTopInStackTrace = positionFromTopInStackTrace;
         this.location = location;
         this.stackTrace = stackTrace;
         this.runtimeValueCollection = runtimeValueCollection;
     }
 
-    private StackFrameContext(List<StackFrame> stackTrace, List<RuntimeValue> runtimeValueCollection) {
+    private StackFrameContext(
+            List<StackFrame> stackTrace, List<RuntimeValue> runtimeValueCollection) {
         this.positionFromTopInStackTrace = 1;
         this.stackTrace =
                 stackTrace.stream()

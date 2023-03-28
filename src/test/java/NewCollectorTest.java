@@ -1,5 +1,17 @@
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -12,19 +24,6 @@ import se.assertteam.LineSnapshot;
 import se.assertteam.RuntimeValue;
 import se.assertteam.SahabOutput;
 import se.assertteam.StackFrameContext;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 class NewCollectorTest {
     @Test
@@ -68,16 +67,19 @@ class NewCollectorTest {
     @Nested
     class SpecialFloatingPointValues {
         @Test
-        void shouldBeAbleToSerialise_specialFloatingPointValue() throws MavenInvocationException, IOException {
+        void shouldBeAbleToSerialise_specialFloatingPointValue()
+                throws MavenInvocationException, IOException {
             // arrange
             InvocationRequest request = new DefaultInvocationRequest();
             request.setPomFile(new File("src/test/resources/special-floating-point-value/pom.xml"));
-            request.setGoals(List.of("clean","test"));
-            List<String> agentOptions = List.of(
-                    "classesAndBreakpoints=src/test/resources/linear.txt",
-                    "output=target/linear.json"
-            );
-            request.addArg("-DargLine=-javaagent:../../../../target/collector-sahab.jar=" + String.join(",", agentOptions));
+            request.setGoals(List.of("clean", "test"));
+            List<String> agentOptions =
+                    List.of(
+                            "classesAndBreakpoints=src/test/resources/linear.txt",
+                            "output=target/linear.json");
+            request.addArg(
+                    "-DargLine=-javaagent:../../../../target/collector-sahab.jar="
+                            + String.join(",", agentOptions));
 
             // act
             Invoker invoker = new DefaultInvoker();
@@ -85,7 +87,8 @@ class NewCollectorTest {
 
             // assert
             assertThat(result.getExitCode(), equalTo(0));
-            File actualOutput = new File("src/test/resources/special-floating-point-value/target/linear.json");
+            File actualOutput =
+                    new File("src/test/resources/special-floating-point-value/target/linear.json");
             assertThat(actualOutput.exists(), equalTo(true));
 
             ObjectMapper mapper = new ObjectMapper();
@@ -101,9 +104,12 @@ class NewCollectorTest {
             assertThat(snapshot0.getLineNumber(), equalTo(11));
             StackFrameContext theOnlyStackFrameContext = snapshot0.getStackFrameContext().get(0);
             assertThat(theOnlyStackFrameContext.getRuntimeValueCollection().size(), equalTo(2));
-            RuntimeValue runtimeValue0_11 = theOnlyStackFrameContext.getRuntimeValueCollection().get(0);
+            RuntimeValue runtimeValue0_11 =
+                    theOnlyStackFrameContext.getRuntimeValueCollection().get(0);
             assertThat(runtimeValue0_11.getName(), equalTo("x"));
-            assertThat(runtimeValue0_11.getValue(), equalTo(Objects.toString(Float.POSITIVE_INFINITY)));
+            assertThat(
+                    runtimeValue0_11.getValue(),
+                    equalTo(Objects.toString(Float.POSITIVE_INFINITY)));
             assertThat(runtimeValue0_11.getType(), equalTo(Float.class));
 
             // Line 5
@@ -115,32 +121,40 @@ class NewCollectorTest {
             assertThat(snapshot2.getLineNumber(), equalTo(6));
             theOnlyStackFrameContext = snapshot2.getStackFrameContext().get(0);
             assertThat(theOnlyStackFrameContext.getRuntimeValueCollection().size(), equalTo(1));
-            RuntimeValue runtimeValue0_6 = theOnlyStackFrameContext.getRuntimeValueCollection().get(0);
+            RuntimeValue runtimeValue0_6 =
+                    theOnlyStackFrameContext.getRuntimeValueCollection().get(0);
             assertThat(runtimeValue0_6.getName(), equalTo("positiveInfinity"));
-            assertThat(runtimeValue0_6.getValue(), equalTo(Objects.toString(Double.POSITIVE_INFINITY)));
+            assertThat(
+                    runtimeValue0_6.getValue(),
+                    equalTo(Objects.toString(Double.POSITIVE_INFINITY)));
             assertThat(runtimeValue0_6.getType(), equalTo(Double.class));
 
             // Line 7
             assertThat(snapshot3.getLineNumber(), equalTo(7));
             theOnlyStackFrameContext = snapshot3.getStackFrameContext().get(0);
             assertThat(theOnlyStackFrameContext.getRuntimeValueCollection().size(), equalTo(2));
-            RuntimeValue runtimeValue1 = theOnlyStackFrameContext.getRuntimeValueCollection().get(1);
+            RuntimeValue runtimeValue1 =
+                    theOnlyStackFrameContext.getRuntimeValueCollection().get(1);
             assertThat(runtimeValue1.getName(), equalTo("negativeInfinity"));
-            assertThat(runtimeValue1.getValue(), equalTo(Objects.toString(Double.NEGATIVE_INFINITY)));
+            assertThat(
+                    runtimeValue1.getValue(), equalTo(Objects.toString(Double.NEGATIVE_INFINITY)));
             assertThat(runtimeValue1.getType(), equalTo(Double.class));
         }
 
         @Test
-        void shouldBeAbleToSerialise_nestedSpecialFloatingPointValue() throws MavenInvocationException, IOException {
+        void shouldBeAbleToSerialise_nestedSpecialFloatingPointValue()
+                throws MavenInvocationException, IOException {
             // arrange
             InvocationRequest request = new DefaultInvocationRequest();
             request.setPomFile(new File("src/test/resources/special-floating-point-value/pom.xml"));
             request.setGoals(List.of("clean", "test"));
-            List<String> agentOptions = List.of(
-                    "classesAndBreakpoints=src/test/resources/nested.txt",
-                    "output=target/nested.json"
-            );
-            request.addArg("-DargLine=-javaagent:../../../../target/collector-sahab.jar=" + String.join(",", agentOptions));
+            List<String> agentOptions =
+                    List.of(
+                            "classesAndBreakpoints=src/test/resources/nested.txt",
+                            "output=target/nested.json");
+            request.addArg(
+                    "-DargLine=-javaagent:../../../../target/collector-sahab.jar="
+                            + String.join(",", agentOptions));
 
             // act
             Invoker invoker = new DefaultInvoker();
@@ -148,7 +162,8 @@ class NewCollectorTest {
 
             // assert
             assertThat(result.getExitCode(), equalTo(0));
-            File actualOutput = new File("src/test/resources/special-floating-point-value/target/nested.json");
+            File actualOutput =
+                    new File("src/test/resources/special-floating-point-value/target/nested.json");
             assertThat(actualOutput.exists(), equalTo(true));
 
             ObjectMapper mapper = new ObjectMapper();
@@ -162,19 +177,22 @@ class NewCollectorTest {
     @Nested
     class RepresentingCollections {
         @Test
-        void invoke_recordValuesFromArrayFieldInsideCollection() throws MavenInvocationException, IOException {
+        void invoke_recordValuesFromArrayFieldInsideCollection()
+                throws MavenInvocationException, IOException {
             // arrange
             InvocationRequest request = new DefaultInvocationRequest();
             request.setPomFile(new File("src/test/resources/collections/pom.xml"));
             request.setGoals(List.of("clean", "test"));
-            List<String> agentOptions = List.of(
-                    "classesAndBreakpoints=src/test/resources/one-level.txt",
-                    "output=target/one-level-collection.json",
-                    "executionDepth=1"
-            );
+            List<String> agentOptions =
+                    List.of(
+                            "classesAndBreakpoints=src/test/resources/one-level.txt",
+                            "output=target/one-level-collection.json",
+                            "executionDepth=1");
             String testArg = "-Dtest=foo.CollectionsTest#test_returnTruthy";
             request.addArg(testArg);
-            request.addArg("-DargLine=-javaagent:../../../../target/collector-sahab.jar=" + String.join(",", agentOptions));
+            request.addArg(
+                    "-DargLine=-javaagent:../../../../target/collector-sahab.jar="
+                            + String.join(",", agentOptions));
 
             // act
             Invoker invoker = new DefaultInvoker();
@@ -182,14 +200,16 @@ class NewCollectorTest {
 
             // assert
             assertThat(result.getExitCode(), equalTo(0));
-            File actualOutput = new File("src/test/resources/collections/target/one-level-collection.json");
+            File actualOutput =
+                    new File("src/test/resources/collections/target/one-level-collection.json");
             assertThat(actualOutput.exists(), equalTo(true));
 
             ObjectMapper mapper = new ObjectMapper();
             SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
             assertThat(output.getBreakpoint().size(), equalTo(1));
 
-            StackFrameContext theOnlyStackTraceContext = output.getBreakpoint().get(0).getStackFrameContext().get(0);
+            StackFrameContext theOnlyStackTraceContext =
+                    output.getBreakpoint().get(0).getStackFrameContext().get(0);
             RuntimeValue arrayDequeue = theOnlyStackTraceContext.getRuntimeValueCollection().get(0);
             assertThat(arrayDequeue.getName(), equalTo("q"));
 
@@ -206,7 +226,10 @@ class NewCollectorTest {
             assertThat(list.getName(), equalTo("list"));
             RuntimeValue elementsOfList = list.getFields().get(0);
 
-            List<Object> atomicValue =  elementsOfList.getArrayElements().stream().map(RuntimeValue::getValue).collect(Collectors.toList());
+            List<Object> atomicValue =
+                    elementsOfList.getArrayElements().stream()
+                            .map(RuntimeValue::getValue)
+                            .collect(Collectors.toList());
             assertThat(atomicValue, equalTo(List.of(1, 2, 3, 4, 5)));
 
             // set
@@ -214,11 +237,14 @@ class NewCollectorTest {
             assertThat(set.getName(), equalTo("set"));
             RuntimeValue elementsOfSet = set.getFields().get(0);
 
-            List<Object> atomicValueOfSet =  elementsOfSet.getArrayElements().stream().map(RuntimeValue::getValue).collect(Collectors.toList());
+            List<Object> atomicValueOfSet =
+                    elementsOfSet.getArrayElements().stream()
+                            .map(RuntimeValue::getValue)
+                            .collect(Collectors.toList());
             // null are pre-allocated buffers in HashSet
-            assertThat(atomicValueOfSet, containsInAnyOrder("aman", "sharma", "sahab", null, null, null));
+            assertThat(
+                    atomicValueOfSet,
+                    containsInAnyOrder("aman", "sharma", "sahab", null, null, null));
         }
     }
-
-
 }

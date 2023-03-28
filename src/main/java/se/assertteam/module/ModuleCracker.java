@@ -7,8 +7,7 @@ public interface ModuleCracker {
     void crack(Class<?> source);
 
     static ModuleCracker noop() {
-        return source -> {
-        };
+        return source -> {};
     }
 
     static ModuleCracker getApplicable(Instrumentation instrumentation) {
@@ -19,9 +18,10 @@ public interface ModuleCracker {
         }
 
         try {
-            return (ModuleCracker) Class.forName("se.assertteam.module.Java9ModuleCracker")
-                    .getDeclaredConstructors()[0]
-                    .newInstance(instrumentation);
+            return (ModuleCracker)
+                    Class.forName("se.assertteam.module.Java9ModuleCracker")
+                            .getDeclaredConstructors()[0]
+                            .newInstance(instrumentation);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }

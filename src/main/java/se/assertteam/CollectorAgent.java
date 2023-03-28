@@ -11,7 +11,6 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.Duplication;
@@ -25,7 +24,6 @@ import net.bytebuddy.implementation.bytecode.constant.NullConstant;
 import net.bytebuddy.implementation.bytecode.constant.TextConstant;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
-import org.eclipse.jdt.internal.compiler.impl.StringConstant;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -89,7 +87,9 @@ public class CollectorAgent {
 
     private static List<String> getClassesAllowed() {
         List<FileAndBreakpoint> fileAndBreakpoints = options.getClassesAndBreakpoints();
-        return fileAndBreakpoints.stream().map(FileAndBreakpoint::getFileName).collect(Collectors.toList());
+        return fileAndBreakpoints.stream()
+                .map(FileAndBreakpoint::getFileName)
+                .collect(Collectors.toList());
     }
 
     private static List<Integer> getBreakpointsAllowed(String className) {
@@ -102,7 +102,8 @@ public class CollectorAgent {
         return new ArrayList<>();
     }
 
-    private static byte[] getBytes(String className, byte[] classfileBuffer, List<String> classesAllowed)
+    private static byte[] getBytes(
+            String className, byte[] classfileBuffer, List<String> classesAllowed)
             throws NoSuchMethodException {
         if (!classesAllowed.contains(className)) {
             return classfileBuffer;
@@ -192,7 +193,12 @@ public class CollectorAgent {
                 MethodInvocation.invoke(
                         new MethodDescription.ForLoadedMethod(
                                 ContextCollector.class.getMethod(
-                                        "logLine", String.class, int.class, Object.class, LocalVariable[].class, String.class))));
+                                        "logLine",
+                                        String.class,
+                                        int.class,
+                                        Object.class,
+                                        LocalVariable[].class,
+                                        String.class))));
 
         return new StackManipulation.Compound(manipulations);
     }

@@ -1,13 +1,12 @@
 package se.assertteam.module;
 
-import se.assertteam.CollectorAgent;
-
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import se.assertteam.CollectorAgent;
 
 public class Java9ModuleCracker implements ModuleCracker {
 
@@ -27,18 +26,16 @@ public class Java9ModuleCracker implements ModuleCracker {
             return;
         }
 
-        Map<String, Set<Module>> toOpen = module.getPackages().stream()
-                .collect(Collectors.toMap(
-                        it -> it,
-                        it -> Set.of(CollectorAgent.class.getClassLoader().getUnnamedModule())
-                ));
-        instrumentation.redefineModule(
-                module,
-                Set.of(),
-                Map.of(),
-                toOpen,
-                Set.of(),
-                Map.of()
-        );
+        Map<String, Set<Module>> toOpen =
+                module.getPackages().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        it -> it,
+                                        it ->
+                                                Set.of(
+                                                        CollectorAgent.class
+                                                                .getClassLoader()
+                                                                .getUnnamedModule())));
+        instrumentation.redefineModule(module, Set.of(), Map.of(), toOpen, Set.of(), Map.of());
     }
 }

@@ -78,7 +78,7 @@ public class CollectorAgentOptions {
 
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(classesAndBreakpoints, new TypeReference<>() {});
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
