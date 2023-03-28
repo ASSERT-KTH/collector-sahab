@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import se.assertteam.module.ModuleCracker;
 
 public class ObjectIntrospection {
@@ -26,39 +25,69 @@ public class ObjectIntrospection {
         ObjectIntrospection.executionDepth = executionDepth;
     }
 
-    public RuntimeValue introspect(LocalVariable variable) throws IllegalAccessException {
-        return introspect(
+    /**
+     * Introspects a local variable of a method.
+     *
+     * @param variable the variable to introspect
+     * @return the created {@link RuntimeValue}
+     * @throws IllegalAccessException if a field could not be read
+     */
+    public RuntimeValue introspectVariable(LocalVariable variable) throws IllegalAccessException {
+        return introspectObject(
                 RuntimeValue.Kind.LOCAL_VARIABLE,
                 variable.getName(),
                 variable.getType(),
                 variable.getValue(),
-                0);
+                0
+        );
     }
 
-    public List<RuntimeValue> introspectReceiver(Object receiver, Class<?> receiverClass)
+    /**
+     * Introspects the fields of the {@code this} object in a method.
+     *
+     * @param receiver the receiver
+     * @param receiverClass the class of the receiver, necessary for static methods without a
+     *     receiver
+     * @return all field values for the receiver
+     * @throws IllegalAccessException if a field could not be read
+     */
+    public List<RuntimeValue> introspectReceiverFields(Object receiver, Class<?> receiverClass)
             throws IllegalAccessException {
-        // Depth is -1 because we are introspecting fields which are one level deeper than the
-        // receiver
-        return introspectFields(receiver, 0, receiverClass);
+        // We do not use introspectObject here, as we do not write arrayElements for the receiver
+        return getFieldValues(receiver, 0, receiverClass);
     }
 
+    /**
+     * Introspects the return value of a method.
+     *
+     * @param methodName the name of the method
+     * @param returned the returned value
+     * @param parameters the parameters of the method
+     * @param stacktrace the stacktrace
+     * @param location the location of the return instruction
+     * @param receiverClass the receiver class
+     * @param returnType the type of the return value
+     * @return the created {@link RuntimeReturnedValue}
+     * @throws IllegalAccessException if a field could not be read
+     */
     public RuntimeReturnedValue introspectReturnValue(
             String methodName,
             Object returned,
             List<Object> parameters,
             List<String> stacktrace,
             String location,
-            Class<?> receiverClass)
-            throws IllegalAccessException {
-        List<RuntimeValue> fields = introspectFields(returned, 0, receiverClass);
-        List<RuntimeValue> arrayValues = introspectArrayValues(returned, 0);
+            Class<?> receiverClass,
+            Class<?> returnType
+    ) throws IllegalAccessException {
+        // We gather the static fields of the receiver class
+        List<RuntimeValue> fields = getFieldValues(returned, 0, receiverClass);
+        List<RuntimeValue> arrayValues = getArrayValues(returned, 0);
 
         return new RuntimeReturnedValue(
-                // FIXME: Use method return type
                 RuntimeValue.Kind.RETURN,
                 methodName,
-                returned == null ? null : returned.getClass(),
-                Objects.toString(returned),
+                returned == null ? returnType : returned.getClass(),
+                returned,
                 fields,
                 arrayValues,
                 parameters,
@@ -66,50 +95,61 @@ public class ObjectIntrospection {
                 location);
     }
 
-    private RuntimeValue introspect(
-            RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth)
-            throws IllegalAccessException {
+    /**
+     * Introspects an object, creating a {@link RuntimeValue}.
+     *
+     * @param kind the kind of the value
+     * @param name the name of this value
+     * @param type the (dynamic or static) type of this value
+     * @param object the object itself
+     * @param depth the current depth
+     * @return the created runtime value
+     * @throws IllegalAccessException if a field could not be read
+     */
+    private RuntimeValue introspectObject(
+            RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth
+    ) throws IllegalAccessException {
+        List<RuntimeValue> fields = List.of();
+        List<RuntimeValue> arrayElements = List.of();
+
         if (depth <= executionDepth) {
-            List<RuntimeValue> fields = introspectFields(object, depth, type);
-            List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
+            fields = getFieldValues(object, depth, type);
+            arrayElements = getArrayValues(object, depth);
 
-            return new RuntimeValue(
-                    kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
         }
-        return new RuntimeValue(
-                kind, name, type, getJSONCompatibleValue(object), List.of(), List.of());
+
+        return new RuntimeValue(kind, name, type, object, fields, arrayElements);
     }
 
-    private static Object getJSONCompatibleValue(Object object) {
-        if (object == null) {
-            return null;
-        }
-        if (isBasicallyPrimitive(object.getClass())) {
-            if (object instanceof Number || object instanceof Boolean) return object;
-            else return object.toString();
-        } else {
-            return object.getClass().getName();
-        }
-    }
+    /**
+     * Introspects an object and, if it not
+     * {@link Classes#isBasicallyPrimitive(Class) basically primitive}, return the field values.
+     *
+     * @param object the object to inspect
+     * @param depth the current depth
+     * @param objectStaticType the static type of the object. Used of the object is {@code null}
+     *   to at least extract static fields.
+     * @return the fields or an empty list if it was
+     *   {@link Classes#isBasicallyPrimitive(Class) basically primitive}
+     * @throws IllegalAccessException if a field could not be read
+     */
+    private List<RuntimeValue> getFieldValues(
+        Object object, int depth, Class<?> objectStaticType
+    ) throws IllegalAccessException {
+        Class<?> objectResolvedType = object != null ? object.getClass() : objectStaticType;
 
-    private List<RuntimeValue> introspectFields(Object object, int depth, Class<?> receiverClass)
-            throws IllegalAccessException {
-        if (isBasicallyPrimitive(object != null ? object.getClass() : receiverClass)) {
+        if (isBasicallyPrimitive(objectResolvedType)) {
+            // primitives and strings need no fields
             return List.of();
         }
-        if (object == null) {
-            return traverseFields(null, depth, receiverClass);
-        }
 
-        return traverseFields(object, depth, object.getClass());
-    }
+        List<RuntimeValue> fieldValues = new ArrayList<>();
+        // If we are in a static method or serializing null values, we are only interested in
+        // static field values.
+        boolean onlyCollectStaticFields = object == null;
 
-    private List<RuntimeValue> traverseFields(Object object, int depth, Class<?> typeOfObject)
-            throws IllegalAccessException {
-        List<RuntimeValue> fields = new ArrayList<>();
-        ObjectGraph.ObjectNode node = objectGraph.getNode(typeOfObject);
-        for (Field field : node.getFields()) {
-            if (object == null && !Modifier.isStatic(field.getModifiers())) {
+        for (Field field : objectGraph.getNode(objectResolvedType).getFields()) {
+            if (onlyCollectStaticFields && !Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
             if (field.isSynthetic()) {
@@ -119,26 +159,36 @@ public class ObjectIntrospection {
                 continue;
             }
             if (!field.trySetAccessible()) {
-                System.out.println("Cracking " + field);
                 moduleCracker.crack(field.getDeclaringClass());
                 moduleCracker.crack(field.getType());
             }
             if (!field.trySetAccessible()) {
                 throw new AssertionError("Could not crack type " + field.getDeclaringClass());
             }
-            fields.add(
-                    introspect(
+            fieldValues.add(
+                    introspectObject(
                             RuntimeValue.Kind.FIELD,
                             field.getName(),
                             field.getType(),
                             field.get(object),
-                            depth + 1));
+                        depth + 1
+                    )
+            );
         }
-        return fields;
+        return fieldValues;
     }
 
-    private List<RuntimeValue> introspectArrayValues(Object array, int depth)
-            throws IllegalAccessException {
+    /**
+     * Introspects an object and, if it is an array, returns the introspected values.
+     *
+     * @param array the potential array
+     * @param depth the current depth
+     * @return the array entries or an empty list if it has none or is nm array
+     * @throws IllegalAccessException if a field could not be read
+     */
+    private List<RuntimeValue> getArrayValues(
+        Object array, int depth
+    ) throws IllegalAccessException {
         if (array == null || !array.getClass().isArray()) {
             return List.of();
         }
@@ -148,12 +198,14 @@ public class ObjectIntrospection {
 
         for (int i = 0; i < Array.getLength(array) && i < 20; i++) {
             arrayElements.add(
-                    introspect(
+                    introspectObject(
                             RuntimeValue.Kind.ARRAY_ELEMENT,
                             null,
                             componentType,
                             Array.get(array, i),
-                            depth + 1));
+                            depth + 1
+                    )
+            );
         }
 
         return arrayElements;

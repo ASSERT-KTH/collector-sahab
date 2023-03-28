@@ -40,10 +40,10 @@ public class ContextCollector {
             throws ReflectiveOperationException {
         List<RuntimeValue> values = new ArrayList<>();
         for (LocalVariable variable : localVariables) {
-            values.add(INTROSPECTOR.introspect(variable));
+            values.add(INTROSPECTOR.introspectVariable(variable));
         }
 
-        values.addAll(INTROSPECTOR.introspectReceiver(receiver, receiverClass));
+        values.addAll(INTROSPECTOR.introspectReceiverFields(receiver, receiverClass));
 
         StackFrameContext stackFrameContext = StackFrameContext.forValues(values);
         LineSnapshot lineSnapshot =
@@ -52,7 +52,7 @@ public class ContextCollector {
         SAHAB_OUTPUT.getBreakpoint().add(lineSnapshot);
     }
 
-    public static void logReturn(Object returnValue, String className) {
+    public static void logReturn(Object returnValue, String returnTypeName, String className) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
             RuntimeReturnedValue returned =
@@ -64,8 +64,9 @@ public class ContextCollector {
                                     .map(StackFrameContext::stackFrameToString)
                                     .collect(Collectors.toList()),
                             StackFrameContext.getLocation(stacktrace),
-                            Class.forName(className));
-
+                            Class.forName(className),
+                            Class.forName(returnTypeName)
+                    );
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

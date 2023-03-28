@@ -1,5 +1,8 @@
 package se.assertteam;
 
+import static se.assertteam.Classes.className;
+import static se.assertteam.Classes.isBasicallyPrimitive;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -70,19 +73,33 @@ public class RuntimeValue {
         @Override
         public void serialize(RuntimeValue value, JsonGenerator gen, SerializerProvider serializers)
             throws IOException {
-            if (value.kind == Kind.ARRAY_ELEMENT && Classes.isBasicallyPrimitive(value.type)) {
+            if (value.kind == Kind.ARRAY_ELEMENT && isBasicallyPrimitive(value.type)) {
                 // Value is enough for values in arrays
-                serializers.defaultSerializeValue(value.value, gen);
+                serializers.defaultSerializeValue(simplifyValue(value), gen);
                 return;
             }
             gen.writeStartObject();
             serializers.defaultSerializeField("kind", value.kind, gen);
             serializers.defaultSerializeField("name", value.name, gen);
-            serializers.defaultSerializeField("type", value.type, gen);
-            serializers.defaultSerializeField("value", value.value, gen);
+            serializers.defaultSerializeField("type", className(value.type), gen);
+            serializers.defaultSerializeField("value", simplifyValue(value), gen);
             serializers.defaultSerializeField("fields", value.fields, gen);
             serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
             gen.writeEndObject();
+        }
+
+        private static Object simplifyValue(RuntimeValue runtimeValue) {
+            Object value = runtimeValue.value;
+            if (value == null) {
+                return null;
+            }
+            if (isBasicallyPrimitive(value.getClass())) {
+                if (value instanceof Number || value instanceof Boolean) {
+                    return value;
+                }
+                return value.toString();
+            }
+            return className(value.getClass());
         }
     }
 
