@@ -10,26 +10,22 @@ import se.kth.debug.JUnitTestRunner;
 import se.kth.debug.Utility;
 
 class JUnitTestRunnerTest {
-    @TempDir private Path tempDir;
-    private static final Path PATH_TO_JUNIT_LOGS =
-            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO
-                    .resolve("src")
-                    .resolve("test")
-                    .resolve("resources")
-                    .resolve("junit-test-runner-logs");
+    @TempDir
+    private Path tempDir;
 
-    private String getActualLogs(String tests)
-            throws IOException, InterruptedException, ClassNotFoundException {
+    private static final Path PATH_TO_JUNIT_LOGS = TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO
+            .resolve("src")
+            .resolve("test")
+            .resolve("resources")
+            .resolve("junit-test-runner-logs");
+
+    private String getActualLogs(String tests) throws IOException, InterruptedException, ClassNotFoundException {
         Path actualLog = Files.createFile(tempDir.resolve("log.txt"));
-        String classpath =
-                Utility.getClasspathForRunningJUnit(
-                        TestHelper.getMavenClasspathFromBuildDirectory(
-                                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve(
-                                        "without-debug")));
+        String classpath = Utility.getClasspathForRunningJUnit(TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve("without-debug")));
 
         ProcessBuilder processBuilder =
-                new ProcessBuilder(
-                        "java", "-cp", classpath, JUnitTestRunner.class.getCanonicalName(), tests);
+                new ProcessBuilder("java", "-cp", classpath, JUnitTestRunner.class.getCanonicalName(), tests);
         processBuilder.redirectOutput(actualLog.toFile());
 
         Process p = processBuilder.start();
@@ -48,8 +44,7 @@ class JUnitTestRunnerTest {
     }
 
     @Test
-    void main_canRunTestMethodsAndClasses()
-            throws IOException, InterruptedException, ClassNotFoundException {
+    void main_canRunTestMethodsAndClasses() throws IOException, InterruptedException, ClassNotFoundException {
         String tests = "foo.junit.JUnit4Test::test_concat foo.junit.JUnit5Test";
         Path expectedLogRegex = PATH_TO_JUNIT_LOGS.resolve("mix-of-method-and-class.regex");
 
@@ -57,12 +52,10 @@ class JUnitTestRunnerTest {
     }
 
     @Test
-    void main_cannotDiscoverAbstractTest()
-            throws IOException, InterruptedException, ClassNotFoundException {
+    void main_cannotDiscoverAbstractTest() throws IOException, InterruptedException, ClassNotFoundException {
         // Read under 'Jupiter Concepts':
         // https://junit.org/junit5/docs/current/user-guide/#running-tests-console-launcher
-        String tests =
-                "foo.junit.AbstractTest::test_junit4 foo.junit.AbstractTestForJUnit5::test_junit5";
+        String tests = "foo.junit.AbstractTest::test_junit4 foo.junit.AbstractTestForJUnit5::test_junit5";
         Path expectedLogRegex = PATH_TO_JUNIT_LOGS.resolve("abstract-test.regex");
 
         assertThat(getActualLogs(tests), matchesPattern(Files.readString(expectedLogRegex)));

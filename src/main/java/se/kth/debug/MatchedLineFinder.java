@@ -57,35 +57,27 @@ public class MatchedLineFinder {
         String fullyQualifiedNameOfContainerClass =
                 methods.getLeft().getParent(CtType.class).getQualifiedName();
 
-        String breakpointsLeft =
-                serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
-        String breakpointsRight =
-                serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
+        String breakpointsLeft = serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
+        String breakpointsRight = serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
 
         if (((CtExecutable<?>) methods.getLeft())
                 .getSignature()
                 .equals(((CtExecutable<?>) methods.getRight()).getSignature())) {
             // This file is particularly useful for patches where there are no matched lines, but we
             // need to record the return values.
-            String serialisedMethods =
-                    serialiseMethods(
-                            fullyQualifiedNameOfContainerClass, methods.getLeft().getSimpleName());
+            String serialisedMethods = serialiseMethods(
+                    fullyQualifiedNameOfContainerClass, methods.getLeft().getSimpleName());
             return Triple.of(breakpointsLeft, serialisedMethods, breakpointsRight);
         }
         throw new RuntimeException(
                 "Either the patch is changing the method signature or it could be a problem with GumTree mappings.");
     }
 
-    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(File left, File right)
-            throws IOException {
+    private static Pair<Set<Integer>, Set<Integer>> getDiffLines(File left, File right) throws IOException {
         Set<Integer> src = new HashSet<>();
         Set<Integer> dst = new HashSet<>();
         ProcessBuilder pb =
-                new ProcessBuilder(
-                        "./scripts/diffn.sh",
-                        "--no-index",
-                        left.getAbsolutePath(),
-                        right.getAbsolutePath());
+                new ProcessBuilder("./scripts/diffn.sh", "--no-index", left.getAbsolutePath(), right.getAbsolutePath());
         Process p = pb.start();
         InputStreamReader isr = new InputStreamReader(p.getInputStream());
         BufferedReader rdr = new BufferedReader(isr);
@@ -122,13 +114,12 @@ public class MatchedLineFinder {
         @Override
         public <R> void visitCtBlock(CtBlock<R> block) {
             List<CtStatement> statements = block.getStatements();
-            statements.forEach(
-                    statement -> {
-                        if (!shouldBeIgnored(statement)
-                                && !diffLines.contains(statement.getPosition().getLine())) {
-                            lines.add(statement.getPosition().getLine());
-                        }
-                    });
+            statements.forEach(statement -> {
+                if (!shouldBeIgnored(statement)
+                        && !diffLines.contains(statement.getPosition().getLine())) {
+                    lines.add(statement.getPosition().getLine());
+                }
+            });
             super.visitCtBlock(block);
         }
 
@@ -153,13 +144,11 @@ public class MatchedLineFinder {
         @Override
         public <S> void visitCtCase(CtCase<S> caseStatement) {
             List<CtStatement> caseBlock = caseStatement.getStatements();
-            caseBlock.forEach(
-                    statement -> {
-                        if (!diffLines.contains(statement.getPosition().getLine())
-                                && !shouldBeIgnored(statement)) {
-                            lines.add(statement.getPosition().getLine());
-                        }
-                    });
+            caseBlock.forEach(statement -> {
+                if (!diffLines.contains(statement.getPosition().getLine()) && !shouldBeIgnored(statement)) {
+                    lines.add(statement.getPosition().getLine());
+                }
+            });
             super.visitCtCase(caseStatement);
         }
 
@@ -191,10 +180,8 @@ public class MatchedLineFinder {
         List<CtTypeMember> leftTypeMembers = getTypeMembers(leftType);
         List<CtTypeMember> rightTypeMembers = getTypeMembers(rightType);
 
-        CtTypeMember leftDiffedTypeMember =
-                findDiffedTypeMember(leftTypeMembers, diffLines.getLeft());
-        CtTypeMember rightDiffedTypeMember =
-                findDiffedTypeMember(rightTypeMembers, diffLines.getRight());
+        CtTypeMember leftDiffedTypeMember = findDiffedTypeMember(leftTypeMembers, diffLines.getLeft());
+        CtTypeMember rightDiffedTypeMember = findDiffedTypeMember(rightTypeMembers, diffLines.getRight());
 
         if (leftDiffedTypeMember == null && rightDiffedTypeMember == null) {
             throw new RuntimeException("Neither left nor right diffed type member could be found.");
@@ -221,8 +208,7 @@ public class MatchedLineFinder {
     private static List<CtTypeMember> getTypeMembers(CtType<?> type) {
         List<CtTypeMember> typeMembers = new ArrayList<>();
         for (CtTypeMember candidateTypeMember : type.getTypeMembers()) {
-            if (candidateTypeMember instanceof CtMethod<?>
-                    || candidateTypeMember instanceof CtConstructor<?>) {
+            if (candidateTypeMember instanceof CtMethod<?> || candidateTypeMember instanceof CtConstructor<?>) {
                 typeMembers.add(candidateTypeMember);
             }
             if (candidateTypeMember instanceof CtClass<?>) {
@@ -232,8 +218,7 @@ public class MatchedLineFinder {
         return typeMembers;
     }
 
-    private static CtTypeMember findDiffedTypeMember(
-            List<CtTypeMember> typeMembers, Set<Integer> diffLines) {
+    private static CtTypeMember findDiffedTypeMember(List<CtTypeMember> typeMembers, Set<Integer> diffLines) {
         Set<CtTypeMember> candidates = new HashSet<>();
         for (CtTypeMember typeMember : typeMembers) {
             if (typeMember.isImplicit()) {
@@ -255,8 +240,7 @@ public class MatchedLineFinder {
         return candidates.stream().findFirst().get();
     }
 
-    private static CtTypeMember findMapping(
-            CtTypeMember whoseMapping, List<CtTypeMember> candidateMappings) {
+    private static CtTypeMember findMapping(CtTypeMember whoseMapping, List<CtTypeMember> candidateMappings) {
         int expectedStartLine = whoseMapping.getPosition().getLine();
         for (CtTypeMember candidateMapping : candidateMappings) {
             if (isPlausibleMapping(whoseMapping, candidateMapping)) {
@@ -264,10 +248,7 @@ public class MatchedLineFinder {
             }
         }
         throw new RuntimeException(
-                "Could not find mapping for "
-                        + whoseMapping.getSimpleName()
-                        + " with start line "
-                        + expectedStartLine);
+                "Could not find mapping for " + whoseMapping.getSimpleName() + " with start line " + expectedStartLine);
     }
 
     /** Compare method equality based on name, parameters, and return type. */
@@ -276,7 +257,8 @@ public class MatchedLineFinder {
             CtMethod<?> firstMethod = (CtMethod<?>) first;
             CtMethod<?> secondMethod = (CtMethod<?>) second;
 
-            return firstMethod.getParameters().size() == secondMethod.getParameters().size()
+            return firstMethod.getParameters().size()
+                            == secondMethod.getParameters().size()
                     && firstMethod.getType().equals(secondMethod.getType())
                     && firstMethod.getSimpleName().equals(secondMethod.getSimpleName());
         }
@@ -290,19 +272,16 @@ public class MatchedLineFinder {
         }
     }
 
-    private static File resolveFilenameWithGivenBase(File base, String filename)
-            throws FileNotFoundException {
+    private static File resolveFilenameWithGivenBase(File base, String filename) throws FileNotFoundException {
         File absolutePath = Paths.get(base.getAbsolutePath()).resolve(filename).toFile();
 
         if (!absolutePath.exists()) {
-            throw new FileNotFoundException(
-                    filename + " does not exist in " + base.getAbsolutePath());
+            throw new FileNotFoundException(filename + " does not exist in " + base.getAbsolutePath());
         }
         return absolutePath;
     }
 
-    private static File prepareFileForGumtree(
-            File cwd, String commit, File diffedFile, String revision)
+    private static File prepareFileForGumtree(File cwd, String commit, File diffedFile, String revision)
             throws IOException, InterruptedException {
         if (checkout(cwd, commit) == 0) {
             return copy(cwd, diffedFile, revision);
@@ -317,16 +296,14 @@ public class MatchedLineFinder {
         return p.waitFor();
     }
 
-    private static File copy(File cwd, File diffedFile, String revision)
-            throws IOException, InterruptedException {
+    private static File copy(File cwd, File diffedFile, String revision) throws IOException, InterruptedException {
         final File revisionDirectory = new File(cwd.toURI().resolve(revision));
         revisionDirectory.mkdir();
 
-        ProcessBuilder cpBuilder =
-                new ProcessBuilder(
-                        "cp",
-                        diffedFile.getAbsolutePath(),
-                        revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
+        ProcessBuilder cpBuilder = new ProcessBuilder(
+                "cp",
+                diffedFile.getAbsolutePath(),
+                revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
         cpBuilder.directory(cwd);
         Process p = cpBuilder.start();
         p.waitFor();
@@ -334,8 +311,7 @@ public class MatchedLineFinder {
         return new File(revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
     }
 
-    private static String serialiseBreakpoints(
-            String fullyQualifiedClassName, Set<Integer> breakpoints) {
+    private static String serialiseBreakpoints(String fullyQualifiedClassName, Set<Integer> breakpoints) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonArray array = new JsonArray();
         JsonObject object = new JsonObject();

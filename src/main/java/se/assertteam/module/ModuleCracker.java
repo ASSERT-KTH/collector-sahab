@@ -18,10 +18,9 @@ public interface ModuleCracker {
         }
 
         try {
-            return (ModuleCracker)
-                    Class.forName("se.assertteam.module.Java9ModuleCracker")
-                            .getDeclaredConstructors()[0]
-                            .newInstance(instrumentation);
+            return (ModuleCracker) Class.forName("se.assertteam.module.Java9ModuleCracker")
+                    .getDeclaredConstructors()[0]
+                    .newInstance(instrumentation);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }

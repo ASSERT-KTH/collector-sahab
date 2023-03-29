@@ -27,25 +27,22 @@ public class CollectorAPITest {
     void invoke_nonStaticFieldsOfStaticClassesShouldNotBeCollected()
             throws AbsentInformationException, FileNotFoundException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.StaticClassFieldTest::test_doSomething"};
         File classesAndBreakpoints =
                 TestHelper.PATH_TO_INPUT.resolve("static-class-field.txt").toFile();
 
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        TestHelper.getDefaultOptions().setSkipReturnValues(true));
-        BreakPointContext bp =
-                eventProcessor.getBreakpointContexts().stream()
-                        .filter(bpc -> bpc.getLineNumber() == 24)
-                        .findAny()
-                        .orElseThrow();
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath,
+                tests,
+                classesAndBreakpoints,
+                TestHelper.getDefaultOptions().setSkipReturnValues(true));
+        BreakPointContext bp = eventProcessor.getBreakpointContexts().stream()
+                .filter(bpc -> bpc.getLineNumber() == 24)
+                .findAny()
+                .orElseThrow();
         StackFrameContext sf = bp.getStackFrameContexts().get(0);
 
         // assert
@@ -59,26 +56,25 @@ public class CollectorAPITest {
         void invoke_recordValuesFromArrayFieldInsideCollection()
                 throws AbsentInformationException, FileNotFoundException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_returnTruthy"};
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("collections")
-                            .resolve("one-level.txt")
-                            .toFile();
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("collections")
+                    .resolve("one-level.txt")
+                    .toFile();
 
             // act
-            EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            setExecutionDepth(1).setSkipReturnValues(true));
+            EventProcessor eventProcessor = Collector.invoke(
+                    classpath,
+                    tests,
+                    classesAndBreakpoints,
+                    setExecutionDepth(1).setSkipReturnValues(true));
 
-            BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
-            StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
+            BreakPointContext breakpoint =
+                    eventProcessor.getBreakpointContexts().get(0);
+            StackFrameContext stackFrameContext =
+                    breakpoint.getStackFrameContexts().get(0);
             List<RuntimeValue> runtimeValues = stackFrameContext.getRuntimeValueCollection();
 
             // assert
@@ -89,8 +85,7 @@ public class CollectorAPITest {
 
             assertThat(queue.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
             assertThat(arrayContainingQueueElements.getName(), equalTo("elements"));
-            assertThat(
-                    arrayContainingQueueElements.getValue(), equalTo(List.of("Added at runtime")));
+            assertThat(arrayContainingQueueElements.getValue(), equalTo(List.of("Added at runtime")));
 
             RuntimeValue list = runtimeValues.get(1);
             FieldData arrayContainingListElements = list.getFields().get(1);
@@ -110,30 +105,26 @@ public class CollectorAPITest {
         }
 
         @Test
-        void invoke_primitiveArraysAreRecorded()
-                throws AbsentInformationException, FileNotFoundException {
+        void invoke_primitiveArraysAreRecorded() throws AbsentInformationException, FileNotFoundException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.CollectionsTest::test_canWePrintPrimitive"};
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("collections")
-                            .resolve("primitive.txt")
-                            .toFile();
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("collections")
+                    .resolve("primitive.txt")
+                    .toFile();
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            TestHelper.getDefaultOptions());
+                    Collector.invoke(classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
 
-            BreakPointContext breakpoint = eventProcessor.getBreakpointContexts().get(0);
-            StackFrameContext stackFrameContext = breakpoint.getStackFrameContexts().get(0);
-            RuntimeValue thePrimitiveArray = stackFrameContext.getRuntimeValueCollection().get(0);
+            BreakPointContext breakpoint =
+                    eventProcessor.getBreakpointContexts().get(0);
+            StackFrameContext stackFrameContext =
+                    breakpoint.getStackFrameContexts().get(0);
+            RuntimeValue thePrimitiveArray =
+                    stackFrameContext.getRuntimeValueCollection().get(0);
             List<String> actualElements = (List<String>) thePrimitiveArray.getValue();
 
             // assert
@@ -147,26 +138,26 @@ public class CollectorAPITest {
             private StackFrameContext arrangeAndAct(int executionDepth)
                     throws AbsentInformationException, FileNotFoundException {
                 // arrange
-                String[] classpath =
-                        TestHelper.getMavenClasspathFromBuildDirectory(
-                                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-                String[] tests =
-                        new String[] {"foo.CollectionsTest::test_canNestedArrayBeRepresented"};
-                File classesAndBreakpoints =
-                        TestHelper.PATH_TO_INPUT
-                                .resolve("collections")
-                                .resolve("nested-array.txt")
-                                .toFile();
+                String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+                String[] tests = new String[] {"foo.CollectionsTest::test_canNestedArrayBeRepresented"};
+                File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                        .resolve("collections")
+                        .resolve("nested-array.txt")
+                        .toFile();
 
                 // act
-                EventProcessor eventProcessor =
-                        Collector.invoke(
-                                classpath,
-                                tests,
-                                classesAndBreakpoints,
-                                setExecutionDepth(executionDepth).setSkipReturnValues(true));
+                EventProcessor eventProcessor = Collector.invoke(
+                        classpath,
+                        tests,
+                        classesAndBreakpoints,
+                        setExecutionDepth(executionDepth).setSkipReturnValues(true));
                 assertThat(eventProcessor.getReturnValues(), is(empty()));
-                return eventProcessor.getBreakpointContexts().get(0).getStackFrameContexts().get(0);
+                return eventProcessor
+                        .getBreakpointContexts()
+                        .get(0)
+                        .getStackFrameContexts()
+                        .get(0);
             }
 
             @Test
@@ -211,85 +202,73 @@ public class CollectorAPITest {
         }
 
         @Test
-        void invoke_elementsInsideNestedSetAreRecorded()
-                throws AbsentInformationException, FileNotFoundException {
+        void invoke_elementsInsideNestedSetAreRecorded() throws AbsentInformationException, FileNotFoundException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-            String[] tests =
-                    new String[] {"foo.CollectionsTest::test_canWeRepresentNestedCollection"};
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("collections")
-                            .resolve("nested-collection.txt")
-                            .toFile();
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.CollectionsTest::test_canWeRepresentNestedCollection"};
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("collections")
+                    .resolve("nested-collection.txt")
+                    .toFile();
 
             // act
-            EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            setExecutionDepth(8).setSkipReturnValues(true));
+            EventProcessor eventProcessor = Collector.invoke(
+                    classpath,
+                    tests,
+                    classesAndBreakpoints,
+                    setExecutionDepth(8).setSkipReturnValues(true));
 
             // assert
             assertThat(eventProcessor.getReturnValues(), is(empty()));
 
-            RuntimeValue onlyNestedSet =
-                    eventProcessor
-                            .getBreakpointContexts()
-                            .get(0)
-                            .getStackFrameContexts()
-                            .get(0)
-                            .getRuntimeValueCollection()
-                            .get(0);
-            ArrayElement innerMostSet =
-                    onlyNestedSet
-                            .getFields()
-                            .get(1)
-                            .getFields()
-                            .get(7)
-                            .getArrayElements()
-                            .get(0)
-                            .getFields()
-                            .get(1)
-                            .getFields()
-                            .get(1)
-                            .getFields()
-                            .get(7)
-                            .getArrayElements()
-                            .get(0);
+            RuntimeValue onlyNestedSet = eventProcessor
+                    .getBreakpointContexts()
+                    .get(0)
+                    .getStackFrameContexts()
+                    .get(0)
+                    .getRuntimeValueCollection()
+                    .get(0);
+            ArrayElement innerMostSet = onlyNestedSet
+                    .getFields()
+                    .get(1)
+                    .getFields()
+                    .get(7)
+                    .getArrayElements()
+                    .get(0)
+                    .getFields()
+                    .get(1)
+                    .getFields()
+                    .get(1)
+                    .getFields()
+                    .get(7)
+                    .getArrayElements()
+                    .get(0);
 
             assertThat(
-                    innerMostSet.getFields().get(1).getValue(),
-                    equalTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+                    innerMostSet.getFields().get(1).getValue(), equalTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
         }
     }
 
     @Nested
     class RepresentingObjects {
         @Test
-        void fieldInsideAOneLevelObjectShouldBeRecorded()
-                throws AbsentInformationException, FileNotFoundException {
+        void fieldInsideAOneLevelObjectShouldBeRecorded() throws AbsentInformationException, FileNotFoundException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::justOneLevel"};
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("objects")
-                            .resolve("one-level-nesting.txt")
-                            .toFile();
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("objects")
+                    .resolve("one-level-nesting.txt")
+                    .toFile();
 
             // act
-            EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            setExecutionDepth(1).setSkipBreakpointValues(true));
+            EventProcessor eventProcessor = Collector.invoke(
+                    classpath,
+                    tests,
+                    classesAndBreakpoints,
+                    setExecutionDepth(1).setSkipBreakpointValues(true));
 
             // assert
             assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
@@ -307,35 +286,31 @@ public class CollectorAPITest {
         void fieldInsideMultipleLevelNestedObjectShouldBeRecorded()
                 throws AbsentInformationException, FileNotFoundException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] tests = new String[] {"foo.ObjectsTest::maybeTwoMoreLevels"};
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("objects")
-                            .resolve("multiple-level-nesting.txt")
-                            .toFile();
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("objects")
+                    .resolve("multiple-level-nesting.txt")
+                    .toFile();
 
             // act
-            EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            setExecutionDepth(3).setSkipReturnValues(true));
+            EventProcessor eventProcessor = Collector.invoke(
+                    classpath,
+                    tests,
+                    classesAndBreakpoints,
+                    setExecutionDepth(3).setSkipReturnValues(true));
 
             // assert
             assertThat(eventProcessor.getReturnValues(), is(empty()));
 
-            RuntimeValue field =
-                    eventProcessor
-                            .getBreakpointContexts()
-                            .get(0)
-                            .getStackFrameContexts()
-                            .get(0)
-                            .getRuntimeValueCollection()
-                            .get(0);
+            RuntimeValue field = eventProcessor
+                    .getBreakpointContexts()
+                    .get(0)
+                    .getStackFrameContexts()
+                    .get(0)
+                    .getRuntimeValueCollection()
+                    .get(0);
 
             RuntimeValue oneLevelDeep = field.getFields().get(0);
             assertThat(oneLevelDeep.getKind(), is(RuntimeValueKind.FIELD));
@@ -353,21 +328,19 @@ public class CollectorAPITest {
     }
 
     @Test
-    void getReadableValue_voidValueShouldBeRecorded()
-            throws AbsentInformationException, FileNotFoundException {
+    void getReadableValue_voidValueShouldBeRecorded() throws AbsentInformationException, FileNotFoundException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.VoidMethodTest::test_doNothing"};
-        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("void-method.txt").toFile();
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_INPUT.resolve("void-method.txt").toFile();
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath,
+                tests,
+                classesAndBreakpoints,
+                TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
 
         // assert
         assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
@@ -379,40 +352,36 @@ public class CollectorAPITest {
     void collectVariables_variablesInsideAnonymousClassShouldBeCollected()
             throws FileNotFoundException, AbsentInformationException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.AnonymousTest::test_implementAnonymousGreetings"};
         File classesAndBreakpoints =
                 TestHelper.PATH_TO_INPUT.resolve("anonymous-class.txt").toFile();
 
         // act
         EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
+                Collector.invoke(classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
 
         // assert
         assertThat(eventProcessor.getReturnValues(), is(empty()));
 
-        RuntimeValue hindiGreeting =
-                eventProcessor
-                        .getBreakpointContexts()
-                        .get(0)
-                        .getStackFrameContexts()
-                        .get(0)
-                        .getRuntimeValueCollection()
-                        .get(0);
+        RuntimeValue hindiGreeting = eventProcessor
+                .getBreakpointContexts()
+                .get(0)
+                .getStackFrameContexts()
+                .get(0)
+                .getRuntimeValueCollection()
+                .get(0);
         assertThat(hindiGreeting.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
         assertThat(hindiGreeting.getValue(), equalTo("Namaste"));
 
-        RuntimeValue swedishGreeting =
-                eventProcessor
-                        .getBreakpointContexts()
-                        .get(1)
-                        .getStackFrameContexts()
-                        .get(0)
-                        .getRuntimeValueCollection()
-                        .get(0);
+        RuntimeValue swedishGreeting = eventProcessor
+                .getBreakpointContexts()
+                .get(1)
+                .getStackFrameContexts()
+                .get(0)
+                .getRuntimeValueCollection()
+                .get(0);
         assertThat(swedishGreeting.getKind(), is(RuntimeValueKind.LOCAL_VARIABLE));
         assertThat(swedishGreeting.getValue(), equalTo("Tjenare!"));
     }
@@ -421,19 +390,18 @@ public class CollectorAPITest {
     void processMethodExit_returnOfOuterMethodShouldBeCollected_notLambda()
             throws AbsentInformationException, FileNotFoundException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.AnonymousTest::test_printString"};
-        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("lambda.txt").toFile();
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_INPUT.resolve("lambda.txt").toFile();
 
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath,
+                tests,
+                classesAndBreakpoints,
+                TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
 
         assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
 
@@ -445,29 +413,19 @@ public class CollectorAPITest {
     @Nested
     class BreakPointAtEndCurlyBrace {
         @Test
-        void nonVoidMethod_doesNotCollectAnything()
-                throws FileNotFoundException, AbsentInformationException {
+        void nonVoidMethod_doesNotCollectAnything() throws FileNotFoundException, AbsentInformationException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-            String[] tests =
-                    new String[] {
-                        "foo.BreakpointAtEndCurlyBraceTest::test_shouldEndLineBeCollected_nonVoid"
-                    };
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("breakpoint-at-end-curly-brace")
-                            .resolve("non-void.txt")
-                            .toFile();
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.BreakpointAtEndCurlyBraceTest::test_shouldEndLineBeCollected_nonVoid"};
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("breakpoint-at-end-curly-brace")
+                    .resolve("non-void.txt")
+                    .toFile();
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            TestHelper.getDefaultOptions());
+                    Collector.invoke(classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
 
             // assert
             assertThat(eventProcessor.getBreakpointContexts(), is(empty()));
@@ -477,35 +435,25 @@ public class CollectorAPITest {
         @Test
         void voidMethod_voidIsCollected() throws FileNotFoundException, AbsentInformationException {
             // arrange
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
-            String[] tests =
-                    new String[] {
-                        "foo.BreakpointAtEndCurlyBraceTest::test_doNotReturnAnything_void"
-                    };
-            File classesAndBreakpoints =
-                    TestHelper.PATH_TO_INPUT
-                            .resolve("breakpoint-at-end-curly-brace")
-                            .resolve("void.txt")
-                            .toFile();
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] tests = new String[] {"foo.BreakpointAtEndCurlyBraceTest::test_doNotReturnAnything_void"};
+            File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                    .resolve("breakpoint-at-end-curly-brace")
+                    .resolve("void.txt")
+                    .toFile();
 
             // act
             EventProcessor eventProcessor =
-                    Collector.invoke(
-                            classpath,
-                            tests,
-                            classesAndBreakpoints,
-                            TestHelper.getDefaultOptions());
+                    Collector.invoke(classpath, tests, classesAndBreakpoints, TestHelper.getDefaultOptions());
 
             // assert
-            List<RuntimeValue> runtimeValuesFromBreakpoint =
-                    eventProcessor
-                            .getBreakpointContexts()
-                            .get(0)
-                            .getStackFrameContexts()
-                            .get(0)
-                            .getRuntimeValueCollection();
+            List<RuntimeValue> runtimeValuesFromBreakpoint = eventProcessor
+                    .getBreakpointContexts()
+                    .get(0)
+                    .getStackFrameContexts()
+                    .get(0)
+                    .getRuntimeValueCollection();
             assertThat(runtimeValuesFromBreakpoint, is(empty()));
 
             RuntimeValue returnValue = eventProcessor.getReturnValues().get(0);
@@ -515,22 +463,20 @@ public class CollectorAPITest {
     }
 
     @Test
-    void dataShouldBeCollectedInsideSwitchBlock()
-            throws FileNotFoundException, AbsentInformationException {
+    void dataShouldBeCollectedInsideSwitchBlock() throws FileNotFoundException, AbsentInformationException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.SwitchCaseTest::test"};
-        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT.resolve("switch-case.json").toFile();
+        File classesAndBreakpoints =
+                TestHelper.PATH_TO_INPUT.resolve("switch-case.json").toFile();
 
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath,
+                tests,
+                classesAndBreakpoints,
+                TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
 
         // assert
         assertThat(eventProcessor.getReturnValues().size(), equalTo(8));
@@ -540,29 +486,25 @@ public class CollectorAPITest {
     void returnDataShouldBeCollected_evenIfThereAreNoBreakpoints()
             throws FileNotFoundException, AbsentInformationException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.RecordMyReturnButWithoutBreakpointsTest::abba"};
-        File classesAndBreakpoints =
-                TestHelper.PATH_TO_INPUT
-                        .resolve("return-value-without-breakpoints")
-                        .resolve("input.txt")
-                        .toFile();
-        File methodsForExitEvent =
-                TestHelper.PATH_TO_INPUT
-                        .resolve("return-value-without-breakpoints")
-                        .resolve("methods.json")
-                        .toFile();
+        File classesAndBreakpoints = TestHelper.PATH_TO_INPUT
+                .resolve("return-value-without-breakpoints")
+                .resolve("input.txt")
+                .toFile();
+        File methodsForExitEvent = TestHelper.PATH_TO_INPUT
+                .resolve("return-value-without-breakpoints")
+                .resolve("methods.json")
+                .toFile();
 
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        methodsForExitEvent,
-                        TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath,
+                tests,
+                classesAndBreakpoints,
+                methodsForExitEvent,
+                TestHelper.getDefaultOptions().setSkipBreakpointValues(true));
 
         // assert
         assertThat(eventProcessor.getReturnValues().size(), equalTo(1));
@@ -572,23 +514,19 @@ public class CollectorAPITest {
     void recordReturnValueOfMethod_ifFullyQualifiedName_andMethodName_matches()
             throws FileNotFoundException, AbsentInformationException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.TwinsTest::executeBothMethods"};
         File classesAndBreakpoints =
                 TestHelper.PATH_TO_INPUT.resolve("twins").resolve("input.txt").toFile();
-        File methodsForExitEvent =
-                TestHelper.PATH_TO_INPUT.resolve("twins").resolve("methods.json").toFile();
+        File methodsForExitEvent = TestHelper.PATH_TO_INPUT
+                .resolve("twins")
+                .resolve("methods.json")
+                .toFile();
 
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        methodsForExitEvent,
-                        TestHelper.getDefaultOptions());
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath, tests, classesAndBreakpoints, methodsForExitEvent, TestHelper.getDefaultOptions());
 
         // assert
         // return value from foo.twin.B#getValue is ignored
@@ -599,26 +537,21 @@ public class CollectorAPITest {
     }
 
     @Test
-    void recordDataOfMethod_RunByNestedTest()
-            throws FileNotFoundException, AbsentInformationException {
+    void recordDataOfMethod_RunByNestedTest() throws FileNotFoundException, AbsentInformationException {
         // arrange
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] tests = new String[] {"foo.NestedTest$NestedClass::test_add"};
         File classesAndBreakpoints =
                 TestHelper.PATH_TO_INPUT.resolve("nested").resolve("input.txt").toFile();
-        File methodsForExitEvent =
-                TestHelper.PATH_TO_INPUT.resolve("nested").resolve("methods.json").toFile();
+        File methodsForExitEvent = TestHelper.PATH_TO_INPUT
+                .resolve("nested")
+                .resolve("methods.json")
+                .toFile();
 
         // act
-        EventProcessor eventProcessor =
-                Collector.invoke(
-                        classpath,
-                        tests,
-                        classesAndBreakpoints,
-                        methodsForExitEvent,
-                        TestHelper.getDefaultOptions());
+        EventProcessor eventProcessor = Collector.invoke(
+                classpath, tests, classesAndBreakpoints, methodsForExitEvent, TestHelper.getDefaultOptions());
 
         // assert
         assertThat(eventProcessor.getReturnValues().size(), equalTo(1));

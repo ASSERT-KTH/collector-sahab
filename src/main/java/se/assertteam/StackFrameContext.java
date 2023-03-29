@@ -26,13 +26,10 @@ public class StackFrameContext {
         this.runtimeValueCollection = runtimeValueCollection;
     }
 
-    private StackFrameContext(
-            List<StackFrame> stackTrace, List<RuntimeValue> runtimeValueCollection) {
+    private StackFrameContext(List<StackFrame> stackTrace, List<RuntimeValue> runtimeValueCollection) {
         this.positionFromTopInStackTrace = 1;
         this.stackTrace =
-                stackTrace.stream()
-                        .map(StackFrameContext::stackFrameToString)
-                        .collect(Collectors.toList());
+                stackTrace.stream().map(StackFrameContext::stackFrameToString).collect(Collectors.toList());
         this.location = getLocation(stackTrace);
         this.runtimeValueCollection = runtimeValueCollection;
     }
@@ -62,12 +59,9 @@ public class StackFrameContext {
     }
 
     public static List<StackFrame> getStacktrace() {
-        return StackWalker.getInstance()
-                .walk(
-                        frames ->
-                                frames.dropWhile(StackFrameContext::isOurCode)
-                                        .takeWhile(Predicate.not(StackFrameContext::isOurCode))
-                                        .collect(Collectors.toList()));
+        return StackWalker.getInstance().walk(frames -> frames.dropWhile(StackFrameContext::isOurCode)
+                .takeWhile(Predicate.not(StackFrameContext::isOurCode))
+                .collect(Collectors.toList()));
     }
 
     public static String stackFrameToString(StackFrame frame) {

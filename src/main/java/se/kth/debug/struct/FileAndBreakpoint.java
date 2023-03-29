@@ -11,8 +11,7 @@ public class FileAndBreakpoint {
     private final List<Integer> breakpoints;
 
     public FileAndBreakpoint(
-            @JsonProperty("fileName") String fileName,
-            @JsonProperty("breakpoints") List<Integer> breakpoints) {
+            @JsonProperty("fileName") String fileName, @JsonProperty("breakpoints") List<Integer> breakpoints) {
         this.fileName = fileName;
         this.breakpoints = breakpoints;
     }
@@ -31,8 +30,7 @@ public class FileAndBreakpoint {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         FileAndBreakpoint other = (FileAndBreakpoint) obj;
-        return fileName.equals(other.fileName)
-                && new HashSet<>(breakpoints).equals(new HashSet<>(other.breakpoints));
+        return fileName.equals(other.fileName) && new HashSet<>(breakpoints).equals(new HashSet<>(other.breakpoints));
     }
 
     @Override

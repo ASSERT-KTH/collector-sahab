@@ -18,25 +18,16 @@ public class ContextCollector {
     }
 
     public static void logLine(
-            String className,
-            int lineNumber,
-            Object receiver,
-            LocalVariable[] localVariables,
-            String receiverClass) {
+            String className, int lineNumber, Object receiver, LocalVariable[] localVariables, String receiverClass) {
         try {
-            logLineImpl(
-                    className, lineNumber, receiver, localVariables, Class.forName(receiverClass));
+            logLineImpl(className, lineNumber, receiver, localVariables, Class.forName(receiverClass));
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
     }
 
     private static void logLineImpl(
-            String className,
-            int lineNumber,
-            Object receiver,
-            LocalVariable[] localVariables,
-            Class<?> receiverClass)
+            String className, int lineNumber, Object receiver, LocalVariable[] localVariables, Class<?> receiverClass)
             throws ReflectiveOperationException {
         List<RuntimeValue> values = new ArrayList<>();
         for (LocalVariable variable : localVariables) {
@@ -46,8 +37,7 @@ public class ContextCollector {
         values.addAll(INTROSPECTOR.introspectReceiver(receiver, receiverClass));
 
         StackFrameContext stackFrameContext = StackFrameContext.forValues(values);
-        LineSnapshot lineSnapshot =
-                new LineSnapshot(className, lineNumber, List.of(stackFrameContext));
+        LineSnapshot lineSnapshot = new LineSnapshot(className, lineNumber, List.of(stackFrameContext));
 
         SAHAB_OUTPUT.getBreakpoint().add(lineSnapshot);
     }
@@ -55,16 +45,15 @@ public class ContextCollector {
     public static void logReturn(Object returnValue, String className) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
-            RuntimeReturnedValue returned =
-                    INTROSPECTOR.introspectReturnValue(
-                            className,
-                            returnValue,
-                            List.of(),
-                            stacktrace.stream()
-                                    .map(StackFrameContext::stackFrameToString)
-                                    .collect(Collectors.toList()),
-                            StackFrameContext.getLocation(stacktrace),
-                            Class.forName(className));
+            RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
+                    className,
+                    returnValue,
+                    List.of(),
+                    stacktrace.stream()
+                            .map(StackFrameContext::stackFrameToString)
+                            .collect(Collectors.toList()),
+                    StackFrameContext.getLocation(stacktrace),
+                    Class.forName(className));
 
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {

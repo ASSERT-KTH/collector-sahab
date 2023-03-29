@@ -24,9 +24,8 @@ public class CollectorTest {
     void should_runWithoutErrors_withNonEmptyOutput(@TempDir Path tempDir) throws IOException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
             TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
@@ -53,14 +52,11 @@ public class CollectorTest {
     }
 
     @Test
-    void should_throwAbsentInformationException(@TempDir Path tempDir)
-            throws FileNotFoundException {
+    void should_throwAbsentInformationException(@TempDir Path tempDir) throws FileNotFoundException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve(
-                                "without-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO.resolve("without-debug"));
         String[] args = {
             "-i",
             TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO
@@ -79,8 +75,7 @@ public class CollectorTest {
         System.setErr(new PrintStream(errorStream));
         Collector.main(args);
 
-        assertThat(
-                errorStream.toString(), containsString("com.sun.jdi.AbsentInformationException"));
+        assertThat(errorStream.toString(), containsString("com.sun.jdi.AbsentInformationException"));
         assertThat(outputJson.toFile(), not(anExistingFile()));
     }
 
@@ -90,9 +85,8 @@ public class CollectorTest {
         void onlyBreakpointsShouldBeRecorded(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
@@ -123,9 +117,8 @@ public class CollectorTest {
         void onlyReturnDataShouldBeRecorded(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
@@ -156,9 +149,8 @@ public class CollectorTest {
         void breakpointAndReturnDataBothShouldBeRecorded(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_INPUT.resolve("basic-math.txt").toString(),
@@ -190,9 +182,8 @@ public class CollectorTest {
     void shouldNotFailEvenIfZeroBreakpointsAreProvided(@TempDir Path tempDir) throws IOException {
         // arrange
         Path outputJson = tempDir.resolve("output.json");
-        String[] classpath =
-                TestHelper.getMavenClasspathFromBuildDirectory(
-                        TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+        String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
         String[] args = {
             "-i",
             TestHelper.PATH_TO_INPUT.resolve("zero-breakpoints-basic-math.txt").toString(),
@@ -214,16 +205,16 @@ public class CollectorTest {
     @Nested
     class BothAttributeShouldBePresent {
         @Test
-        void breakpointShouldBePresentEvenIfItsDataIsEmpty(@TempDir Path tempDir)
-                throws IOException {
+        void breakpointShouldBePresentEvenIfItsDataIsEmpty(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_INPUT.resolve("zero-breakpoints-basic-math.txt").toString(),
+                TestHelper.PATH_TO_INPUT
+                        .resolve("zero-breakpoints-basic-math.txt")
+                        .toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -249,12 +240,14 @@ public class CollectorTest {
         void returnShouldBePresentEvenIfItsDataIsEmpty(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
-                TestHelper.PATH_TO_INPUT.resolve("collections").resolve("primitive.txt").toString(),
+                TestHelper.PATH_TO_INPUT
+                        .resolve("collections")
+                        .resolve("primitive.txt")
+                        .toString(),
                 "-p",
                 StringUtils.join(classpath, " "),
                 "-t",
@@ -271,9 +264,7 @@ public class CollectorTest {
                 final Gson gson = new Gson();
                 Object json = gson.fromJson(jsonReader, Object.class);
                 assertThat(((LinkedTreeMap<?, ?>) json).size(), equalTo(2));
-                assertThat(
-                        (List<?>) (((LinkedTreeMap<?, ?>) json).get("breakpoint")),
-                        is(not(empty())));
+                assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("breakpoint")), is(not(empty())));
                 assertThat((List<?>) (((LinkedTreeMap<?, ?>) json).get("return")), is(empty()));
             }
         }
@@ -282,13 +273,11 @@ public class CollectorTest {
     @Nested
     class SpecialFloatingPointValues {
         @Test
-        void shouldBeAbleToSerialise_specialFloatingPointValue(@TempDir Path tempDir)
-                throws IOException {
+        void shouldBeAbleToSerialise_specialFloatingPointValue(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_INPUT
@@ -307,23 +296,19 @@ public class CollectorTest {
             Collector.main(args);
 
             // assert
-            String expectedOutput =
-                    Files.readString(
-                            TestHelper.PATH_TO_EXPECTED_OUTPUT
-                                    .resolve("special-floating-values")
-                                    .resolve("linear.json"));
+            String expectedOutput = Files.readString(TestHelper.PATH_TO_EXPECTED_OUTPUT
+                    .resolve("special-floating-values")
+                    .resolve("linear.json"));
             String actualOutput = Files.readString(outputJson);
             assertThat(actualOutput, equalTo(expectedOutput));
         }
 
         @Test
-        void shouldBeAbleToSerialise_nestedSpecialFloatingPointValue(@TempDir Path tempDir)
-                throws IOException {
+        void shouldBeAbleToSerialise_nestedSpecialFloatingPointValue(@TempDir Path tempDir) throws IOException {
             // arrange
             Path outputJson = tempDir.resolve("output.json");
-            String[] classpath =
-                    TestHelper.getMavenClasspathFromBuildDirectory(
-                            TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
+            String[] classpath = TestHelper.getMavenClasspathFromBuildDirectory(
+                    TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("with-debug"));
             String[] args = {
                 "-i",
                 TestHelper.PATH_TO_INPUT
@@ -344,11 +329,9 @@ public class CollectorTest {
             Collector.main(args);
 
             // assert
-            String expectedOutput =
-                    Files.readString(
-                            TestHelper.PATH_TO_EXPECTED_OUTPUT
-                                    .resolve("special-floating-values")
-                                    .resolve("nested.json"));
+            String expectedOutput = Files.readString(TestHelper.PATH_TO_EXPECTED_OUTPUT
+                    .resolve("special-floating-values")
+                    .resolve("nested.json"));
             String actualOutput = Files.readString(outputJson);
             assertThat(actualOutput, equalTo(expectedOutput));
         }

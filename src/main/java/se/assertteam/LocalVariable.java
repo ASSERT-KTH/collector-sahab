@@ -34,9 +34,7 @@ public class LocalVariable {
             return false;
         }
         LocalVariable that = (LocalVariable) o;
-        return Objects.equals(name, that.name)
-                && Objects.equals(type, that.type)
-                && Objects.equals(value, that.value);
+        return Objects.equals(name, that.name) && Objects.equals(type, that.type) && Objects.equals(value, that.value);
     }
 
     @Override

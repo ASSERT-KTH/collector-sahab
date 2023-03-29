@@ -16,11 +16,10 @@ import org.junit.platform.engine.discovery.MethodSelector;
 public class JUnitTestRunner {
     public static void main(String... args) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Callable<Object> task =
-                () -> {
-                    runTests(args[0].split(" "));
-                    return 0;
-                };
+        Callable<Object> task = () -> {
+            runTests(args[0].split(" "));
+            return 0;
+        };
         Future<Object> future = executor.submit(task);
         try {
             executor.shutdown();

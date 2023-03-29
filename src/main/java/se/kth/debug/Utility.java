@@ -25,8 +25,7 @@ public class Utility {
     public static String getClasspathForRunningJUnit(String[] providedClasspath) {
         Set<String> classpathCollection = new LinkedHashSet<>();
 
-        String[] pathElements =
-                System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+        String[] pathElements = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
 
         classpathCollection.addAll(verifyAndGetClasspath(pathElements));
         classpathCollection.addAll(verifyAndGetClasspath(providedClasspath));
@@ -69,14 +68,12 @@ public class Utility {
      * @throws ClassNotFoundException thrown when JaCoCo is not provided as a test dependency
      */
     public static File getJaCoCoJavaagentJar() throws ClassNotFoundException {
-        String[] pathElements =
-                System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+        String[] pathElements = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
         String jarPattern = "org\\.jacoco\\.agent-\\d\\.\\d\\.\\d-runtime\\.jar";
-        Optional<File> jaCoCoCandidate =
-                Arrays.stream(pathElements)
-                        .map(File::new)
-                        .filter(f -> f.getName().matches(jarPattern))
-                        .findFirst();
+        Optional<File> jaCoCoCandidate = Arrays.stream(pathElements)
+                .map(File::new)
+                .filter(f -> f.getName().matches(jarPattern))
+                .findFirst();
 
         if (jaCoCoCandidate.isPresent()) {
             return jaCoCoCandidate.get();

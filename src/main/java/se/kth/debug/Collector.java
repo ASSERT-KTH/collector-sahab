@@ -35,10 +35,7 @@ public class Collector implements Callable<Integer> {
     @CommandLine.Option(names = "-o", description = "Path to output file (JSON)", required = true)
     private String collectedOutput;
 
-    @CommandLine.Option(
-            names = "-i",
-            description = "File containing class names and breakpoints",
-            required = true)
+    @CommandLine.Option(names = "-i", description = "File containing class names and breakpoints", required = true)
     private File classesAndBreakpoints = null;
 
     @CommandLine.Option(names = "-m", description = "File containing method names")
@@ -46,14 +43,12 @@ public class Collector implements Callable<Integer> {
 
     @CommandLine.Option(
             names = "--stack-trace-depth",
-            description =
-                    "The depth of stack trace the data needs to be collected from (default: ${DEFAULT-VALUE}).")
+            description = "The depth of stack trace the data needs to be collected from (default: ${DEFAULT-VALUE}).")
     private int stackTraceDepth = 1;
 
     @CommandLine.Option(
             names = "--number-of-array-elements",
-            description =
-                    "Number of elements that need to be printed inside an array (default: ${DEFAULT-VALUE}).")
+            description = "Number of elements that need to be printed inside an array (default: ${DEFAULT-VALUE}).")
     private int numberOfArrayElements = 10;
 
     @CommandLine.Option(
@@ -84,12 +79,7 @@ public class Collector implements Callable<Integer> {
     public Integer call() throws IOException, AbsentInformationException {
         CollectorOptions context = getCollectorOptions();
         EventProcessor eventProcessor =
-                invoke(
-                        providedClasspath,
-                        tests,
-                        classesAndBreakpoints,
-                        methodsForExitEvent,
-                        context);
+                invoke(providedClasspath, tests, classesAndBreakpoints, methodsForExitEvent, context);
         write(eventProcessor);
         return 0;
     }
@@ -102,18 +92,14 @@ public class Collector implements Callable<Integer> {
             CollectorOptions context)
             throws AbsentInformationException {
         EventProcessor eventProcessor =
-                new EventProcessor(
-                        providedClasspath, tests, classesAndBreakpoints, methodsForExitEvent);
+                new EventProcessor(providedClasspath, tests, classesAndBreakpoints, methodsForExitEvent);
         eventProcessor.startEventProcessor(context);
 
         return eventProcessor;
     }
 
     public static EventProcessor invoke(
-            String[] providedClasspath,
-            String[] tests,
-            File classesAndBreakpoints,
-            CollectorOptions context)
+            String[] providedClasspath, String[] tests, File classesAndBreakpoints, CollectorOptions context)
             throws AbsentInformationException {
         return invoke(providedClasspath, tests, classesAndBreakpoints, null, context);
     }
@@ -131,12 +117,11 @@ public class Collector implements Callable<Integer> {
     }
 
     public void write(EventProcessor eventProcessor) throws IOException {
-        final Gson gson =
-                new GsonBuilder()
-                        .setPrettyPrinting()
-                        .serializeNulls()
-                        .registerTypeAdapter(ArrayList.class, new SpecialFloatingValueAdapter())
-                        .create();
+        final Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .serializeNulls()
+                .registerTypeAdapter(ArrayList.class, new SpecialFloatingValueAdapter())
+                .create();
 
         File file = new File(collectedOutput);
         if (file.getParentFile() != null) {
@@ -165,8 +150,7 @@ public class Collector implements Callable<Integer> {
         }
 
         if (skipReturnValues) {
-            logger.info(
-                    "Return data was not asked for. Please provide method names if you desire otherwise.");
+            logger.info("Return data was not asked for. Please provide method names if you desire otherwise.");
         } else if (!eventProcessor.getReturnValues().isEmpty()) {
             writer.name("return");
             writer.beginArray();

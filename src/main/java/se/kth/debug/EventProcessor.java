@@ -24,17 +24,12 @@ public class EventProcessor {
     private final List<ReturnData> returnValues = new ArrayList<>();
     private final Debugger debugger;
 
-    EventProcessor(
-            String[] providedClasspath,
-            String[] tests,
-            File classesAndBreakpoints,
-            File methodsForExitEvent) {
-        debugger =
-                new Debugger(
-                        providedClasspath,
-                        tests,
-                        parseFileAndBreakpoints(classesAndBreakpoints),
-                        parseMethodsForExitEvent(methodsForExitEvent));
+    EventProcessor(String[] providedClasspath, String[] tests, File classesAndBreakpoints, File methodsForExitEvent) {
+        debugger = new Debugger(
+                providedClasspath,
+                tests,
+                parseFileAndBreakpoints(classesAndBreakpoints),
+                parseMethodsForExitEvent(methodsForExitEvent));
     }
 
     /** Monitor events triggered by JDB. */
@@ -58,16 +53,13 @@ public class EventProcessor {
                         }
                     }
                     if (event instanceof BreakpointEvent) {
-                        List<StackFrameContext> result =
-                                debugger.processBreakpoints((BreakpointEvent) event, context);
+                        List<StackFrameContext> result = debugger.processBreakpoints((BreakpointEvent) event, context);
                         Location location = ((BreakpointEvent) event).location();
                         breakpointContexts.add(
-                                new BreakPointContext(
-                                        location.sourcePath(), location.lineNumber(), result));
+                                new BreakPointContext(location.sourcePath(), location.lineNumber(), result));
                     }
                     if (event instanceof MethodExitEvent) {
-                        ReturnData rd =
-                                debugger.processMethodExit((MethodExitEvent) event, context);
+                        ReturnData rd = debugger.processMethodExit((MethodExitEvent) event, context);
                         if (rd != null) {
                             returnValues.add(rd);
                         }

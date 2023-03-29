@@ -41,14 +41,13 @@ public class Debugger {
         try {
             String classpath = Utility.getClasspathForRunningJUnit(pathToBuiltProject);
             String testsSeparatedBySpace = Utility.parseTests(tests);
-            ProcessBuilder processBuilder =
-                    new ProcessBuilder(
-                            "java",
-                            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y",
-                            "-cp",
-                            classpath,
-                            JUnitTestRunner.class.getCanonicalName(),
-                            testsSeparatedBySpace);
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "java",
+                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y",
+                    "-cp",
+                    classpath,
+                    JUnitTestRunner.class.getCanonicalName(),
+                    testsSeparatedBySpace);
             logger.log(
                     Level.INFO,
                     "java -cp "
@@ -71,13 +70,11 @@ public class Debugger {
             final VirtualMachine vm = new VMAcquirer().connect(port);
             logger.log(Level.INFO, "Connected to port: " + port);
             // kill process when the program exit
-            Runtime.getRuntime()
-                    .addShutdownHook(
-                            new Thread() {
-                                public void run() {
-                                    shutdown(vm);
-                                }
-                            });
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                public void run() {
+                    shutdown(vm);
+                }
+            });
             return vm;
         } catch (MalformedURLException e) {
             logger.log(Level.SEVERE, "Wrong URL: " + e.toString());
@@ -115,16 +112,14 @@ public class Debugger {
         return classesFromRegisteringClassPrepareRequest;
     }
 
-    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent event)
-            throws AbsentInformationException {
+    public void setBreakpoints(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
         EventRequestManager erm = vm.eventRequestManager();
 
-        List<Integer> breakpoints =
-                classesAndBreakpoints.stream()
-                        .filter(cb -> cb.getFileName().equals(event.referenceType().name()))
-                        .findFirst()
-                        .get()
-                        .getBreakpoints();
+        List<Integer> breakpoints = classesAndBreakpoints.stream()
+                .filter(cb -> cb.getFileName().equals(event.referenceType().name()))
+                .findFirst()
+                .get()
+                .getBreakpoints();
 
         for (int lineNumber : breakpoints) {
             try {
@@ -132,10 +127,9 @@ public class Debugger {
                 BreakpointRequest br = erm.createBreakpointRequest(locations.get(0));
                 br.setEnabled(true);
             } catch (IndexOutOfBoundsException exception) {
-                logger.warning(
-                        String.format(
-                                "%d is not a valid breakpoint in %s",
-                                lineNumber, event.referenceType().name()));
+                logger.warning(String.format(
+                        "%d is not a valid breakpoint in %s",
+                        lineNumber, event.referenceType().name()));
             }
         }
     }
@@ -154,20 +148,16 @@ public class Debugger {
         int framesToBeProcessed = context.getStackTraceDepth();
         if (context.getStackTraceDepth() > threadReference.frameCount()) {
             framesToBeProcessed = threadReference.frameCount();
-            logger.warning(
-                    String.format(
-                            "Stack trace depth cannot be larger than actual. Processing %d frames instead.",
-                            framesToBeProcessed));
+            logger.warning(String.format(
+                    "Stack trace depth cannot be larger than actual. Processing %d frames instead.",
+                    framesToBeProcessed));
         }
 
         List<StackFrameContext> stackFrameContexts = new ArrayList<>();
         for (int i = 0; i < framesToBeProcessed; ++i) {
             StackFrame stackFrame = threadReference.frame(i);
             StackFrameContext stackFrameContext =
-                    new StackFrameContext(
-                            i + 1,
-                            stackFrame.location().toString(),
-                            computeStackTrace(threadReference));
+                    new StackFrameContext(i + 1, stackFrame.location().toString(), computeStackTrace(threadReference));
             try {
                 List<LocalVariableData> localVariables = collectLocalVariable(stackFrame, context);
                 stackFrameContext.addRuntimeValueCollection(localVariables);
@@ -183,27 +173,25 @@ public class Debugger {
                     throw new AbsentInformationException(
                             "The files corresponding to provided breakpoints are not compiled with debugging information.");
                 }
-                logger.warning(
-                        "Information does not exist for " + stackFrame + " and frames later on");
+                logger.warning("Information does not exist for " + stackFrame + " and frames later on");
                 return stackFrameContexts;
             }
         }
         return stackFrameContexts;
     }
 
-    private List<String> computeStackTrace(ThreadReference threadReference)
-            throws IncompatibleThreadStateException {
+    private List<String> computeStackTrace(ThreadReference threadReference) throws IncompatibleThreadStateException {
         List<String> result = new ArrayList<>();
-        List<String> excludedPackages =
-                List.of("java.lang", "java.util", "org.junit", "junit", "jdk", "se.kth.debug");
+        List<String> excludedPackages = List.of("java.lang", "java.util", "org.junit", "junit", "jdk", "se.kth.debug");
         for (StackFrame stackFrame : threadReference.frames()) {
             Location location = stackFrame.location();
             String declaringTypeName = location.declaringType().name();
-            if (excludedPackages.stream().filter(declaringTypeName::contains).findAny().isEmpty()) {
+            if (excludedPackages.stream()
+                    .filter(declaringTypeName::contains)
+                    .findAny()
+                    .isEmpty()) {
                 String output =
-                        String.format(
-                                "%s:%d, %s",
-                                location.method().name(), location.lineNumber(), declaringTypeName);
+                        String.format("%s:%d, %s", location.method().name(), location.lineNumber(), declaringTypeName);
                 result.add(output);
             }
         }
@@ -214,36 +202,30 @@ public class Debugger {
             throws IncompatibleThreadStateException, AbsentInformationException {
         String methodName = mee.method().name();
         if (!isReturnWithinBreakpoints(
-                        mee.location().lineNumber(), mee.method().declaringType().name())
+                        mee.location().lineNumber(),
+                        mee.method().declaringType().name())
                 && !isMethodExplicitlyAskedFor(mee.method())) {
             return null;
         }
         String location = mee.location().toString();
         List<LocalVariable> arguments = mee.method().arguments();
 
-        ReturnData returnData =
-                new ReturnData(
-                        methodName,
-                        mee.method().returnTypeName(),
-                        computeReadableValue(mee.returnValue(), context),
-                        location,
-                        // the method will be in the 0th stack frame when the method exit event is
-                        // triggered
-                        collectArguments(mee.thread().frame(0), arguments, context),
-                        computeStackTrace(mee.thread()));
+        ReturnData returnData = new ReturnData(
+                methodName,
+                mee.method().returnTypeName(),
+                computeReadableValue(mee.returnValue(), context),
+                location,
+                // the method will be in the 0th stack frame when the method exit event is
+                // triggered
+                collectArguments(mee.thread().frame(0), arguments, context),
+                computeStackTrace(mee.thread()));
         if (isAnObjectReference(mee.returnValue())) {
             returnData.setFields(
-                    getNestedFields(
-                            (ObjectReference) mee.returnValue(),
-                            context.getExecutionDepth(),
-                            context));
+                    getNestedFields((ObjectReference) mee.returnValue(), context.getExecutionDepth(), context));
         }
         if (mee.returnValue() instanceof ArrayReference) {
             returnData.setArrayElements(
-                    getNestedElements(
-                            (ArrayReference) mee.returnValue(),
-                            context.getExecutionDepth(),
-                            context));
+                    getNestedElements((ArrayReference) mee.returnValue(), context.getExecutionDepth(), context));
         }
         return returnData;
     }
@@ -275,8 +257,8 @@ public class Debugger {
         return parseVariable(stackFrame, arguments, context);
     }
 
-    private List<LocalVariableData> collectLocalVariable(
-            StackFrame stackFrame, CollectorOptions context) throws AbsentInformationException {
+    private List<LocalVariableData> collectLocalVariable(StackFrame stackFrame, CollectorOptions context)
+            throws AbsentInformationException {
         return parseVariable(stackFrame, stackFrame.visibleVariables(), context);
     }
 
@@ -289,8 +271,7 @@ public class Debugger {
         return getReadableValue(value);
     }
 
-    private static List<Object> getReadableValueOfArray(
-            ArrayReference array, CollectorOptions context) {
+    private static List<Object> getReadableValueOfArray(ArrayReference array, CollectorOptions context) {
         return array.getValues().stream()
                 .filter(Objects::nonNull)
                 .limit(context.getNumberOfArrayElements())
@@ -337,20 +318,15 @@ public class Debugger {
         for (LocalVariable variable : variables) {
             Value value = stackFrame.getValue(variable);
             LocalVariableData localVariableData =
-                    new LocalVariableData(
-                            variable.name(),
-                            variable.typeName(),
-                            computeReadableValue(value, context));
+                    new LocalVariableData(variable.name(), variable.typeName(), computeReadableValue(value, context));
             result.add(localVariableData);
             if (isAnObjectReference(value)) {
                 localVariableData.setFields(
-                        getNestedFields(
-                                (ObjectReference) value, context.getExecutionDepth(), context));
+                        getNestedFields((ObjectReference) value, context.getExecutionDepth(), context));
             }
             if (value instanceof ArrayReference) {
                 localVariableData.setArrayElements(
-                        getNestedElements(
-                                (ArrayReference) value, context.getExecutionDepth(), context));
+                        getNestedElements((ArrayReference) value, context.getExecutionDepth(), context));
             }
         }
         return result;
@@ -372,18 +348,13 @@ public class Debugger {
             } else {
                 value = stackFrame.thisObject().getValue(field);
             }
-            FieldData fieldData =
-                    new FieldData(
-                            field.name(), field.typeName(), computeReadableValue(value, context));
+            FieldData fieldData = new FieldData(field.name(), field.typeName(), computeReadableValue(value, context));
             if (isAnObjectReference(value)) {
-                fieldData.setFields(
-                        getNestedFields(
-                                (ObjectReference) value, context.getExecutionDepth(), context));
+                fieldData.setFields(getNestedFields((ObjectReference) value, context.getExecutionDepth(), context));
             }
             if (value instanceof ArrayReference) {
                 fieldData.setArrayElements(
-                        getNestedElements(
-                                (ArrayReference) value, context.getExecutionDepth(), context));
+                        getNestedElements((ArrayReference) value, context.getExecutionDepth(), context));
             }
             result.add(fieldData);
         }
@@ -396,31 +367,23 @@ public class Debugger {
             return null;
         }
         List<ArrayElement> result = new ArrayList<>();
-        List<Value> neededValues =
-                array.getValues().stream()
-                        .filter(Objects::nonNull)
-                        .limit(context.getNumberOfArrayElements())
-                        .collect(Collectors.toList());
+        List<Value> neededValues = array.getValues().stream()
+                .filter(Objects::nonNull)
+                .limit(context.getNumberOfArrayElements())
+                .collect(Collectors.toList());
         for (Value nestedValue : neededValues) {
             if (nestedValue instanceof ArrayReference) {
-                ArrayElement arrayElement =
-                        new ArrayElement(
-                                nestedValue.type().name(),
-                                getReadableValueOfArray((ArrayReference) nestedValue, context));
+                ArrayElement arrayElement = new ArrayElement(
+                        nestedValue.type().name(), getReadableValueOfArray((ArrayReference) nestedValue, context));
                 result.add(arrayElement);
                 arrayElement.setArrayElements(
-                        getNestedElements(
-                                (ArrayReference) nestedValue, executionDepth - 1, context));
+                        getNestedElements((ArrayReference) nestedValue, executionDepth - 1, context));
             } else if (isAnObjectReference(nestedValue)) {
-                ArrayElement arrayElement =
-                        new ArrayElement(nestedValue.type().name(), getReadableValue(nestedValue));
+                ArrayElement arrayElement = new ArrayElement(nestedValue.type().name(), getReadableValue(nestedValue));
                 result.add(arrayElement);
-                arrayElement.setFields(
-                        getNestedFields(
-                                (ObjectReference) nestedValue, executionDepth - 1, context));
+                arrayElement.setFields(getNestedFields((ObjectReference) nestedValue, executionDepth - 1, context));
             } else {
-                ArrayElement arrayElement =
-                        new ArrayElement(nestedValue.type().name(), getReadableValue(nestedValue));
+                ArrayElement arrayElement = new ArrayElement(nestedValue.type().name(), getReadableValue(nestedValue));
                 result.add(arrayElement);
             }
         }
@@ -437,17 +400,13 @@ public class Debugger {
         for (Field field : fields) {
             Value value = object.getValue(field);
 
-            FieldData fieldData =
-                    new FieldData(
-                            field.name(), field.typeName(), computeReadableValue(value, context));
+            FieldData fieldData = new FieldData(field.name(), field.typeName(), computeReadableValue(value, context));
             result.add(fieldData);
             if (isAnObjectReference(value)) {
-                fieldData.setFields(
-                        getNestedFields((ObjectReference) value, executionDepth - 1, context));
+                fieldData.setFields(getNestedFields((ObjectReference) value, executionDepth - 1, context));
             }
             if (value instanceof ArrayReference) {
-                fieldData.setArrayElements(
-                        getNestedElements((ArrayReference) value, executionDepth - 1, context));
+                fieldData.setArrayElements(getNestedElements((ArrayReference) value, executionDepth - 1, context));
             }
         }
         return result;
@@ -458,17 +417,16 @@ public class Debugger {
         // how the object
         // will be printed. Since void does not have any value, we do not need to determine how its
         // printing will be handled.
-        List<Class<?>> included =
-                List.of(
-                        String.class,
-                        Integer.class,
-                        Long.class,
-                        Double.class,
-                        Float.class,
-                        Boolean.class,
-                        Character.class,
-                        Byte.class,
-                        Short.class);
+        List<Class<?>> included = List.of(
+                String.class,
+                Integer.class,
+                Long.class,
+                Double.class,
+                Float.class,
+                Boolean.class,
+                Character.class,
+                Byte.class,
+                Short.class);
         try {
             return included.contains(Class.forName(value.type().name()));
         } catch (ClassNotFoundException exception) {

@@ -61,8 +61,7 @@ public class Classes {
                         int indexOfFirstBracket = className.indexOf('[');
                         int dimensions = (className.length() - indexOfFirstBracket) / 2;
                         return getArrayClass(
-                                getClassFromString(className.substring(0, indexOfFirstBracket)),
-                                dimensions);
+                                getClassFromString(className.substring(0, indexOfFirstBracket)), dimensions);
                     }
                     return Class.forName(className);
                 } catch (ClassNotFoundException e) {

@@ -13,28 +13,23 @@ import se.kth.debug.Utility;
 
 public class UtilityTest {
     @Test
-    void getClasspathForRunningJUnit_providedClasspathIsAppendedToSystemClasspath(
-            @TempDir Path tempDir) throws IOException {
+    void getClasspathForRunningJUnit_providedClasspathIsAppendedToSystemClasspath(@TempDir Path tempDir)
+            throws IOException {
         Path pathToDebuggerExecutable = Files.createFile(tempDir.resolve("debugger.jar"));
         Path pathToProjectClasspath = Files.createFile(tempDir.resolve("classpath.txt"));
         Path pathToProjectClasses = Files.createDirectories(tempDir.resolve("target/classes"));
 
-        String actualClasspath =
-                Utility.getClasspathForRunningJUnit(
-                        new String[] {
-                            pathToDebuggerExecutable.toString(),
-                            pathToProjectClasspath.toString(),
-                            pathToProjectClasses.toString()
-                        });
+        String actualClasspath = Utility.getClasspathForRunningJUnit(new String[] {
+            pathToDebuggerExecutable.toString(), pathToProjectClasspath.toString(), pathToProjectClasses.toString()
+        });
 
-        String expectedClasspath =
-                String.format(
-                        "%s%s%s%s%s",
-                        pathToDebuggerExecutable.toAbsolutePath(),
-                        File.pathSeparator,
-                        pathToProjectClasspath.toAbsolutePath(),
-                        File.pathSeparator,
-                        pathToProjectClasses.toAbsolutePath());
+        String expectedClasspath = String.format(
+                "%s%s%s%s%s",
+                pathToDebuggerExecutable.toAbsolutePath(),
+                File.pathSeparator,
+                pathToProjectClasspath.toAbsolutePath(),
+                File.pathSeparator,
+                pathToProjectClasses.toAbsolutePath());
 
         assertThat(
                 Arrays.asList(actualClasspath.split(File.pathSeparator)),

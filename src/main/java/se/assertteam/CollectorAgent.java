@@ -65,31 +65,20 @@ public class CollectorAgent {
                     }
                 },
                 true);
-        Runtime.getRuntime()
-                .addShutdownHook(
-                        new Thread(
-                                () -> {
-                                    try {
-                                        new ObjectMapper()
-                                                .writer(
-                                                        new DefaultPrettyPrinter()
-                                                                .withArrayIndenter(
-                                                                        new DefaultIndenter(
-                                                                                "  ", "\n")))
-                                                .writeValue(
-                                                        options.getOutput(),
-                                                        ContextCollector.getSahabOutput());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                new ObjectMapper()
+                        .writer(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter("  ", "\n")))
+                        .writeValue(options.getOutput(), ContextCollector.getSahabOutput());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     private static List<String> getClassesAllowed() {
         List<FileAndBreakpoint> fileAndBreakpoints = options.getClassesAndBreakpoints();
-        return fileAndBreakpoints.stream()
-                .map(FileAndBreakpoint::getFileName)
-                .collect(Collectors.toList());
+        return fileAndBreakpoints.stream().map(FileAndBreakpoint::getFileName).collect(Collectors.toList());
     }
 
     private static List<Integer> getBreakpointsAllowed(String className) {
@@ -102,8 +91,7 @@ public class CollectorAgent {
         return new ArrayList<>();
     }
 
-    private static byte[] getBytes(
-            String className, byte[] classfileBuffer, List<String> classesAllowed)
+    private static byte[] getBytes(String className, byte[] classfileBuffer, List<String> classesAllowed)
             throws NoSuchMethodException {
         if (!classesAllowed.contains(className)) {
             return classfileBuffer;
@@ -131,14 +119,9 @@ public class CollectorAgent {
                         continue;
                     }
                     StackManipulation callLineLog =
-                            getCallToLineLogMethod(
-                                    className, method, liveVariables, (LineNumberNode) instruction);
-                    currentNode =
-                            ByteBuddyHelper.applyStackManipulation(
-                                    method,
-                                    currentNode,
-                                    callLineLog,
-                                    ByteBuddyHelper.InsertPosition.AFTER);
+                            getCallToLineLogMethod(className, method, liveVariables, (LineNumberNode) instruction);
+                    currentNode = ByteBuddyHelper.applyStackManipulation(
+                            method, currentNode, callLineLog, ByteBuddyHelper.InsertPosition.AFTER);
                 }
             }
         }
@@ -148,10 +131,7 @@ public class CollectorAgent {
     }
 
     private static StackManipulation getCallToLineLogMethod(
-            String className,
-            MethodNode method,
-            List<LocalVariableNode> liveVariables,
-            LineNumberNode node)
+            String className, MethodNode method, List<LocalVariableNode> liveVariables, LineNumberNode node)
             throws NoSuchMethodException {
         List<StackManipulation> manipulations = new ArrayList<>();
 
@@ -181,53 +161,38 @@ public class CollectorAgent {
         }
         //    LocalVariable[] localVariables
         manipulations.add(
-                ArrayFactory.forType(
-                                TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(
-                                        LocalVariable.class))
+                ArrayFactory.forType(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(LocalVariable.class))
                         .withValues(values));
         //    Class<?> receiverClass
         manipulations.add(new TextConstant(className.replace('/', '.')));
         //  );
 
         manipulations.add(
-                MethodInvocation.invoke(
-                        new MethodDescription.ForLoadedMethod(
-                                ContextCollector.class.getMethod(
-                                        "logLine",
-                                        String.class,
-                                        int.class,
-                                        Object.class,
-                                        LocalVariable[].class,
-                                        String.class))));
+                MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
+                        "logLine", String.class, int.class, Object.class, LocalVariable[].class, String.class))));
 
         return new StackManipulation.Compound(manipulations);
     }
 
-    private static StackManipulation.Compound createLocalVariable(
-            String name, int readIndex, Class<?> type) throws NoSuchMethodException {
-        return new StackManipulation.Compound(
-                List.of(
-                        // new LocalVariable(
-                        TypeCreation.of(TypeDescription.ForLoadedType.of(LocalVariable.class)),
-                        Duplication.of(TypeDescription.ForLoadedType.of(LocalVariable.class)),
-                        //   String name
-                        new TextConstant(name),
-                        // , Class<?> type
-                        ClassConstant.of(TypeDescription.ForLoadedType.of(type)),
-                        // , Object value
-                        MethodVariableAccess.of(
-                                        TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(
-                                                type))
-                                .loadFrom(readIndex),
-                        Assigner.GENERICS_AWARE.assign(
-                                TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type),
-                                TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(
-                                        Object.class),
-                                Assigner.Typing.STATIC),
-                        // );
-                        MethodInvocation.invoke(
-                                new MethodDescription.ForLoadedConstructor(
-                                        LocalVariable.class.getConstructor(
-                                                String.class, Class.class, Object.class)))));
+    private static StackManipulation.Compound createLocalVariable(String name, int readIndex, Class<?> type)
+            throws NoSuchMethodException {
+        return new StackManipulation.Compound(List.of(
+                // new LocalVariable(
+                TypeCreation.of(TypeDescription.ForLoadedType.of(LocalVariable.class)),
+                Duplication.of(TypeDescription.ForLoadedType.of(LocalVariable.class)),
+                //   String name
+                new TextConstant(name),
+                // , Class<?> type
+                ClassConstant.of(TypeDescription.ForLoadedType.of(type)),
+                // , Object value
+                MethodVariableAccess.of(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type))
+                        .loadFrom(readIndex),
+                Assigner.GENERICS_AWARE.assign(
+                        TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type),
+                        TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(Object.class),
+                        Assigner.Typing.STATIC),
+                // );
+                MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(
+                        LocalVariable.class.getConstructor(String.class, Class.class, Object.class)))));
     }
 }

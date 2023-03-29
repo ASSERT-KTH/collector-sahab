@@ -15,14 +15,13 @@ import org.objectweb.asm.tree.MethodNode;
 
 public class ByteBuddyHelper {
 
-    private static final ExtractableView BYTE_BUDDY_CONTEXT =
-            Factory.INSTANCE.make(
-                    TargetType.DESCRIPTION,
-                    new Enumerating("F"),
-                    None.INSTANCE,
-                    ClassFileVersion.JAVA_V17,
-                    ClassFileVersion.JAVA_V17,
-                    FrameGeneration.DISABLED);
+    private static final ExtractableView BYTE_BUDDY_CONTEXT = Factory.INSTANCE.make(
+            TargetType.DESCRIPTION,
+            new Enumerating("F"),
+            None.INSTANCE,
+            ClassFileVersion.JAVA_V17,
+            ClassFileVersion.JAVA_V17,
+            FrameGeneration.DISABLED);
 
     /**
      * Applies a stack manipulation and adds the resulting instructions.

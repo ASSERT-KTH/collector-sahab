@@ -28,11 +28,7 @@ public class ObjectIntrospection {
 
     public RuntimeValue introspect(LocalVariable variable) throws IllegalAccessException {
         return introspect(
-                RuntimeValue.Kind.LOCAL_VARIABLE,
-                variable.getName(),
-                variable.getType(),
-                variable.getValue(),
-                0);
+                RuntimeValue.Kind.LOCAL_VARIABLE, variable.getName(), variable.getType(), variable.getValue(), 0);
     }
 
     public List<RuntimeValue> introspectReceiver(Object receiver, Class<?> receiverClass)
@@ -66,18 +62,15 @@ public class ObjectIntrospection {
                 location);
     }
 
-    private RuntimeValue introspect(
-            RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth)
+    private RuntimeValue introspect(RuntimeValue.Kind kind, String name, Class<?> type, Object object, int depth)
             throws IllegalAccessException {
         if (depth <= executionDepth) {
             List<RuntimeValue> fields = introspectFields(object, depth, type);
             List<RuntimeValue> arrayElements = introspectArrayValues(object, depth);
 
-            return new RuntimeValue(
-                    kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
+            return new RuntimeValue(kind, name, type, getJSONCompatibleValue(object), fields, arrayElements);
         }
-        return new RuntimeValue(
-                kind, name, type, getJSONCompatibleValue(object), List.of(), List.of());
+        return new RuntimeValue(kind, name, type, getJSONCompatibleValue(object), List.of(), List.of());
     }
 
     private static Object getJSONCompatibleValue(Object object) {
@@ -126,19 +119,13 @@ public class ObjectIntrospection {
             if (!field.trySetAccessible()) {
                 throw new AssertionError("Could not crack type " + field.getDeclaringClass());
             }
-            fields.add(
-                    introspect(
-                            RuntimeValue.Kind.FIELD,
-                            field.getName(),
-                            field.getType(),
-                            field.get(object),
-                            depth + 1));
+            fields.add(introspect(
+                    RuntimeValue.Kind.FIELD, field.getName(), field.getType(), field.get(object), depth + 1));
         }
         return fields;
     }
 
-    private List<RuntimeValue> introspectArrayValues(Object array, int depth)
-            throws IllegalAccessException {
+    private List<RuntimeValue> introspectArrayValues(Object array, int depth) throws IllegalAccessException {
         if (array == null || !array.getClass().isArray()) {
             return List.of();
         }
@@ -148,22 +135,16 @@ public class ObjectIntrospection {
 
         for (int i = 0; i < Array.getLength(array) && i < 20; i++) {
             if (isBasicallyPrimitive(componentType)) {
-                arrayElements.add(
-                        new RuntimeValue(
-                                RuntimeValue.Kind.ARRAY_ELEMENT,
-                                null,
-                                componentType,
-                                Array.get(array, i),
-                                List.of(),
-                                List.of()));
+                arrayElements.add(new RuntimeValue(
+                        RuntimeValue.Kind.ARRAY_ELEMENT,
+                        null,
+                        componentType,
+                        Array.get(array, i),
+                        List.of(),
+                        List.of()));
             } else {
-                arrayElements.add(
-                        introspect(
-                                RuntimeValue.Kind.ARRAY_ELEMENT,
-                                null,
-                                componentType,
-                                Array.get(array, i),
-                                depth + 1));
+                arrayElements.add(introspect(
+                        RuntimeValue.Kind.ARRAY_ELEMENT, null, componentType, Array.get(array, i), depth + 1));
             }
         }
 

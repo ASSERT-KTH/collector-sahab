@@ -10,8 +10,7 @@ public class StackFrameContext {
 
     private List<RuntimeValue> runtimeValueCollection = new ArrayList<>();
 
-    public StackFrameContext(
-            int positionFromTopInStackTrace, String location, List<String> stackTrace) {
+    public StackFrameContext(int positionFromTopInStackTrace, String location, List<String> stackTrace) {
         this.positionFromTopInStackTrace = positionFromTopInStackTrace;
         this.location = location;
         this.stackTrace = stackTrace;

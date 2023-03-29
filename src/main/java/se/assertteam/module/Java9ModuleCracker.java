@@ -26,16 +26,10 @@ public class Java9ModuleCracker implements ModuleCracker {
             return;
         }
 
-        Map<String, Set<Module>> toOpen =
-                module.getPackages().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        it -> it,
-                                        it ->
-                                                Set.of(
-                                                        CollectorAgent.class
-                                                                .getClassLoader()
-                                                                .getUnnamedModule())));
+        Map<String, Set<Module>> toOpen = module.getPackages().stream()
+                .collect(Collectors.toMap(
+                        it -> it,
+                        it -> Set.of(CollectorAgent.class.getClassLoader().getUnnamedModule())));
         instrumentation.redefineModule(module, Set.of(), Map.of(), toOpen, Set.of(), Map.of());
     }
 }

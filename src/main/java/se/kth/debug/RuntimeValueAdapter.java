@@ -9,8 +9,7 @@ import se.kth.debug.struct.result.RuntimeValue;
 public class RuntimeValueAdapter implements JsonSerializer<RuntimeValue> {
 
     @Override
-    public JsonElement serialize(
-            RuntimeValue runtimeValue, Type type, JsonSerializationContext context) {
+    public JsonElement serialize(RuntimeValue runtimeValue, Type type, JsonSerializationContext context) {
         if (runtimeValue == null) {
             return JsonNull.INSTANCE;
         }
@@ -23,9 +22,7 @@ public class RuntimeValueAdapter implements JsonSerializer<RuntimeValue> {
                 if (fieldValue != null && fieldValue.getClass().isAssignableFrom(ArrayList.class)) {
                     object.add(field.getName(), context.serialize(fieldValue));
                 } else {
-                    object.add(
-                            field.getName(),
-                            context.serialize(Utility.escapeSpecialFloatingValues(fieldValue)));
+                    object.add(field.getName(), context.serialize(Utility.escapeSpecialFloatingValues(fieldValue)));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);

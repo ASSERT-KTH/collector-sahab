@@ -7,8 +7,7 @@ public class BreakPointContext {
     private final int lineNumber;
     private final List<StackFrameContext> stackFrameContexts;
 
-    public BreakPointContext(
-            String file, int lineNumber, List<StackFrameContext> stackFrameContexts) {
+    public BreakPointContext(String file, int lineNumber, List<StackFrameContext> stackFrameContexts) {
         this.file = file;
         this.lineNumber = lineNumber;
         this.stackFrameContexts = stackFrameContexts;

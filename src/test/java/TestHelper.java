@@ -10,13 +10,11 @@ import java.util.stream.Collectors;
 import se.kth.debug.CollectorOptions;
 
 public class TestHelper {
-    public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT =
-            Paths.get("src/test/resources/sample-maven-project");
+    public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT = Paths.get("src/test/resources/sample-maven-project");
     private static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES =
             PATH_TO_SAMPLE_MAVEN_PROJECT.resolve("src").resolve("test").resolve("resources");
 
-    public static final Path PATH_TO_INPUT =
-            PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("inputs");
+    public static final Path PATH_TO_INPUT = PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("inputs");
 
     public static final Path PATH_TO_EXPECTED_OUTPUT =
             PATH_TO_SAMPLE_MAVEN_PROJECT_RESOURCES.resolve("expected-outputs");
@@ -24,20 +22,16 @@ public class TestHelper {
     public static final Path PATH_TO_SAMPLE_MAVEN_PROJECT_WITHOUT_DEBUG_INFO =
             Paths.get("src/test/resources/sample-maven-project-cannot-be-debugged");
 
-    public static String[] getMavenClasspathFromBuildDirectory(Path buildDirectory)
-            throws FileNotFoundException {
+    public static String[] getMavenClasspathFromBuildDirectory(Path buildDirectory) throws FileNotFoundException {
         if (!Files.exists(buildDirectory)) {
             throw new FileNotFoundException(buildDirectory + " does not exist");
         }
-        List<String> classpath =
-                new ArrayList<>(
-                        List.of(
-                                buildDirectory.resolve("classes").toString(),
-                                buildDirectory.resolve("test-classes").toString()));
+        List<String> classpath = new ArrayList<>(List.of(
+                buildDirectory.resolve("classes").toString(),
+                buildDirectory.resolve("test-classes").toString()));
         try {
             String additionalClasspath = Files.readString(buildDirectory.resolve("cp.txt"));
-            classpath.addAll(
-                    Arrays.stream(additionalClasspath.split(":")).collect(Collectors.toList()));
+            classpath.addAll(Arrays.stream(additionalClasspath.split(":")).collect(Collectors.toList()));
             return classpath.toArray(new String[] {});
         } catch (IOException e) {
             throw new RuntimeException("Classpath of " + buildDirectory + " could not be read.");
