@@ -1,8 +1,18 @@
 package se.assertteam;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import static se.assertteam.Classes.className;
+import static se.assertteam.Classes.isBasicallyPrimitive;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.IOException;
+import java.util.List;
+import se.assertteam.RuntimeValue.RuntimeValueSerializer;
+
+@JsonSerialize(using = RuntimeValueSerializer.class)
 public class RuntimeValue {
 
     private final Kind kind;
@@ -57,4 +67,40 @@ public class RuntimeValue {
         RETURN,
         ARRAY_ELEMENT,
     }
+
+    static class RuntimeValueSerializer extends JsonSerializer<RuntimeValue> {
+
+        @Override
+        public void serialize(RuntimeValue value, JsonGenerator gen, SerializerProvider serializers)
+            throws IOException {
+            if (value.kind == Kind.ARRAY_ELEMENT && isBasicallyPrimitive(value.type)) {
+                // Value is enough for values in arrays
+                serializers.defaultSerializeValue(simplifyValue(value), gen);
+                return;
+            }
+            gen.writeStartObject();
+            serializers.defaultSerializeField("kind", value.kind, gen);
+            serializers.defaultSerializeField("name", value.name, gen);
+            serializers.defaultSerializeField("type", className(value.type), gen);
+            serializers.defaultSerializeField("value", simplifyValue(value), gen);
+            serializers.defaultSerializeField("fields", value.fields, gen);
+            serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
+            gen.writeEndObject();
+        }
+
+        private static Object simplifyValue(RuntimeValue runtimeValue) {
+            Object value = runtimeValue.value;
+            if (value == null) {
+                return null;
+            }
+            if (isBasicallyPrimitive(value.getClass())) {
+                if (value instanceof Number || value instanceof Boolean) {
+                    return value;
+                }
+                return value.toString();
+            }
+            return className(value.getClass());
+        }
+    }
+
 }

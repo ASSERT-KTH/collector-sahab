@@ -31,10 +31,10 @@ public class ContextCollector {
             throws ReflectiveOperationException {
         List<RuntimeValue> values = new ArrayList<>();
         for (LocalVariable variable : localVariables) {
-            values.add(INTROSPECTOR.introspect(variable));
+            values.add(INTROSPECTOR.introspectVariable(variable));
         }
 
-        values.addAll(INTROSPECTOR.introspectReceiver(receiver, receiverClass));
+        values.addAll(INTROSPECTOR.introspectReceiverFields(receiver, receiverClass));
 
         StackFrameContext stackFrameContext = StackFrameContext.forValues(values);
         LineSnapshot lineSnapshot = new LineSnapshot(className, lineNumber, List.of(stackFrameContext));
@@ -42,19 +42,21 @@ public class ContextCollector {
         SAHAB_OUTPUT.getBreakpoint().add(lineSnapshot);
     }
 
-    public static void logReturn(Object returnValue, String className) {
+    public static void logReturn(Object returnValue, String returnTypeName, String className) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
-            RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
-                    className,
-                    returnValue,
-                    List.of(),
-                    stacktrace.stream()
-                            .map(StackFrameContext::stackFrameToString)
-                            .collect(Collectors.toList()),
-                    StackFrameContext.getLocation(stacktrace),
-                    Class.forName(className));
-
+            RuntimeReturnedValue returned =
+                    INTROSPECTOR.introspectReturnValue(
+                            className,
+                            returnValue,
+                            List.of(),
+                            stacktrace.stream()
+                                    .map(StackFrameContext::stackFrameToString)
+                                    .collect(Collectors.toList()),
+                            StackFrameContext.getLocation(stacktrace),
+                            Class.forName(className),
+                            Class.forName(returnTypeName)
+                    );
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

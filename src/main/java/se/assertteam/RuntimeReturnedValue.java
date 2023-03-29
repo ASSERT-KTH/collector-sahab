@@ -13,13 +13,13 @@ public class RuntimeReturnedValue extends RuntimeValue {
             Kind kind,
             String name,
             Class<?> type,
-            String valueAsString,
+            Object value,
             List<RuntimeValue> fields,
             List<RuntimeValue> arrayElements,
             List<Object> parameters,
             List<String> stackTrace,
             String location) {
-        super(kind, name, type, valueAsString, fields, arrayElements);
+        super(kind, name, type, value, fields, arrayElements);
 
         this.arguments = parameters;
         this.stackTrace = stackTrace;
