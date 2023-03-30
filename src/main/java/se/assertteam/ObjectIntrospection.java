@@ -1,5 +1,7 @@
 package se.assertteam;
 
+import static se.assertteam.Classes.getCanonicalClassName;
+import static se.assertteam.Classes.getType;
 import static se.assertteam.Classes.isBasicallyPrimitive;
 
 import java.lang.reflect.Array;
@@ -34,7 +36,11 @@ public class ObjectIntrospection {
      */
     public RuntimeValue introspectVariable(LocalVariable variable) throws IllegalAccessException {
         return introspectObject(
-                RuntimeValue.Kind.LOCAL_VARIABLE, variable.getName(), variable.getType(), variable.getValue(), 0);
+                RuntimeValue.Kind.LOCAL_VARIABLE,
+                variable.getName(),
+                getType(variable.getValue(), variable.getType()),
+                variable.getValue(),
+                0);
     }
 
     /**
@@ -81,7 +87,7 @@ public class ObjectIntrospection {
         return new RuntimeReturnedValue(
                 RuntimeValue.Kind.RETURN,
                 methodName,
-                returned == null ? returnType : returned.getClass(),
+                Classes.getCanonicalClassName(getType(returned, returnType)),
                 returned,
                 fields,
                 arrayValues,
@@ -111,7 +117,7 @@ public class ObjectIntrospection {
             arrayElements = getArrayValues(object, depth);
         }
 
-        return new RuntimeValue(kind, name, type, object, fields, arrayElements);
+        return new RuntimeValue(kind, name, getCanonicalClassName(type), object, fields, arrayElements);
     }
 
     /**
@@ -157,8 +163,9 @@ public class ObjectIntrospection {
             if (!field.trySetAccessible()) {
                 throw new AssertionError("Could not crack type " + field.getDeclaringClass());
             }
+            Object value = field.get(object);
             fieldValues.add(introspectObject(
-                    RuntimeValue.Kind.FIELD, field.getName(), field.getType(), field.get(object), depth + 1));
+                    RuntimeValue.Kind.FIELD, field.getName(), getType(value, field.getType()), value, depth + 1));
         }
         return fieldValues;
     }
@@ -180,8 +187,9 @@ public class ObjectIntrospection {
         Class<?> componentType = array.getClass().getComponentType();
 
         for (int i = 0; i < Array.getLength(array) && i < 20; i++) {
+            Object value = Array.get(array, i);
             arrayElements.add(introspectObject(
-                    RuntimeValue.Kind.ARRAY_ELEMENT, null, componentType, Array.get(array, i), depth + 1));
+                    RuntimeValue.Kind.ARRAY_ELEMENT, null, getType(value, componentType), value, depth + 1));
         }
 
         return arrayElements;

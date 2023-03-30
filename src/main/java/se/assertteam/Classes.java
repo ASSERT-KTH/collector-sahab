@@ -24,6 +24,13 @@ public class Classes {
         return clazz.isPrimitive() || clazz == String.class || isBoxed(clazz);
     }
 
+    public static Class<?> getType(Object returned, Class<?> returnType) {
+        if (returnType.isPrimitive()) {
+            return returnType;
+        }
+        return returned == null ? returnType : returned.getClass();
+    }
+
     private static boolean isBoxed(Class<?> clazz) {
         return clazz == Byte.class
                 || clazz == Short.class

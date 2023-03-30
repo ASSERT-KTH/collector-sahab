@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -20,7 +19,6 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.assertteam.Classes;
 import se.assertteam.LineSnapshot;
 import se.assertteam.RuntimeValue;
 import se.assertteam.SahabOutput;
@@ -52,11 +50,11 @@ class NewCollectorTest {
         List<RuntimeValue> runtimeValues = theOnlyStackFrameContext.getRuntimeValueCollection();
         RuntimeValue runtimeValue0 = runtimeValues.get(0);
         assertThat(runtimeValue0.getValue(), equalTo(23));
-        assertThat(runtimeValue0.getType(), equalTo(int.class));
+        assertThat(runtimeValue0.getType(), equalTo(int.class.getName()));
 
         RuntimeValue runtimeValue1 = runtimeValues.get(1);
         assertThat(runtimeValue1.getValue(), equalTo(2));
-        assertThat(runtimeValue1.getType(), equalTo(int.class));
+        assertThat(runtimeValue1.getType(), equalTo(int.class.getName()));
         // ToDo: Add feature for collecting return values
     }
 
@@ -93,7 +91,7 @@ class NewCollectorTest {
                     theOnlyStackFrameContext.getRuntimeValueCollection().get(0);
             assertThat(runtimeValue0_11.getName(), equalTo("x"));
             assertThat(runtimeValue0_11.getValue(), equalTo(Objects.toString(Float.POSITIVE_INFINITY)));
-            assertThat(runtimeValue0_11.getType(), equalTo(Float.class));
+            assertThat(runtimeValue0_11.getType(), equalTo(Float.class.getName()));
 
             // Line 5
             assertThat(snapshot1.getLineNumber(), equalTo(5));
@@ -108,7 +106,7 @@ class NewCollectorTest {
                     theOnlyStackFrameContext.getRuntimeValueCollection().get(0);
             assertThat(runtimeValue0_6.getName(), equalTo("positiveInfinity"));
             assertThat(runtimeValue0_6.getValue(), equalTo(Objects.toString(Double.POSITIVE_INFINITY)));
-            assertThat(runtimeValue0_6.getType(), equalTo(Double.class));
+            assertThat(runtimeValue0_6.getType(), equalTo(Double.class.getName()));
 
             // Line 7
             assertThat(snapshot3.getLineNumber(), equalTo(7));
@@ -118,7 +116,7 @@ class NewCollectorTest {
                     theOnlyStackFrameContext.getRuntimeValueCollection().get(1);
             assertThat(runtimeValue1.getName(), equalTo("negativeInfinity"));
             assertThat(runtimeValue1.getValue(), equalTo(Objects.toString(Double.NEGATIVE_INFINITY)));
-            assertThat(runtimeValue1.getType(), equalTo(Double.class));
+            assertThat(runtimeValue1.getType(), equalTo(Double.class.getName()));
         }
 
         @Test
@@ -175,8 +173,8 @@ class NewCollectorTest {
             RuntimeValue elementsOfQueue = arrayDequeue.getFields().get(0);
             assertThat(elementsOfQueue.getName(), equalTo("elements"));
 
-            RuntimeValue firstElement = elementsOfQueue.getArrayElements().get(0);
-            assertThat(firstElement.getValue(), equalTo("Added at runtime"));
+            String firstElement = ((List<String>) elementsOfQueue.getValue()).get(0);
+            assertThat(firstElement, equalTo("Added at runtime"));
 
             // static fields
             // list
@@ -185,9 +183,7 @@ class NewCollectorTest {
             assertThat(list.getName(), equalTo("list"));
             RuntimeValue elementsOfList = list.getFields().get(0);
 
-            List<Object> atomicValue = elementsOfList.getArrayElements().stream()
-                    .map(RuntimeValue::getValue)
-                    .collect(Collectors.toList());
+            List<?> atomicValue = (List<?>) elementsOfList.getValue();
             assertThat(atomicValue, equalTo(List.of(1, 2, 3, 4, 5)));
 
             // set
@@ -196,9 +192,7 @@ class NewCollectorTest {
             assertThat(set.getName(), equalTo("set"));
             RuntimeValue elementsOfSet = set.getFields().get(0);
 
-            List<Object> atomicValuesInSet = elementsOfSet.getArrayElements().stream()
-                    .map(RuntimeValue::getValue)
-                    .collect(Collectors.toList());
+            List<?> atomicValuesInSet = (List<?>) elementsOfSet.getValue();
             // null are pre-allocated buffers in HashSet
             assertThat(atomicValuesInSet, containsInAnyOrder("aman", "sharma", "sahab", null, null, null));
         }
@@ -226,10 +220,9 @@ class NewCollectorTest {
             List<RuntimeValue> runtimeValues =
                     output.getBreakpoint().get(0).getStackFrameContext().get(0).getRuntimeValueCollection();
 
-            List<RuntimeValue> stringsInsideArray = runtimeValues.get(0).getArrayElements();
-            List<Object> atomicValuesInSet =
-                    stringsInsideArray.stream().map(RuntimeValue::getValue).collect(Collectors.toList());
-            assertThat(atomicValuesInSet, equalTo(List.of("yes", "we", "can")));
+            List<String> stringsInsideArray =
+                    (List<String>) runtimeValues.get(0).getValue();
+            assertThat(stringsInsideArray, equalTo(List.of("yes", "we", "can")));
         }
 
         @Nested
@@ -266,7 +259,7 @@ class NewCollectorTest {
                 // arrange
                 RuntimeValue nestedArray = getStackFrameContext(0);
                 assertThat(nestedArray.getName(), equalTo("x"));
-                assertThat(nestedArray.getType(), equalTo(Classes.getClassFromString("int[][][]")));
+                assertThat(nestedArray.getType(), equalTo("int[][][]"));
                 assertThat(nestedArray.getArrayElements(), is(empty()));
             }
 
@@ -278,12 +271,12 @@ class NewCollectorTest {
 
                 RuntimeValue array0 = nestedArray.getArrayElements().get(0);
                 assertThat(array0.getKind(), equalTo(RuntimeValue.Kind.ARRAY_ELEMENT));
-                assertThat(array0.getType(), equalTo(Classes.getClassFromString("int[][]")));
+                assertThat(array0.getType(), equalTo("int[][]"));
                 assertThat(array0.getArrayElements(), is(empty()));
 
                 RuntimeValue array1 = nestedArray.getArrayElements().get(1);
                 assertThat(array1.getKind(), equalTo(RuntimeValue.Kind.ARRAY_ELEMENT));
-                assertThat(array1.getType(), equalTo(Classes.getClassFromString("int[][]")));
+                assertThat(array1.getType(), equalTo("int[][]"));
                 assertThat(array1.getArrayElements(), is(empty()));
             }
 
@@ -295,61 +288,22 @@ class NewCollectorTest {
                 // assert
                 RuntimeValue array0 =
                         nestedArray.getArrayElements().get(0).getArrayElements().get(0);
-                assertThat(array0.getKind(), equalTo(RuntimeValue.Kind.ARRAY_ELEMENT));
-                assertThat(array0.getType(), equalTo(Classes.getClassFromString("int[]")));
-                assertThat(array0.getArrayElements(), is(empty()));
-
-                RuntimeValue array1 =
-                        nestedArray.getArrayElements().get(0).getArrayElements().get(1);
-                assertThat(array1.getKind(), equalTo(RuntimeValue.Kind.ARRAY_ELEMENT));
-                assertThat(array1.getType(), equalTo(Classes.getClassFromString("int[]")));
-                assertThat(array1.getArrayElements(), is(empty()));
-
-                RuntimeValue array2 =
-                        nestedArray.getArrayElements().get(1).getArrayElements().get(0);
-                assertThat(array2.getKind(), equalTo(RuntimeValue.Kind.ARRAY_ELEMENT));
-                assertThat(array2.getType(), equalTo(Classes.getClassFromString("int[]")));
-                assertThat(array2.getArrayElements(), is(empty()));
-
-                RuntimeValue array3 =
-                        nestedArray.getArrayElements().get(1).getArrayElements().get(1);
-                assertThat(array3.getKind(), equalTo(RuntimeValue.Kind.ARRAY_ELEMENT));
-                assertThat(array3.getType(), equalTo(Classes.getClassFromString("int[]")));
-                assertThat(array3.getArrayElements(), is(empty()));
-            }
-
-            @Test
-            void nestedArray_depth3() throws MavenInvocationException, IOException {
-                // arrange
-                RuntimeValue nestedArray = getStackFrameContext(3);
-
-                // assert
-                RuntimeValue array0 =
-                        nestedArray.getArrayElements().get(0).getArrayElements().get(0);
-                List<Object> actualValues_0 = array0.getArrayElements().stream()
-                        .map(RuntimeValue::getValue)
-                        .collect(Collectors.toList());
+                List<Object> actualValues_0 = (List<Object>) array0.getValue();
                 assertThat(actualValues_0, equalTo(List.of(1)));
 
                 RuntimeValue array1 =
                         nestedArray.getArrayElements().get(0).getArrayElements().get(1);
-                List<Object> actualValues_1 = array1.getArrayElements().stream()
-                        .map(RuntimeValue::getValue)
-                        .collect(Collectors.toList());
+                List<Object> actualValues_1 = (List<Object>) array1.getValue();
                 assertThat(actualValues_1, equalTo(List.of(2)));
 
                 RuntimeValue array2 =
                         nestedArray.getArrayElements().get(1).getArrayElements().get(0);
-                List<Object> actualValues_2 = array2.getArrayElements().stream()
-                        .map(RuntimeValue::getValue)
-                        .collect(Collectors.toList());
+                List<Object> actualValues_2 = (List<Object>) array2.getValue();
                 assertThat(actualValues_2, equalTo(List.of(3, 4, 5)));
 
                 RuntimeValue array3 =
                         nestedArray.getArrayElements().get(1).getArrayElements().get(1);
-                List<Object> actualValues_3 = array3.getArrayElements().stream()
-                        .map(RuntimeValue::getValue)
-                        .collect(Collectors.toList());
+                List<Object> actualValues_3 = (List<Object>) array3.getValue();
                 assertThat(actualValues_3, equalTo(List.of(5, 3)));
             }
 

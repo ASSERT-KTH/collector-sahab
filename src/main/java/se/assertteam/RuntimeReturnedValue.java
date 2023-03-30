@@ -12,7 +12,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
     RuntimeReturnedValue(
             Kind kind,
             String name,
-            Class<?> type,
+            String type,
             Object value,
             List<RuntimeValue> fields,
             List<RuntimeValue> arrayElements,
