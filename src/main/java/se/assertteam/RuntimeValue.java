@@ -81,7 +81,7 @@ public class RuntimeValue {
             gen.writeStartObject();
             serializers.defaultSerializeField("kind", value.kind, gen);
             serializers.defaultSerializeField("name", value.name, gen);
-            serializers.defaultSerializeField("type", getCanonicalClassName(value.type), gen);
+            serializers.defaultSerializeField("type", value.type.getName(), gen);
             serializers.defaultSerializeField("value", simplifyValue(value), gen);
             serializers.defaultSerializeField("fields", value.fields, gen);
             serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
