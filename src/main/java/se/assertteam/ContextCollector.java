@@ -45,18 +45,16 @@ public class ContextCollector {
     public static void logReturn(Object returnValue, String returnTypeName, String className) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
-            RuntimeReturnedValue returned =
-                    INTROSPECTOR.introspectReturnValue(
-                            className,
-                            returnValue,
-                            List.of(),
-                            stacktrace.stream()
-                                    .map(StackFrameContext::stackFrameToString)
-                                    .collect(Collectors.toList()),
-                            StackFrameContext.getLocation(stacktrace),
-                            Class.forName(className),
-                            Class.forName(returnTypeName)
-                    );
+            RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
+                    className,
+                    returnValue,
+                    List.of(),
+                    stacktrace.stream()
+                            .map(StackFrameContext::stackFrameToString)
+                            .collect(Collectors.toList()),
+                    StackFrameContext.getLocation(stacktrace),
+                    Class.forName(className),
+                    Class.forName(returnTypeName));
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

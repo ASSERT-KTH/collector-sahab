@@ -1,6 +1,6 @@
 package se.assertteam;
 
-import static se.assertteam.Classes.className;
+import static se.assertteam.Classes.getCanonicalClassName;
 import static se.assertteam.Classes.isBasicallyPrimitive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -72,7 +72,7 @@ public class RuntimeValue {
 
         @Override
         public void serialize(RuntimeValue value, JsonGenerator gen, SerializerProvider serializers)
-            throws IOException {
+                throws IOException {
             if (value.kind == Kind.ARRAY_ELEMENT && isBasicallyPrimitive(value.type)) {
                 // Value is enough for values in arrays
                 serializers.defaultSerializeValue(simplifyValue(value), gen);
@@ -81,7 +81,7 @@ public class RuntimeValue {
             gen.writeStartObject();
             serializers.defaultSerializeField("kind", value.kind, gen);
             serializers.defaultSerializeField("name", value.name, gen);
-            serializers.defaultSerializeField("type", className(value.type), gen);
+            serializers.defaultSerializeField("type", getCanonicalClassName(value.type), gen);
             serializers.defaultSerializeField("value", simplifyValue(value), gen);
             serializers.defaultSerializeField("fields", value.fields, gen);
             serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
@@ -99,8 +99,7 @@ public class RuntimeValue {
                 }
                 return value.toString();
             }
-            return className(value.getClass());
+            return getCanonicalClassName(value.getClass());
         }
     }
-
 }
