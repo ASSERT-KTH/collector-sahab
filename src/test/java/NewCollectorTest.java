@@ -29,14 +29,8 @@ import se.assertteam.StackFrameContext;
 class NewCollectorTest {
     @Test
     void basicMath_test() throws MavenInvocationException, IOException {
-        // arrange
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setPomFile(new File("src/test/resources/basic-math/pom.xml"));
-        request.setGoals(List.of("test"));
-
         // act
-        Invoker invoker = new DefaultInvoker();
-        InvocationResult result = invoker.execute(request);
+        InvocationResult result = getInvocationResult(new File("src/test/resources/basic-math/pom.xml"), List.of(), "");
 
         // assert
         assertThat(result.getExitCode(), equalTo(1));
@@ -70,18 +64,11 @@ class NewCollectorTest {
     class SpecialFloatingPointValues {
         @Test
         void shouldBeAbleToSerialise_specialFloatingPointValue() throws MavenInvocationException, IOException {
-            // arrange
-            InvocationRequest request = new DefaultInvocationRequest();
-            request.setPomFile(new File("src/test/resources/special-floating-point-value/pom.xml"));
-            request.setGoals(List.of("clean", "test"));
-            List<String> agentOptions =
-                    List.of("classesAndBreakpoints=src/test/resources/linear.txt", "output=target/linear.json");
-            request.addArg(
-                    "-DargLine=-javaagent:../../../../target/collector-sahab.jar=" + String.join(",", agentOptions));
-
             // act
-            Invoker invoker = new DefaultInvoker();
-            InvocationResult result = invoker.execute(request);
+            InvocationResult result = getInvocationResult(
+                    new File("src/test/resources/special-floating-point-value/pom.xml"),
+                    List.of("classesAndBreakpoints=src/test/resources/linear.txt", "output=target/linear.json"),
+                    "");
 
             // assert
             assertThat(result.getExitCode(), equalTo(0));
@@ -136,18 +123,11 @@ class NewCollectorTest {
 
         @Test
         void shouldBeAbleToSerialise_nestedSpecialFloatingPointValue() throws MavenInvocationException, IOException {
-            // arrange
-            InvocationRequest request = new DefaultInvocationRequest();
-            request.setPomFile(new File("src/test/resources/special-floating-point-value/pom.xml"));
-            request.setGoals(List.of("clean", "test"));
-            List<String> agentOptions =
-                    List.of("classesAndBreakpoints=src/test/resources/nested.txt", "output=target/nested.json");
-            request.addArg(
-                    "-DargLine=-javaagent:../../../../target/collector-sahab.jar=" + String.join(",", agentOptions));
-
             // act
-            Invoker invoker = new DefaultInvoker();
-            InvocationResult result = invoker.execute(request);
+            InvocationResult result = getInvocationResult(
+                    new File("src/test/resources/special-floating-point-value/pom.xml"),
+                    List.of("classesAndBreakpoints=src/test/resources/nested.txt", "output=target/nested.json"),
+                    "");
 
             // assert
             assertThat(result.getExitCode(), equalTo(0));
