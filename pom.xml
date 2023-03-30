@@ -53,6 +53,16 @@
       <artifactId>junit-platform-console-standalone</artifactId>
       <version>1.9.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.14.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-parameter-names</artifactId>
+      <version>2.14.2</version>
+    </dependency>
 
     <!--        This dependency is already in `junit-platform-console-standalone`.-->
     <!--        However, without explicitly mentioning `junit-jupiter`, the tests were not being detected by JUnit runner.-->
