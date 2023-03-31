@@ -1,0 +1,4 @@
+[{
+  "fileName": "ArrayOfObjects",
+  "breakpoints": [4]
+}]

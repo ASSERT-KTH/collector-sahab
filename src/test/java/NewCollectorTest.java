@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -356,6 +357,49 @@ class NewCollectorTest {
                 assertThat(onlyItemInsideNestedSet.getValue(), equalTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
             }
         }
+    }
+
+    @Test
+    void arrayOfObjects() throws IOException, MavenInvocationException {
+        // act
+        File pomFile = new File("src/test/resources/array-of-objects/pom.xml");
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "classesAndBreakpoints=src/test/resources/array-of-objects.txt",
+                        "output=target/output.json",
+                        "executionDepth=1"),
+                "-Dtest=ArrayOfObjectsTest");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/array-of-objects/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(1));
+
+        List<RuntimeValue> arrayElements = output.getBreakpoint()
+                .get(0)
+                .getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection()
+                .get(0)
+                .getArrayElements();
+
+        List<String> entries = arrayElements.stream()
+                .map(RuntimeValue::getValue)
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        assertThat(entries, equalTo(List.of("CustomObject", "CustomObject")));
+
+        RuntimeValue entry0 = arrayElements.get(0);
+        RuntimeValue entry1 = arrayElements.get(1);
+
+        assertThat(entry0.getFields(), is(empty()));
+        assertThat(entry1.getFields(), is(empty()));
     }
 
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
