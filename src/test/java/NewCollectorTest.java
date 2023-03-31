@@ -402,6 +402,29 @@ class NewCollectorTest {
         assertThat(entry1.getFields(), is(empty()));
     }
 
+    @Test
+    void nonStaticField_shouldNotBeRecorded() throws IOException, MavenInvocationException {
+        // act
+        File pomFile = new File("src/test/resources/non-static-field/pom.xml");
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "classesAndBreakpoints=src/test/resources/non-static-field.txt",
+                        "output=target/output.json",
+                        "executionDepth=1"),
+                "-Dtest=NonStaticFieldTest");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/non-static-field/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint(), is(empty()));
+        assertThat(output.getReturns(), is(empty()));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException {
         // arrange
