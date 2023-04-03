@@ -1,15 +1,11 @@
 package se.assertteam;
 
-import static se.assertteam.Classes.getCanonicalClassName;
-import static se.assertteam.Classes.isBasicallyPrimitive;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.List;
 import se.assertteam.RuntimeValue.RuntimeValueSerializer;
 
@@ -79,41 +75,14 @@ public class RuntimeValue {
             serializers.defaultSerializeField("name", value.name, gen);
             serializers.defaultSerializeField("type", value.type, gen);
             serializers.defaultSerializeField("fields", value.fields, gen);
-            if (isArrayBasicallyPrimitive(value.getValue())) {
+            if (Classes.isArrayBasicallyPrimitive(value.getValue())) {
                 serializers.defaultSerializeField("arrayElements", List.of(), gen);
                 serializers.defaultSerializeField("value", value.value, gen);
             } else {
-                serializers.defaultSerializeField("value", simplifyValue(value), gen);
+                serializers.defaultSerializeField("value", Classes.simplifyValue(value), gen);
                 serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
             }
             gen.writeEndObject();
-        }
-
-        private static boolean isArrayBasicallyPrimitive(Object value) {
-            if (value == null || !value.getClass().isArray()) {
-                return false;
-            }
-            for (int i = 0; i < Array.getLength(value); i++) {
-                Object arrayEntry = Array.get(value, i);
-                if (arrayEntry != null && !isBasicallyPrimitive(arrayEntry.getClass())) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private static Object simplifyValue(RuntimeValue runtimeValue) {
-            Object value = runtimeValue.value;
-            if (value == null) {
-                return null;
-            }
-            if (isBasicallyPrimitive(value.getClass())) {
-                if (value instanceof Number || value instanceof Boolean) {
-                    return value;
-                }
-                return value.toString();
-            }
-            return getCanonicalClassName(value.getClass());
         }
     }
 }

@@ -77,10 +77,37 @@ public class Classes {
         }
     }
 
-    private static Class<?> getArrayClass(Class<?> componentType, int dimensions) {
+    public static Class<?> getArrayClass(Class<?> componentType, int dimensions) {
         if (dimensions == 1) {
             return Array.newInstance(componentType, 0).getClass();
         }
         return getArrayClass(Array.newInstance(componentType, 0).getClass(), dimensions - 1);
+    }
+
+    public static boolean isArrayBasicallyPrimitive(Object value) {
+        if (value == null || !value.getClass().isArray()) {
+            return false;
+        }
+        for (int i = 0; i < Array.getLength(value); i++) {
+            Object arrayEntry = Array.get(value, i);
+            if (arrayEntry != null && !isBasicallyPrimitive(arrayEntry.getClass())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static Object simplifyValue(RuntimeValue runtimeValue) {
+        Object value = runtimeValue.getValue();
+        if (value == null) {
+            return null;
+        }
+        if (isBasicallyPrimitive(value.getClass())) {
+            if (value instanceof Number || value instanceof Boolean) {
+                return value;
+            }
+            return value.toString();
+        }
+        return getCanonicalClassName(value.getClass());
     }
 }

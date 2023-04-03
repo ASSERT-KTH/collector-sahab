@@ -425,6 +425,37 @@ class NewCollectorTest {
         assertThat(output.getReturns(), is(empty()));
     }
 
+    @Test
+    void twins_onlyRecordOneMethodExit() throws IOException, MavenInvocationException {
+        // act
+        File pomFile = new File("src/test/resources/twins/pom.xml");
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "methodsForExitEvent=src/test/resources/methods.json",
+                        "output=target/output.json",
+                        "executionDepth=0"),
+                "-Dtest=TwinsTest");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/twins/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint(), is(empty()));
+        assertThat(output.getReturns().size(), equalTo(1));
+
+        RuntimeValue returnValue = output.getReturns().get(0);
+
+        assertThat(returnValue.getName(), equalTo("getValue"));
+        assertThat(returnValue.getValue(), equalTo("a"));
+        assertThat(returnValue.getType(), equalTo("java.lang.String"));
+        assertThat(returnValue.getFields(), is(empty()));
+        assertThat(returnValue.getArrayElements(), is(empty()));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException {
         // arrange

@@ -1,10 +1,12 @@
 package se.kth.debug.struct;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MethodForExitEvent {
     private final String name;
     private final String className;
 
-    public MethodForExitEvent(String name, String className) {
+    public MethodForExitEvent(@JsonProperty("name") String name, @JsonProperty("className") String className) {
         this.name = name;
         this.className = className;
     }

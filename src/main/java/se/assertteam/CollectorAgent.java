@@ -1,5 +1,9 @@
 package se.assertteam;
 
+import static org.objectweb.asm.Opcodes.ATHROW;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.RETURN;
+
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.description.type.TypeDescription.Generic;
+import net.bytebuddy.description.type.TypeDescription.Generic.OfNonGenericType.ForLoadedType;
 import net.bytebuddy.implementation.bytecode.Duplication;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.TypeCreation;
@@ -36,6 +42,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 import se.assertteam.module.ModuleCracker;
 import se.kth.debug.struct.FileAndBreakpoint;
+import se.kth.debug.struct.MethodForExitEvent;
 
 public class CollectorAgent {
 
@@ -47,6 +54,7 @@ public class CollectorAgent {
         options = new CollectorAgentOptions(arguments);
         ContextCollector.setExecutionDepth(options.getExecutionDepth());
         List<String> classesAllowed = getClassesAllowed();
+        List<String> methodExits = getMethodExits();
         instrumentation.addTransformer(
                 new ClassFileTransformer() {
                     @Override
@@ -57,7 +65,7 @@ public class CollectorAgent {
                             ProtectionDomain protectionDomain,
                             byte[] classfileBuffer) {
                         try {
-                            return getBytes(className, classfileBuffer, classesAllowed);
+                            return getBytes(className, classfileBuffer, classesAllowed, methodExits);
                         } catch (Throwable t) {
                             t.printStackTrace();
                             throw new RuntimeException(t);
@@ -78,7 +86,14 @@ public class CollectorAgent {
 
     private static List<String> getClassesAllowed() {
         List<FileAndBreakpoint> fileAndBreakpoints = options.getClassesAndBreakpoints();
-        return fileAndBreakpoints.stream().map(FileAndBreakpoint::getFileName).collect(Collectors.toList());
+        List<MethodForExitEvent> methodForExitEvents = options.getMethodsForExitEvent();
+        List<String> classesAllowed = new ArrayList<>();
+        classesAllowed.addAll(
+                fileAndBreakpoints.stream().map(FileAndBreakpoint::getFileName).collect(Collectors.toList()));
+        classesAllowed.addAll(methodForExitEvents.stream()
+                .map(MethodForExitEvent::getClassName)
+                .collect(Collectors.toList()));
+        return classesAllowed;
     }
 
     private static List<Integer> getBreakpointsAllowed(String className) {
@@ -91,7 +106,13 @@ public class CollectorAgent {
         return new ArrayList<>();
     }
 
-    private static byte[] getBytes(String className, byte[] classfileBuffer, List<String> classesAllowed)
+    private static List<String> getMethodExits() {
+        List<MethodForExitEvent> methodsForExitEvents = options.getMethodsForExitEvent();
+        return methodsForExitEvents.stream().map(MethodForExitEvent::getName).collect(Collectors.toList());
+    }
+
+    private static byte[] getBytes(
+            String className, byte[] classfileBuffer, List<String> classesAllowed, List<String> methodExits)
             throws NoSuchMethodException {
         if (!classesAllowed.contains(className)) {
             return classfileBuffer;
@@ -115,19 +136,33 @@ public class CollectorAgent {
                     }
                 }
                 if (instruction instanceof LineNumberNode) {
-                    if (!breakpointsAllowed.contains(((LineNumberNode) instruction).line)) {
-                        continue;
+                    if (breakpointsAllowed.contains(((LineNumberNode) instruction).line)) {
+                        StackManipulation callLineLog =
+                                getCallToLineLogMethod(className, method, liveVariables, (LineNumberNode) instruction);
+                        currentNode = ByteBuddyHelper.applyStackManipulation(
+                                method, currentNode, callLineLog, ByteBuddyHelper.InsertPosition.AFTER);
                     }
-                    StackManipulation callLineLog =
-                            getCallToLineLogMethod(className, method, liveVariables, (LineNumberNode) instruction);
+                }
+
+                int opCode = instruction.getOpcode();
+                if (shouldMethodExitBeRecorded(method, methodExits) && isItExitInstruction(opCode)) {
+                    StackManipulation callReturnLog = getCallToReturnLogMethod(className, method);
                     currentNode = ByteBuddyHelper.applyStackManipulation(
-                            method, currentNode, callLineLog, ByteBuddyHelper.InsertPosition.AFTER);
+                            method, currentNode, callReturnLog, ByteBuddyHelper.InsertPosition.BEFORE);
                 }
             }
         }
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classNode.accept(new TraceClassVisitor(writer, null));
         return writer.toByteArray();
+    }
+
+    private static boolean shouldMethodExitBeRecorded(MethodNode method, List<String> methodExits) {
+        return methodExits.contains(method.name);
+    }
+
+    private static boolean isItExitInstruction(int opCode) {
+        return (opCode >= IRETURN && opCode <= RETURN) || opCode == ATHROW;
     }
 
     private static StackManipulation getCallToLineLogMethod(
@@ -194,5 +229,34 @@ public class CollectorAgent {
                 // );
                 MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(
                         LocalVariable.class.getConstructor(String.class, Class.class, Object.class)))));
+    }
+
+    private static StackManipulation getCallToReturnLogMethod(String className, MethodNode method)
+            throws NoSuchMethodException {
+        List<StackManipulation> manipulations = new ArrayList<>();
+
+        // Stack is empty.
+
+        // public static void logReturn(
+        //   Object returnValue,
+        Generic typeDesc = ForLoadedType.of(Classes.getClassFromString(
+                Type.getMethodType(method.desc).getReturnType().getClassName()));
+        manipulations.add(Duplication.of(typeDesc));
+        manipulations.add(
+                Assigner.GENERICS_AWARE.assign(typeDesc, ForLoadedType.of(Object.class), Assigner.Typing.DYNAMIC));
+        //   String methodName,
+        manipulations.add(new TextConstant(method.name));
+        //   String returnTypeName
+        manipulations.add(
+                new TextConstant(Type.getMethodType(method.desc).getReturnType().getClassName()));
+
+        //   String className
+        manipulations.add(new TextConstant(className.replace('/', '.')));
+        //  );
+        manipulations.add(
+                MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
+                        "logReturn", Object.class, String.class, String.class, String.class))));
+
+        return new StackManipulation.Compound(manipulations);
     }
 }

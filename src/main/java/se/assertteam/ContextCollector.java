@@ -42,11 +42,13 @@ public class ContextCollector {
         SAHAB_OUTPUT.getBreakpoint().add(lineSnapshot);
     }
 
-    public static void logReturn(Object returnValue, String returnTypeName, String className) {
+    public static void logReturn(Object returnValue, String methodName, String returnTypeName, String className) {
         try {
-            List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
+            List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace().stream()
+                    .filter(frame -> !excludeStackFrames(frame))
+                    .collect(Collectors.toList());
             RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
-                    className,
+                    methodName,
                     returnValue,
                     List.of(),
                     stacktrace.stream()
@@ -59,5 +61,9 @@ public class ContextCollector {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static boolean excludeStackFrames(StackWalker.StackFrame frame) {
+        return frame.getClassName().startsWith("se.assertteam");
     }
 }

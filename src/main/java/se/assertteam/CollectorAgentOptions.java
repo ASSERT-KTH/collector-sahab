@@ -66,9 +66,6 @@ public class CollectorAgentOptions {
     }
 
     public List<FileAndBreakpoint> getClassesAndBreakpoints() {
-        if (classesAndBreakpoints == null) {
-            throw new IllegalStateException("classesAndBreakpoints is not set");
-        }
         return parseFileAndBreakpoints(classesAndBreakpoints);
     }
 
@@ -80,13 +77,12 @@ public class CollectorAgentOptions {
             return mapper.readValue(classesAndBreakpoints, new TypeReference<>() {});
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return List.of();
         }
     }
 
     public List<MethodForExitEvent> getMethodsForExitEvent() {
-        if (methodsForExitEvent == null) {
-            throw new IllegalStateException("methodsForExitEvent is not set");
-        }
         return parseMethodsForExitEvent(methodsForExitEvent);
     }
 
@@ -96,6 +92,8 @@ public class CollectorAgentOptions {
             return mapper.readValue(methodsForExitEvent, new TypeReference<>() {});
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return List.of();
         }
     }
 }
