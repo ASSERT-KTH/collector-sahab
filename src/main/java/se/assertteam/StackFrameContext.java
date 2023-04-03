@@ -69,7 +69,7 @@ public class StackFrameContext {
     }
 
     private static boolean isOurCode(StackFrame frame) {
-        String julianCode = "de.ialistannen.traceaman";
+        String julianCode = "se.assertteam";
         if (frame.getClassName().startsWith(julianCode)) {
             return true;
         }

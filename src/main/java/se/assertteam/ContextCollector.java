@@ -45,9 +45,7 @@ public class ContextCollector {
 
     public static void logReturn(Object returnValue, String methodName, String returnTypeName, String className) {
         try {
-            List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace().stream()
-                    .filter(frame -> !excludeStackFrames(frame))
-                    .collect(Collectors.toList());
+            List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
             RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
                     methodName,
                     returnValue,
@@ -62,9 +60,5 @@ public class ContextCollector {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static boolean excludeStackFrames(StackWalker.StackFrame frame) {
-        return frame.getClassName().startsWith("se.assertteam");
     }
 }

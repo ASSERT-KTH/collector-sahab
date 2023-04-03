@@ -522,6 +522,45 @@ class NewCollectorTest {
         }
     }
 
+    @Test
+    void anonymousClass_onlyInnerLocalVariableShouldBeRecorded() throws MavenInvocationException, IOException {
+        // act
+        File pomFile = new File("src/test/resources/anonymous-class/pom.xml");
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "classesAndBreakpoints=src/test/resources/input.txt",
+                        "output=target/output.json",
+                        "executionDepth=0"),
+                "-Dtest=AnonymousClassTest");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/anonymous-class/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(2));
+        assertThat(output.getReturns(), is(empty()));
+
+        RuntimeValue hindiGreeting = output.getBreakpoint()
+                .get(0)
+                .getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection()
+                .get(0);
+        assertThat(hindiGreeting.getValue(), equalTo("Namaste"));
+
+        RuntimeValue swedishGreeting = output.getBreakpoint()
+                .get(1)
+                .getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection()
+                .get(0);
+        assertThat(swedishGreeting.getValue(), equalTo("Tjenare!"));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException {
         // arrange
