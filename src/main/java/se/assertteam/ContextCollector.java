@@ -2,6 +2,7 @@ package se.assertteam;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ContextCollector {
@@ -56,7 +57,7 @@ public class ContextCollector {
                             .collect(Collectors.toList()),
                     StackFrameContext.getLocation(stacktrace),
                     Class.forName(className),
-                    Class.forName(returnTypeName));
+                    Objects.equals(returnTypeName, "void") ? void.class : Class.forName(returnTypeName));
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

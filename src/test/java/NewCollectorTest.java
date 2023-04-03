@@ -3,6 +3,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -454,6 +455,71 @@ class NewCollectorTest {
         assertThat(returnValue.getType(), equalTo("java.lang.String"));
         assertThat(returnValue.getFields(), is(empty()));
         assertThat(returnValue.getArrayElements(), is(empty()));
+    }
+
+    @Nested
+    class VoidMethod {
+        @Test
+        void voidMethod_boxedVoidValueShouldBeRecorded() throws IOException, MavenInvocationException {
+            // act
+            File pomFile = new File("src/test/resources/void-method/pom.xml");
+            InvocationResult result = getInvocationResult(
+                    pomFile,
+                    List.of(
+                            "methodsForExitEvent=src/test/resources/boxed-void.json",
+                            "output=target/boxed-void.json",
+                            "executionDepth=0"),
+                    "-Dtest=VoidMethodTest#test_doNotReturnAnything_boxedVoid");
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/void-method/target/boxed-void.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint(), is(empty()));
+            assertThat(output.getReturns().size(), equalTo(1));
+
+            RuntimeValue returnValue = output.getReturns().get(0);
+
+            assertThat(returnValue.getName(), equalTo("doNotReturnAnything"));
+            assertThat(returnValue.getValue(), is(nullValue()));
+            assertThat(returnValue.getType(), equalTo("java.lang.Void"));
+            assertThat(returnValue.getFields(), is(empty()));
+            assertThat(returnValue.getArrayElements(), is(empty()));
+        }
+
+        @Test
+        void voidMethod_voidValueShouldBeRecorded() throws IOException, MavenInvocationException {
+            // act
+            File pomFile = new File("src/test/resources/void-method/pom.xml");
+            InvocationResult result = getInvocationResult(
+                    pomFile,
+                    List.of(
+                            "methodsForExitEvent=src/test/resources/void.json",
+                            "output=target/void.json",
+                            "executionDepth=0"),
+                    "-Dtest=VoidMethodTest#test_doNotReturnAnything_void");
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/void-method/target/void.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint(), is(empty()));
+            assertThat(output.getReturns().size(), equalTo(1));
+
+            RuntimeValue returnValue = output.getReturns().get(0);
+
+            assertThat(returnValue.getName(), equalTo("doNotReturnAnything"));
+            assertThat(returnValue.getValue(), is(nullValue()));
+            assertThat(returnValue.getType(), equalTo("void"));
+            assertThat(returnValue.getFields(), is(empty()));
+            assertThat(returnValue.getArrayElements(), is(empty()));
+        }
     }
 
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
