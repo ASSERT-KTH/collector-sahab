@@ -40,7 +40,8 @@ public class ObjectIntrospection {
                 variable.getName(),
                 getType(variable.getValue(), variable.getType()),
                 variable.getValue(),
-                0);
+                // Depth is 1 if we go inside a variable
+                1);
     }
 
     /**
@@ -81,8 +82,8 @@ public class ObjectIntrospection {
             Class<?> returnType)
             throws IllegalAccessException {
         // We gather the static fields of the receiver class
-        List<RuntimeValue> fields = getFieldValues(returned, 0, receiverClass);
-        List<RuntimeValue> arrayValues = getArrayValues(returned, 0);
+        List<RuntimeValue> fields = getFieldValues(returned, 1, receiverClass);
+        List<RuntimeValue> arrayValues = getArrayValues(returned, 1);
 
         return new RuntimeReturnedValue(
                 RuntimeValue.Kind.RETURN,
@@ -112,6 +113,8 @@ public class ObjectIntrospection {
         List<RuntimeValue> fields = List.of();
         List<RuntimeValue> arrayElements = List.of();
 
+        // Depth 0 means we are at the top level, so we do not want to introspect
+        // However, declared fields will be recorded at depth 0 as well
         if (depth <= executionDepth) {
             fields = getFieldValues(object, depth, type);
             arrayElements = getArrayValues(object, depth);
