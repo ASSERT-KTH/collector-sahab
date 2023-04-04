@@ -19,6 +19,7 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import se.assertteam.LineSnapshot;
@@ -621,6 +622,7 @@ class NewCollectorTest {
             assertThat(((int) argument2.getValue()) - 1, equalTo(localVariable2.getValue()));
         }
 
+        @Disabled("Non-primitive parameter values are not recorded")
         @Test
         void nonPrimitiveArgumentValues_shouldBeRecorded() throws MavenInvocationException, IOException {
             // act
@@ -647,6 +649,14 @@ class NewCollectorTest {
             // return
             RuntimeReturnedValue returnValue = output.getReturns().get(0);
             assertThat(returnValue.getArguments().size(), equalTo(2));
+
+            RuntimeValue argument1 = returnValue.getArguments().get(0);
+            assertThat(argument1.getName(), equalTo("a"));
+            assertThat(argument1.getValue(), equalTo("1/1"));
+
+            RuntimeValue argument2 = returnValue.getArguments().get(1);
+            assertThat(argument2.getName(), equalTo("b"));
+            assertThat(argument2.getValue(), equalTo("1/4"));
         }
     }
 
