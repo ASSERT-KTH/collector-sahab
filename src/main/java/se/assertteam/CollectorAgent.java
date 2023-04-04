@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Modifier;
@@ -49,6 +48,9 @@ public class CollectorAgent {
 
     public static ModuleCracker moduleCracker;
     private static CollectorAgentOptions options;
+
+    // Needed to store the array of parameter values we create during method entry
+    private static final int STACK_OFFSET = 42;
 
     public static void premain(String arguments, Instrumentation instrumentation) {
         moduleCracker = ModuleCracker.getApplicable(instrumentation);
@@ -159,7 +161,7 @@ public class CollectorAgent {
             }
         }
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        classNode.accept(new TraceClassVisitor(writer, new PrintWriter(System.err)));
+        classNode.accept(new TraceClassVisitor(writer, null));
         return writer.toByteArray();
     }
 
@@ -185,7 +187,7 @@ public class CollectorAgent {
 
         manipulations.add(arrayFactory.withValues(arguments));
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
-                .storeAt(indexOfLastLocalVariable(method) + 1));
+                .storeAt(indexOfLastLocalVariable(method) + STACK_OFFSET));
 
         return new StackManipulation.Compound(manipulations);
     }
@@ -280,7 +282,7 @@ public class CollectorAgent {
 
         //   LocalVariable[] parameterValues
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
-                .loadFrom(indexOfLastLocalVariable(method) + 1));
+                .loadFrom(indexOfLastLocalVariable(method) + STACK_OFFSET));
 
         manipulations.add(
                 MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
