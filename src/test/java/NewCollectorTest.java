@@ -22,6 +22,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import se.assertteam.LineSnapshot;
+import se.assertteam.RuntimeReturnedValue;
 import se.assertteam.RuntimeValue;
 import se.assertteam.SahabOutput;
 import se.assertteam.StackFrameContext;
@@ -559,6 +560,94 @@ class NewCollectorTest {
                 .getRuntimeValueCollection()
                 .get(0);
         assertThat(swedishGreeting.getValue(), equalTo("Tjenare!"));
+    }
+
+    @Nested
+    class Arguments {
+        @Test
+        void primitiveArgumentValues_shouldBeRecorded() throws MavenInvocationException, IOException {
+            // act
+            File pomFile = new File("src/test/resources/arguments/pom.xml");
+            InvocationResult result = getInvocationResult(
+                    pomFile,
+                    List.of(
+                            "methodsForExitEvent=src/test/resources/primitive.json",
+                            "classesAndBreakpoints=src/test/resources/primitive.txt",
+                            "output=target/output.json",
+                            "executionDepth=0"),
+                    "-Dtest=ArgumentTest#primitive_argumentsValueShouldChange");
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/arguments/target/output.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint().size(), equalTo(1));
+            assertThat(output.getReturns().size(), equalTo(1));
+
+            // breakpoints
+            RuntimeValue localVariable1 = output.getBreakpoint()
+                    .get(0)
+                    .getStackFrameContext()
+                    .get(0)
+                    .getRuntimeValueCollection()
+                    .get(0);
+            assertThat(localVariable1.getName(), equalTo("a"));
+            assertThat(localVariable1.getValue(), equalTo(3));
+
+            RuntimeValue localVariable2 = output.getBreakpoint()
+                    .get(0)
+                    .getStackFrameContext()
+                    .get(0)
+                    .getRuntimeValueCollection()
+                    .get(1);
+            assertThat(localVariable2.getName(), equalTo("b"));
+            assertThat(localVariable2.getValue(), equalTo(1));
+
+            // return
+            RuntimeReturnedValue returnValue = output.getReturns().get(0);
+            assertThat(returnValue.getArguments().size(), equalTo(2));
+
+            RuntimeValue argument1 = returnValue.getArguments().get(0);
+            assertThat(argument1.getName(), equalTo("a"));
+            assertThat(argument1.getValue(), equalTo(2));
+            assertThat(((int) argument1.getValue()) + 1, equalTo(localVariable1.getValue()));
+
+            RuntimeValue argument2 = returnValue.getArguments().get(1);
+            assertThat(argument2.getName(), equalTo("b"));
+            assertThat(argument2.getValue(), equalTo(2));
+            assertThat(((int) argument2.getValue()) - 1, equalTo(localVariable2.getValue()));
+        }
+
+        @Test
+        void nonPrimitiveArgumentValues_shouldBeRecorded() throws MavenInvocationException, IOException {
+            // act
+            File pomFile = new File("src/test/resources/arguments/pom.xml");
+            InvocationResult result = getInvocationResult(
+                    pomFile,
+                    List.of(
+                            "methodsForExitEvent=src/test/resources/non-primitive.json",
+                            "classesAndBreakpoints=src/test/resources/non-primitive.txt",
+                            "output=target/output.json",
+                            "executionDepth=1"),
+                    "-Dtest=ArgumentTest#nonPrimitive_argumentsValueShouldChange");
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/arguments/target/output.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint().size(), equalTo(1));
+            assertThat(output.getReturns().size(), equalTo(1));
+
+            // return
+            RuntimeReturnedValue returnValue = output.getReturns().get(0);
+            assertThat(returnValue.getArguments().size(), equalTo(2));
+        }
     }
 
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)

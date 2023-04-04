@@ -252,10 +252,22 @@ public class CollectorAgent {
 
         //   String className
         manipulations.add(new TextConstant(className.replace('/', '.')));
-        //  );
+
+        List<StackManipulation> arguments = new ArrayList<>();
+        Type[] parameterTypes = Type.getArgumentTypes(method.desc);
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
+            arguments.add(createLocalVariable(method.parameters.get(i).name, i, type));
+        }
+
+        //   LocalVariable[] parameterValues
+        manipulations.add(
+                ArrayFactory.forType(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(LocalVariable.class))
+                        .withValues(arguments));
+
         manipulations.add(
                 MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
-                        "logReturn", Object.class, String.class, String.class, String.class))));
+                        "logReturn", Object.class, String.class, String.class, String.class, LocalVariable[].class))));
 
         return new StackManipulation.Compound(manipulations);
     }

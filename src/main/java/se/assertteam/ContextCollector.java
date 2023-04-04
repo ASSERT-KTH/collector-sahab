@@ -42,13 +42,22 @@ public class ContextCollector {
         SAHAB_OUTPUT.getBreakpoint().add(lineSnapshot);
     }
 
-    public static void logReturn(Object returnValue, String methodName, String returnTypeName, String className) {
+    public static void logReturn(
+            Object returnValue,
+            String methodName,
+            String returnTypeName,
+            String className,
+            LocalVariable[] parameters) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
+            List<RuntimeValue> arguments = new ArrayList<>();
+            for (LocalVariable parameter : parameters) {
+                arguments.add(INTROSPECTOR.introspectVariable(parameter));
+            }
             RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
                     methodName,
                     returnValue,
-                    List.of(),
+                    arguments,
                     stacktrace.stream()
                             .map(StackFrameContext::stackFrameToString)
                             .collect(Collectors.toList()),
