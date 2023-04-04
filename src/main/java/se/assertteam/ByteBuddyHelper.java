@@ -59,7 +59,7 @@ public class ByteBuddyHelper {
             current = newNode;
         }
 
-        return current;
+        return insertPosition == InsertPosition.BEFORE ? insertAfter : current;
     }
 
     public enum InsertPosition {

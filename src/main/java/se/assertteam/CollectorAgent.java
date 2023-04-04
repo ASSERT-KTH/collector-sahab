@@ -185,7 +185,7 @@ public class CollectorAgent {
 
         manipulations.add(arrayFactory.withValues(arguments));
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
-                .storeAt(method.localVariables.size() + 1));
+                .storeAt(indexOfLastLocalVariable(method) + 1));
 
         return new StackManipulation.Compound(manipulations);
     }
@@ -280,12 +280,20 @@ public class CollectorAgent {
 
         //   LocalVariable[] parameterValues
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
-                .loadFrom(method.localVariables.size() + 1));
+                .loadFrom(indexOfLastLocalVariable(method) + 1));
 
         manipulations.add(
                 MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
                         "logReturn", Object.class, String.class, String.class, String.class, LocalVariable[].class))));
 
         return new StackManipulation.Compound(manipulations);
+    }
+
+    private static int indexOfLastLocalVariable(MethodNode method) {
+        int max = 0;
+        for (LocalVariableNode localVariable : method.localVariables) {
+            max = Math.max(max, localVariable.index);
+        }
+        return max;
     }
 }
