@@ -1,8 +1,15 @@
 package se.assertteam;
 
 import java.lang.reflect.Array;
+import java.util.HashMap;
 
 public class Classes {
+
+    private static final HashMap<Class<?>, Boolean> CACHED_CLASSES = new HashMap<>();
+
+    static {
+        CACHED_CLASSES.put(Object.class, Boolean.FALSE);
+    }
 
     public static String getCanonicalClassName(Class<?> type) {
         String canonicalName = type.getCanonicalName();
@@ -108,6 +115,31 @@ public class Classes {
             }
             return value.toString();
         }
+        if (hasImplementedToString(value.getClass())) {
+            return value.toString();
+        }
         return getCanonicalClassName(value.getClass());
+    }
+
+    /**
+     * Returns whether the type declares `toString`.
+     */
+    public static boolean hasImplementedToString(Class<?> type) {
+        try {
+            if (type == null) {
+                return false;
+            }
+            if (CACHED_CLASSES.containsKey(type)) {
+                return CACHED_CLASSES.get(type);
+            }
+            type.getDeclaredMethod("toString");
+            if (type != Object.class) {
+                CACHED_CLASSES.put(type, Boolean.TRUE);
+                return true;
+            }
+        } catch (NoSuchMethodException e) {
+            return hasImplementedToString(type.getSuperclass());
+        }
+        return false;
     }
 }
