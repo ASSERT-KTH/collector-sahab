@@ -74,7 +74,7 @@ public class ObjectIntrospection {
     public RuntimeReturnedValue introspectReturnValue(
             String methodName,
             Object returned,
-            List<Object> parameters,
+            List<RuntimeValue> parameters,
             List<String> stacktrace,
             String location,
             Class<?> receiverClass,

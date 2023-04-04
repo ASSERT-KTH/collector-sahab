@@ -11,7 +11,7 @@ import java.util.List;
 @JsonSerialize(using = RuntimeReturnedValue.RuntimeReturnedValueSerializer.class)
 public class RuntimeReturnedValue extends RuntimeValue {
 
-    private final List<Object> arguments;
+    private final List<RuntimeValue> arguments;
     private final List<String> stackTrace;
 
     private final String location;
@@ -23,7 +23,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
             @JsonProperty("value") Object value,
             @JsonProperty("fields") List<RuntimeValue> fields,
             @JsonProperty("arrayElements") List<RuntimeValue> arrayElements,
-            @JsonProperty("parameterValues") List<Object> parameters,
+            @JsonProperty("parameterValues") List<RuntimeValue> parameters,
             @JsonProperty("stackTrace") List<String> stackTrace,
             @JsonProperty("location") String location) {
         super(kind, name, type, value, fields, arrayElements);
@@ -33,7 +33,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
         this.location = location;
     }
 
-    public List<Object> getArguments() {
+    public List<RuntimeValue> getArguments() {
         return arguments;
     }
 
