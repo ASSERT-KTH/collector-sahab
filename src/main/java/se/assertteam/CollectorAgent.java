@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Modifier;
@@ -128,6 +129,11 @@ public class CollectorAgent {
             for (AbstractInsnNode instruction : method.instructions) {
                 AbstractInsnNode currentNode = instruction;
 
+                if (shouldMethodExitBeRecorded(method, methodExits) && instruction.getPrevious() == null) {
+                    StackManipulation callEntryLog = getCallToEntryLogMethod(method);
+                    currentNode = ByteBuddyHelper.applyStackManipulation(
+                            method, currentNode, callEntryLog, ByteBuddyHelper.InsertPosition.BEFORE);
+                }
                 if (instruction instanceof LabelNode) {
                     for (LocalVariableNode localVariable : method.localVariables) {
                         if (localVariable.start == currentNode) {
@@ -153,7 +159,7 @@ public class CollectorAgent {
             }
         }
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        classNode.accept(new TraceClassVisitor(writer, null));
+        classNode.accept(new TraceClassVisitor(writer, new PrintWriter(System.err)));
         return writer.toByteArray();
     }
 
@@ -163,6 +169,25 @@ public class CollectorAgent {
 
     private static boolean isItExitInstruction(int opCode) {
         return (opCode >= IRETURN && opCode <= RETURN) || opCode == ATHROW;
+    }
+
+    private static StackManipulation.Compound getCallToEntryLogMethod(MethodNode method) throws NoSuchMethodException {
+        List<StackManipulation> manipulations = new ArrayList<>();
+
+        List<StackManipulation> arguments = new ArrayList<>();
+        Type[] parameterTypes = Type.getArgumentTypes(method.desc);
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
+            arguments.add(createLocalVariable(method.parameters.get(i).name, i, type));
+        }
+
+        ArrayFactory arrayFactory = ArrayFactory.forType(ForLoadedType.of(LocalVariable.class));
+
+        manipulations.add(arrayFactory.withValues(arguments));
+        manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
+                .storeAt(method.localVariables.size() + 1));
+
+        return new StackManipulation.Compound(manipulations);
     }
 
     private static StackManipulation getCallToLineLogMethod(
@@ -253,17 +278,9 @@ public class CollectorAgent {
         //   String className
         manipulations.add(new TextConstant(className.replace('/', '.')));
 
-        List<StackManipulation> arguments = new ArrayList<>();
-        Type[] parameterTypes = Type.getArgumentTypes(method.desc);
-        for (int i = 0; i < parameterTypes.length; i++) {
-            Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
-            arguments.add(createLocalVariable(method.parameters.get(i).name, i, type));
-        }
-
         //   LocalVariable[] parameterValues
-        manipulations.add(
-                ArrayFactory.forType(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(LocalVariable.class))
-                        .withValues(arguments));
+        manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
+                .loadFrom(method.localVariables.size() + 1));
 
         manipulations.add(
                 MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
