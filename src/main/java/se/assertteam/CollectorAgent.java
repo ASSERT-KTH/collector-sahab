@@ -194,35 +194,39 @@ public class CollectorAgent {
         ArrayFactory arrayFactory = ArrayFactory.forType(ForLoadedType.of(LocalVariable.class));
 
         manipulations.add(arrayFactory.withValues(arguments));
-//        for (int i = 0; i < parameterTypes.length; i++) {
-//            Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
-//
-//            // new RuntimeValue
-//            manipulations.add(TypeCreation.of(TypeDescription.ForLoadedType.of(RuntimeValue.class)));
-//            manipulations.add(Duplication.of(TypeDescription.ForLoadedType.of(RuntimeValue.class)));
-////            private final RuntimeValue.Kind kind;
-//            manipulations.add(ClassConstant.of(TypeDescription.ForLoadedType.of(RuntimeValue.Kind.class)));
-////            private final String name;
-//            manipulations.add(new TextConstant(method.parameters.get(i).name));
-////            private final String type;
-//            manipulations.add(ClassConstant.of(TypeDescription.ForLoadedType.of(type)));
-////            private final Object value;
-//            int readIndex = 0;
-//            for (LocalVariableNode localVariable : method.localVariables) {
-//                if (localVariable.name.equals(method.parameters.get(i).name)) {
-//                    readIndex = localVariable.index;
-//                }
-//            }
-//            manipulations.add(MethodVariableAccess.of(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type))
-//                    .loadFrom(readIndex));
-////            private final List<RuntimeValue> fields;
-//            manipulations.add(ArrayFactory.forType(ForLoadedType.of(RuntimeValue.class)).withValues(List.of()));
-////            private final List<RuntimeValue> arrayElements;
-//            manipulations.add(ArrayFactory.forType(ForLoadedType.of(RuntimeValue.class)).withValues(List.of()));
-//
-//            manipulations.add(MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(
-//                    RuntimeValue.class.getConstructor(RuntimeValue.Kind.class, String.class, String.class, Object.class, List.class, List.class))));
-//        }
+        //        for (int i = 0; i < parameterTypes.length; i++) {
+        //            Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
+        //
+        //            // new RuntimeValue
+        //            manipulations.add(TypeCreation.of(TypeDescription.ForLoadedType.of(RuntimeValue.class)));
+        //            manipulations.add(Duplication.of(TypeDescription.ForLoadedType.of(RuntimeValue.class)));
+        ////            private final RuntimeValue.Kind kind;
+        //            manipulations.add(ClassConstant.of(TypeDescription.ForLoadedType.of(RuntimeValue.Kind.class)));
+        ////            private final String name;
+        //            manipulations.add(new TextConstant(method.parameters.get(i).name));
+        ////            private final String type;
+        //            manipulations.add(ClassConstant.of(TypeDescription.ForLoadedType.of(type)));
+        ////            private final Object value;
+        //            int readIndex = 0;
+        //            for (LocalVariableNode localVariable : method.localVariables) {
+        //                if (localVariable.name.equals(method.parameters.get(i).name)) {
+        //                    readIndex = localVariable.index;
+        //                }
+        //            }
+        //
+        // manipulations.add(MethodVariableAccess.of(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type))
+        //                    .loadFrom(readIndex));
+        ////            private final List<RuntimeValue> fields;
+        //
+        // manipulations.add(ArrayFactory.forType(ForLoadedType.of(RuntimeValue.class)).withValues(List.of()));
+        ////            private final List<RuntimeValue> arrayElements;
+        //
+        // manipulations.add(ArrayFactory.forType(ForLoadedType.of(RuntimeValue.class)).withValues(List.of()));
+        //
+        //            manipulations.add(MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(
+        //                    RuntimeValue.class.getConstructor(RuntimeValue.Kind.class, String.class, String.class,
+        // Object.class, List.class, List.class))));
+        //        }
 
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
                 .storeAt(indexOfLastLocalVariable(method) + STACK_OFFSET));
