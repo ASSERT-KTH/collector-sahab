@@ -21,7 +21,7 @@
                 <version>3.0.0</version>
                 <configuration>
                     <!-- To debug: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -->
-                    <argLine>-javaagent:../../../../target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt</argLine>
+                    <argLine>-javaagent:../../../../target/collector-sahab.jar=classesAndBreakpoints=src/test/resources/basic-math.txt,methodsForExitEvent=src/test/resources/basic-math.json</argLine>
                 </configuration>
             </plugin>
         </plugins>

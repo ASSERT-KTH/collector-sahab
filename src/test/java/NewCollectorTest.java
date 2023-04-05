@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +58,12 @@ class NewCollectorTest {
         RuntimeValue runtimeValue1 = runtimeValues.get(1);
         assertThat(runtimeValue1.getValue(), equalTo(2));
         assertThat(runtimeValue1.getType(), equalTo(int.class.getName()));
-        // ToDo: Add feature for collecting return values
+
+        // Returned value
+        assertThat(output.getReturns().size(), equalTo(1));
+        RuntimeReturnedValue returnedValue = output.getReturns().get(0);
+
+        assertThat(returnedValue.getValue(), equalTo(25));
     }
 
     @Nested
@@ -128,7 +132,10 @@ class NewCollectorTest {
             // act
             InvocationResult result = getInvocationResult(
                     new File("src/test/resources/special-floating-point-value/pom.xml"),
-                    List.of("classesAndBreakpoints=src/test/resources/nested.txt", "output=target/nested.json"),
+                    List.of(
+                            "methodsForExitEvent=src/test/resources/nested.json",
+                            "classesAndBreakpoints=src/test/resources/nested.txt",
+                            "output=target/nested.json"),
                     "");
 
             // assert
@@ -138,9 +145,7 @@ class NewCollectorTest {
 
             ObjectMapper mapper = new ObjectMapper();
             SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
-            assumeFalse(output.getReturns().size() == 1);
-
-            // ToDo: Add feature for collecting return values
+            assertThat(output.getReturns().size(), equalTo(1));
         }
     }
 

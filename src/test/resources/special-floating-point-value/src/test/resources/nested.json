@@ -1,0 +1,6 @@
+[
+  {
+    "className": "foo/SpecialFloatingPointValue",
+    "name": "giveMeNan"
+  }
+]

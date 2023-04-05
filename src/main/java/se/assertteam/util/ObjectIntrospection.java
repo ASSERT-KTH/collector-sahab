@@ -186,7 +186,7 @@ public class ObjectIntrospection {
      * @throws IllegalAccessException if a field could not be read
      */
     private List<RuntimeValue> getArrayValues(Object array, int depth) throws IllegalAccessException {
-        if (array == null || !array.getClass().isArray()) {
+        if (array == null || !array.getClass().isArray() || depth > executionDepth) {
             return List.of();
         }
 
