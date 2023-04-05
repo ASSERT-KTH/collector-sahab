@@ -1,5 +1,6 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -190,20 +191,24 @@ class NewCollectorTest {
             RuntimeValue list =
                     theOnlyStackTraceContext.getRuntimeValueCollection().get(1);
             assertThat(list.getName(), equalTo("list"));
-            RuntimeValue elementsOfList = list.getFields().get(0);
+            RuntimeValue elementsOfList = list.getFields().get(1);
 
             List<?> atomicValue = (List<?>) elementsOfList.getValue();
             assertThat(atomicValue, equalTo(List.of(1, 2, 3, 4, 5)));
+            assertThat(list.getValue(), equalTo(List.of(1, 2, 3, 4, 5).toString()));
 
             // set
             RuntimeValue set =
                     theOnlyStackTraceContext.getRuntimeValueCollection().get(2);
             assertThat(set.getName(), equalTo("set"));
-            RuntimeValue elementsOfSet = set.getFields().get(0);
+            RuntimeValue elementsOfSet = set.getFields().get(1);
 
             List<?> atomicValuesInSet = (List<?>) elementsOfSet.getValue();
             // null are pre-allocated buffers in HashSet
             assertThat(atomicValuesInSet, containsInAnyOrder("aman", "sharma", "sahab", null, null, null));
+            assertThat((String) set.getValue(), containsString("sahab"));
+            assertThat((String) set.getValue(), containsString("aman"));
+            assertThat((String) set.getValue(), containsString("sharma"));
         }
 
         @Test
