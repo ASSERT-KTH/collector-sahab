@@ -183,7 +183,7 @@ class NewCollectorTest {
             RuntimeValue elementsOfQueue = arrayDequeue.getFields().get(0);
             assertThat(elementsOfQueue.getName(), equalTo("elements"));
 
-            String firstElement = ((List<String>) elementsOfQueue.getValue()).get(0);
+            String firstElement = (String) ((List<?>) elementsOfQueue.getValue()).get(0);
             assertThat(firstElement, equalTo("Added at runtime"));
 
             // static fields
@@ -234,8 +234,7 @@ class NewCollectorTest {
             List<RuntimeValue> runtimeValues =
                     output.getBreakpoint().get(0).getStackFrameContext().get(0).getRuntimeValueCollection();
 
-            List<String> stringsInsideArray =
-                    (List<String>) runtimeValues.get(0).getValue();
+            List<?> stringsInsideArray = (List<?>) runtimeValues.get(0).getValue();
             assertThat(stringsInsideArray, equalTo(List.of("yes", "we", "can")));
         }
 
@@ -302,22 +301,22 @@ class NewCollectorTest {
                 // assert
                 RuntimeValue array0 =
                         nestedArray.getArrayElements().get(0).getArrayElements().get(0);
-                List<Object> actualValues_0 = (List<Object>) array0.getValue();
+                List<?> actualValues_0 = (List<?>) array0.getValue();
                 assertThat(actualValues_0, equalTo(List.of(1)));
 
                 RuntimeValue array1 =
                         nestedArray.getArrayElements().get(0).getArrayElements().get(1);
-                List<Object> actualValues_1 = (List<Object>) array1.getValue();
+                List<?> actualValues_1 = (List<?>) array1.getValue();
                 assertThat(actualValues_1, equalTo(List.of(2)));
 
                 RuntimeValue array2 =
                         nestedArray.getArrayElements().get(1).getArrayElements().get(0);
-                List<Object> actualValues_2 = (List<Object>) array2.getValue();
+                List<?> actualValues_2 = (List<?>) array2.getValue();
                 assertThat(actualValues_2, equalTo(List.of(3, 4, 5)));
 
                 RuntimeValue array3 =
                         nestedArray.getArrayElements().get(1).getArrayElements().get(1);
-                List<Object> actualValues_3 = (List<Object>) array3.getValue();
+                List<?> actualValues_3 = (List<?>) array3.getValue();
                 assertThat(actualValues_3, equalTo(List.of(5, 3)));
             }
 
