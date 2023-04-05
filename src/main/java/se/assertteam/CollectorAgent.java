@@ -20,6 +20,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
 import net.bytebuddy.description.type.TypeDescription.Generic.OfNonGenericType.ForLoadedType;
+import net.bytebuddy.description.type.TypeDescription.Latent;
 import net.bytebuddy.implementation.bytecode.Duplication;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.TypeCreation;
@@ -194,7 +195,6 @@ public class CollectorAgent {
         if (options.getExtractParameters()) {
             Type[] parameterTypes = Type.getArgumentTypes(method.desc);
             for (int i = 0; i < parameterTypes.length; i++) {
-                Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
                 ParameterNode parameterNode = method.parameters.get(i);
                 int readIndex = 0;
                 for (LocalVariableNode localVariable : method.localVariables) {
@@ -202,6 +202,7 @@ public class CollectorAgent {
                         readIndex = localVariable.index;
                     }
                 }
+                TypeDescription type = getLatentType(parameterTypes[i]);
                 arguments.add(createLocalVariable(method.parameters.get(i).name, readIndex, type));
             }
         }
@@ -249,6 +250,24 @@ public class CollectorAgent {
         return new StackManipulation.Compound(manipulations);
     }
 
+    private static TypeDescription getLatentType(Type type) {
+        // Arrays can only be looked up using their internal-ish name:
+        // "int[]" does not work, "[I" does.
+        // "java.lang.String[]" does not work, "[Ljava.lamg.String;" does.
+        if (type.getInternalName().startsWith("[")) {
+            return getLatentType(type.getInternalName().replace("/", "."));
+        }
+        return getLatentType(type.getClassName());
+    }
+
+    private static TypeDescription getLatentType(String name) {
+        Class<?> primitive = Classes.getPrimitiveFromString(name);
+        if (primitive != null) {
+            return TypeDescription.ForLoadedType.of(primitive);
+        }
+        return new Latent(name, 0, null);
+    }
+
     private static StackManipulation getCallToLineLogMethod(
             String className, MethodNode method, List<LocalVariableNode> liveVariables, LineNumberNode node)
             throws NoSuchMethodException {
@@ -260,9 +279,8 @@ public class CollectorAgent {
             if (liveVariable.index == 0 && !Modifier.isStatic(method.access)) {
                 continue;
             }
-            Class<?> type =
-                    Classes.getClassFromString(Type.getType(liveVariable.desc).getClassName());
-            values.add(createLocalVariable(liveVariable.name, liveVariable.index, type));
+            TypeDescription variableType = getLatentType(Type.getType(liveVariable.desc));
+            values.add(createLocalVariable(liveVariable.name, liveVariable.index, variableType));
         }
 
         // Stack is still empty.
@@ -283,17 +301,17 @@ public class CollectorAgent {
                 ArrayFactory.forType(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(LocalVariable.class))
                         .withValues(values));
         //    Class<?> receiverClass
-        manipulations.add(new TextConstant(className.replace('/', '.')));
+        manipulations.add(ClassConstant.of(getLatentType(className.replace('/', '.'))));
         //  );
 
         manipulations.add(
                 MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
-                        "logLine", String.class, int.class, Object.class, LocalVariable[].class, String.class))));
+                        "logLine", String.class, int.class, Object.class, LocalVariable[].class, Class.class))));
 
         return new StackManipulation.Compound(manipulations);
     }
 
-    private static StackManipulation.Compound createLocalVariable(String name, int readIndex, Class<?> type)
+    private static StackManipulation.Compound createLocalVariable(String name, int readIndex, TypeDescription type)
             throws NoSuchMethodException {
         return new StackManipulation.Compound(List.of(
                 // new LocalVariable(
@@ -302,12 +320,12 @@ public class CollectorAgent {
                 //   String name
                 new TextConstant(name),
                 // , Class<?> type
-                ClassConstant.of(TypeDescription.ForLoadedType.of(type)),
+                ClassConstant.of(type),
                 // , Object value
-                MethodVariableAccess.of(TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type))
+                MethodVariableAccess.of(type)
                         .loadFrom(readIndex),
                 Assigner.GENERICS_AWARE.assign(
-                        TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(type),
+                        type.asGenericType(),
                         TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(Object.class),
                         Assigner.Typing.STATIC),
                 // );
@@ -323,19 +341,17 @@ public class CollectorAgent {
 
         // public static void logReturn(
         //   Object returnValue,
-        Generic typeDesc = ForLoadedType.of(Classes.getClassFromString(
-                Type.getMethodType(method.desc).getReturnType().getClassName()));
+        Generic typeDesc = getLatentType(Type.getMethodType(method.desc).getReturnType()).asGenericType();
         manipulations.add(Duplication.of(typeDesc));
         manipulations.add(
                 Assigner.GENERICS_AWARE.assign(typeDesc, ForLoadedType.of(Object.class), Assigner.Typing.DYNAMIC));
         //   String methodName,
         manipulations.add(new TextConstant(method.name));
-        //   String returnTypeName
-        manipulations.add(
-                new TextConstant(Type.getMethodType(method.desc).getReturnType().getClassName()));
+        //   Class<?> returnTypeName
+        manipulations.add(ClassConstant.of(getLatentType(Type.getMethodType(method.desc).getReturnType())));
 
-        //   String className
-        manipulations.add(new TextConstant(className.replace('/', '.')));
+        //   Class<?> className
+        manipulations.add(ClassConstant.of(getLatentType(className.replace('/', '.'))));
 
         //   LocalVariable[] parameterValues
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(LocalVariable[].class))
@@ -343,7 +359,7 @@ public class CollectorAgent {
 
         manipulations.add(
                 MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(ContextCollector.class.getMethod(
-                        "logReturn", Object.class, String.class, String.class, String.class, LocalVariable[].class))));
+                        "logReturn", Object.class, String.class, Class.class, Class.class, LocalVariable[].class))));
 
         return new StackManipulation.Compound(manipulations);
     }

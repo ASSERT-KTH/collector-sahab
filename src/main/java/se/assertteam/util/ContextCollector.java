@@ -20,13 +20,13 @@ public class ContextCollector {
     }
 
     public static void setExecutionDepth(int depth) {
-        INTROSPECTOR.setExecutionDepth(depth);
+        ObjectIntrospection.setExecutionDepth(depth);
     }
 
     public static void logLine(
-            String className, int lineNumber, Object receiver, LocalVariable[] localVariables, String receiverClass) {
+            String className, int lineNumber, Object receiver, LocalVariable[] localVariables, Class<?> receiverClass) {
         try {
-            logLineImpl(className, lineNumber, receiver, localVariables, Class.forName(receiverClass));
+            logLineImpl(className, lineNumber, receiver, localVariables, receiverClass);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
@@ -51,8 +51,8 @@ public class ContextCollector {
     public static void logReturn(
             Object returnValue,
             String methodName,
-            String returnTypeName,
-            String className,
+            Class<?> returnTypeClass,
+            Class<?> receiverClass,
             LocalVariable[] parameters) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
@@ -68,8 +68,8 @@ public class ContextCollector {
                             .map(StackFrameContext::stackFrameToString)
                             .collect(Collectors.toList()),
                     StackFrameContext.getLocation(stacktrace),
-                    Class.forName(className),
-                    Classes.getClassFromString(returnTypeName));
+                    receiverClass,
+                    returnTypeClass);
             SAHAB_OUTPUT.getReturns().add(returned);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

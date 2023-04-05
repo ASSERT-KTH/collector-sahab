@@ -50,7 +50,7 @@ public class Classes {
                 || clazz == Character.class;
     }
 
-    public static Class<?> getClassFromString(String className) {
+    public static Class<?> getPrimitiveFromString(String className) {
         switch (className) {
             case "byte":
                 return byte.class;
@@ -71,25 +71,8 @@ public class Classes {
             case "void":
                 return void.class;
             default:
-                try {
-                    if (className.endsWith("[]")) {
-                        int indexOfFirstBracket = className.indexOf('[');
-                        int dimensions = (className.length() - indexOfFirstBracket) / 2;
-                        return getArrayClass(
-                                getClassFromString(className.substring(0, indexOfFirstBracket)), dimensions);
-                    }
-                    return Class.forName(className);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+                return null;
         }
-    }
-
-    public static Class<?> getArrayClass(Class<?> componentType, int dimensions) {
-        if (dimensions == 1) {
-            return Array.newInstance(componentType, 0).getClass();
-        }
-        return getArrayClass(Array.newInstance(componentType, 0).getClass(), dimensions - 1);
     }
 
     public static boolean isArrayBasicallyPrimitive(Object value) {
