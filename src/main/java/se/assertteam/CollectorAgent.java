@@ -42,8 +42,12 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.ParameterNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 import se.assertteam.module.ModuleCracker;
-import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.MethodForExitEvent;
+import se.assertteam.runtime.LocalVariable;
+import se.assertteam.runtime.output.FileAndBreakpoint;
+import se.assertteam.runtime.output.MethodForExitEvent;
+import se.assertteam.util.ByteBuddyHelper;
+import se.assertteam.util.Classes;
+import se.assertteam.util.ContextCollector;
 
 public class CollectorAgent {
 

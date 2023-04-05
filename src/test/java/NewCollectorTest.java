@@ -22,11 +22,11 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.assertteam.LineSnapshot;
-import se.assertteam.RuntimeReturnedValue;
-import se.assertteam.RuntimeValue;
-import se.assertteam.SahabOutput;
-import se.assertteam.StackFrameContext;
+import se.assertteam.runtime.LineSnapshot;
+import se.assertteam.runtime.RuntimeReturnedValue;
+import se.assertteam.runtime.RuntimeValue;
+import se.assertteam.runtime.StackFrameContext;
+import se.assertteam.runtime.output.SahabOutput;
 
 class NewCollectorTest {
     @Test

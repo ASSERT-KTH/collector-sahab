@@ -27,9 +27,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import se.assertteam.runtime.output.FileAndBreakpoint;
+import se.assertteam.runtime.output.MethodForExitEvent;
 import se.kth.debug.MatchedLineFinder;
-import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.MethodForExitEvent;
 
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
@@ -99,7 +99,7 @@ class MatchedLineFinderTest {
                 throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
                         IllegalAccessException {
             // arrange
-            File base = TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.toFile();
+            File base = Paths.get("src/test/resources/basic-math").toFile();
 
             Class<?> mlf = Class.forName("se.kth.debug.MatchedLineFinder");
             Method method = mlf.getDeclaredMethod("resolveFilenameWithGivenBase", File.class, String.class);
@@ -113,8 +113,8 @@ class MatchedLineFinderTest {
                 throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
                         IllegalAccessException {
             // arrange
-            String filename = String.join(
-                    File.separator, new String[] {"src", "main", "java", "foo", "collections", "Primitive.java"});
+            String filename =
+                    String.join(File.separator, new String[] {"src", "main", "java", "foo", "BasicMath.java"});
 
             // act
             File resolvedFile = (File) resolveFilename(filename);

@@ -1,6 +1,0 @@
-[
-    {
-        "fileName": "foo.objects.OneLevelNestedObject",
-        "breakpoints": [5]
-    }
-]

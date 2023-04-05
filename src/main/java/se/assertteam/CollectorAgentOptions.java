@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.MethodForExitEvent;
+import se.assertteam.runtime.output.FileAndBreakpoint;
+import se.assertteam.runtime.output.MethodForExitEvent;
 
 public class CollectorAgentOptions {
 

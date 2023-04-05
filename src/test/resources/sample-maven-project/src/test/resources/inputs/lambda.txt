@@ -1,6 +1,0 @@
-[
-    {
-        "breakpoints": [7, 8],
-        "fileName": "foo.anonymous.Lambda"
-    }
-]

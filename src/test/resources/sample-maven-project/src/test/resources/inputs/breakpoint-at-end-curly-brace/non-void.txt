@@ -1,6 +1,0 @@
-[
-    {
-        "fileName": "foo.breakpointAtEndCurlyBrace.NonVoid",
-        "breakpoints": [7]
-    }
-]

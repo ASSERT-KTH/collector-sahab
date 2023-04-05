@@ -1,6 +1,0 @@
-[
-    {
-        "fileName": "foo.StaticClassField$Pair",
-        "breakpoints": [15,24]
-    }
-]
