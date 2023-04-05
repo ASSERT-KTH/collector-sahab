@@ -18,6 +18,8 @@ public class CollectorAgentOptions {
     private File output = new File("target/output.json");
     private int executionDepth = 0;
 
+    private boolean extractParameters = false;
+
     public CollectorAgentOptions(String javaAgentArgs) {
         if (javaAgentArgs == null || javaAgentArgs.isEmpty()) {
             return;
@@ -47,6 +49,9 @@ public class CollectorAgentOptions {
                 case "methodsForExitEvent":
                     methodsForExitEvent = new File(value);
                     break;
+                case "extractParameters":
+                    extractParameters = Boolean.parseBoolean(value);
+                    break;
                 default:
                     throw new IllegalArgumentException("Unknown argument: " + key);
             }
@@ -63,6 +68,10 @@ public class CollectorAgentOptions {
 
     public int getNumberOfArrayElements() {
         return numberOfArrayElements;
+    }
+
+    public boolean getExtractParameters() {
+        return extractParameters;
     }
 
     public List<FileAndBreakpoint> getClassesAndBreakpoints() {

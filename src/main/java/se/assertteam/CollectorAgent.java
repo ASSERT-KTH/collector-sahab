@@ -136,6 +136,7 @@ public class CollectorAgent {
             for (AbstractInsnNode instruction : method.instructions) {
                 AbstractInsnNode currentNode = instruction;
 
+                // Stores parameter values in an array
                 if (shouldMethodExitBeRecorded(method, methodExits) && instruction.getPrevious() == null) {
                     StackManipulation callEntryLog = getCallToEntryLogMethod(method);
                     currentNode = ByteBuddyHelper.applyStackManipulation(
@@ -180,19 +181,21 @@ public class CollectorAgent {
 
     private static StackManipulation.Compound getCallToEntryLogMethod(MethodNode method) throws NoSuchMethodException {
         List<StackManipulation> manipulations = new ArrayList<>();
-
         List<StackManipulation> arguments = new ArrayList<>();
-        Type[] parameterTypes = Type.getArgumentTypes(method.desc);
-        for (int i = 0; i < parameterTypes.length; i++) {
-            Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
-            ParameterNode parameterNode = method.parameters.get(i);
-            int readIndex = 0;
-            for (LocalVariableNode localVariable : method.localVariables) {
-                if (localVariable.name.equals(parameterNode.name)) {
-                    readIndex = localVariable.index;
+
+        if (options.getExtractParameters()) {
+            Type[] parameterTypes = Type.getArgumentTypes(method.desc);
+            for (int i = 0; i < parameterTypes.length; i++) {
+                Class<?> type = Classes.getClassFromString(parameterTypes[i].getClassName());
+                ParameterNode parameterNode = method.parameters.get(i);
+                int readIndex = 0;
+                for (LocalVariableNode localVariable : method.localVariables) {
+                    if (localVariable.name.equals(parameterNode.name)) {
+                        readIndex = localVariable.index;
+                    }
                 }
+                arguments.add(createLocalVariable(method.parameters.get(i).name, readIndex, type));
             }
-            arguments.add(createLocalVariable(method.parameters.get(i).name, readIndex, type));
         }
 
         ArrayFactory arrayFactory = ArrayFactory.forType(ForLoadedType.of(LocalVariable.class));

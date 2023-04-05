@@ -572,6 +572,7 @@ class NewCollectorTest {
             InvocationResult result = getInvocationResult(
                     pomFile,
                     List.of(
+                            "extractParameters=true",
                             "methodsForExitEvent=src/test/resources/primitive.json",
                             "classesAndBreakpoints=src/test/resources/primitive.txt",
                             "output=target/output.json",
@@ -630,6 +631,7 @@ class NewCollectorTest {
             InvocationResult result = getInvocationResult(
                     pomFile,
                     List.of(
+                            "extractParameters=true",
                             "methodsForExitEvent=src/test/resources/non-primitive.json",
                             "classesAndBreakpoints=src/test/resources/non-primitive.txt",
                             "output=target/output.json",
