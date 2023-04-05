@@ -131,10 +131,7 @@ public class Classes {
                 return false;
             }
             if (!CACHED_CLASSES.containsKey(type)) {
-                CACHED_CLASSES.put(
-                    type,
-                    type.getMethod("toString").getDeclaringClass() != Object.class
-                );
+                CACHED_CLASSES.put(type, type.getMethod("toString").getDeclaringClass() != Object.class);
             }
 
             return CACHED_CLASSES.get(type);
