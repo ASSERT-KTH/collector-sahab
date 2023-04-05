@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "foo/DeathAndGlory",
+        "breakpoints": [8, 11, 14]
+    }
+]

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import se.assertteam.runtime.RuntimeValue.RuntimeValueSerializer;
 import se.assertteam.util.Classes;
 
@@ -57,6 +58,25 @@ public class RuntimeValue {
 
     public List<RuntimeValue> getArrayElements() {
         return arrayElements;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RuntimeValue that = (RuntimeValue) o;
+        return kind == that.kind && Objects.equals(name, that.name) && Objects.equals(
+            type, that.type) && Objects.equals(value, that.value) && Objects.equals(
+            fields, that.fields) && Objects.equals(arrayElements, that.arrayElements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kind, name, type, value, fields, arrayElements);
     }
 
     public enum Kind {

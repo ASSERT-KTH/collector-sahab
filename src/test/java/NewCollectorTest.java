@@ -20,11 +20,13 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import se.assertteam.runtime.LineSnapshot;
 import se.assertteam.runtime.RuntimeReturnedValue;
 import se.assertteam.runtime.RuntimeValue;
+import se.assertteam.runtime.RuntimeValue.Kind;
 import se.assertteam.runtime.StackFrameContext;
 import se.assertteam.runtime.output.SahabOutput;
 
@@ -65,6 +67,67 @@ class NewCollectorTest {
         RuntimeReturnedValue returnedValue = output.getReturns().get(0);
 
         assertThat(returnedValue.getValue(), equalTo(25));
+    }
+
+    @Nested
+    class Liveness {
+
+        @Test
+        @DisplayName("Dead variables are removed from later line logs")
+        void deadVariablesShouldBeRemoved() throws MavenInvocationException, IOException {
+            InvocationResult result = getInvocationResult(
+                new File("src/test/resources/liveness-and-death/pom.xml"),
+                List.of(
+                    "classesAndBreakpoints=src/test/resources/death-and-glory.txt",
+                    "output=target/death-and-glory.json",
+                    "executionDepth=1"
+                ),
+                ""
+            );
+
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/liveness-and-death/target/death-and-glory.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint().size(), equalTo(4));
+
+            LineSnapshot snapshot8 = output.getBreakpoint().get(2);
+            LineSnapshot snapshot11 = output.getBreakpoint().get(0);
+            LineSnapshot snapshot14 = output.getBreakpoint().get(1);
+
+            List<RuntimeValue> values8 = snapshot8.getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection();
+            assertThat(values8.get(0), equalTo(new RuntimeValue(
+                Kind.LOCAL_VARIABLE, "input", "int", 42, List.of(), List.of()
+            )));
+            assertThat(values8.get(1), equalTo(new RuntimeValue(
+                Kind.LOCAL_VARIABLE, "robot", "java.lang.String", "What is my purpose", List.of(), List.of()
+            )));
+
+            List<RuntimeValue> values11 = snapshot11.getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection();
+            assertThat(values11.get(0), equalTo(new RuntimeValue(
+                Kind.LOCAL_VARIABLE, "input", "int", 21, List.of(), List.of()
+            )));
+            assertThat(values11.get(1), equalTo(new RuntimeValue(
+                Kind.LOCAL_VARIABLE, "answer", "java.lang.String", "THERE IS AS YET INSUFFICIENT DATA FOR A MEANINGFUL ANSWER", List.of(), List.of()
+            )));
+
+            List<RuntimeValue> values14 = snapshot14.getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection();
+            assertThat(values14.get(0), equalTo(new RuntimeValue(
+                Kind.LOCAL_VARIABLE, "input", "int", 21, List.of(), List.of()
+            )));
+            assertThat(values14.get(1), equalTo(new RuntimeValue(
+                Kind.LOCAL_VARIABLE, "nextSteps", "int", 42, List.of(), List.of()
+            )));
+        }
+
     }
 
     @Nested
