@@ -19,7 +19,6 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -100,30 +99,30 @@ class NewCollectorTest {
             List<RuntimeValue> values8 = snapshot8.getStackFrameContext()
                 .get(0)
                 .getRuntimeValueCollection();
-            assertThat(values8.get(0), equalTo(new RuntimeValue(
+            assertThat(values8.get(0), equalTo(RuntimeValue.fromRaw(
                 Kind.LOCAL_VARIABLE, "input", "int", 42, List.of(), List.of()
             )));
-            assertThat(values8.get(1), equalTo(new RuntimeValue(
+            assertThat(values8.get(1), equalTo(RuntimeValue.fromRaw(
                 Kind.LOCAL_VARIABLE, "robot", "java.lang.String", "What is my purpose", List.of(), List.of()
             )));
 
             List<RuntimeValue> values11 = snapshot11.getStackFrameContext()
                 .get(0)
                 .getRuntimeValueCollection();
-            assertThat(values11.get(0), equalTo(new RuntimeValue(
+            assertThat(values11.get(0), equalTo(RuntimeValue.fromRaw(
                 Kind.LOCAL_VARIABLE, "input", "int", 21, List.of(), List.of()
             )));
-            assertThat(values11.get(1), equalTo(new RuntimeValue(
+            assertThat(values11.get(1), equalTo(RuntimeValue.fromRaw(
                 Kind.LOCAL_VARIABLE, "answer", "java.lang.String", "THERE IS AS YET INSUFFICIENT DATA FOR A MEANINGFUL ANSWER", List.of(), List.of()
             )));
 
             List<RuntimeValue> values14 = snapshot14.getStackFrameContext()
                 .get(0)
                 .getRuntimeValueCollection();
-            assertThat(values14.get(0), equalTo(new RuntimeValue(
+            assertThat(values14.get(0), equalTo(RuntimeValue.fromRaw(
                 Kind.LOCAL_VARIABLE, "input", "int", 21, List.of(), List.of()
             )));
-            assertThat(values14.get(1), equalTo(new RuntimeValue(
+            assertThat(values14.get(1), equalTo(RuntimeValue.fromRaw(
                 Kind.LOCAL_VARIABLE, "nextSteps", "int", 42, List.of(), List.of()
             )));
         }
@@ -695,7 +694,6 @@ class NewCollectorTest {
             assertThat(((int) argument2.getValue()) - 1, equalTo(localVariable2.getValue()));
         }
 
-        @Disabled("Non-primitive parameter values are not recorded")
         @Test
         void nonPrimitiveArgumentValues_shouldBeRecorded() throws MavenInvocationException, IOException {
             // act

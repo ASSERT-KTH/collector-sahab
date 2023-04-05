@@ -1,5 +1,6 @@
 package se.assertteam.runtime;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -21,7 +22,7 @@ public class RuntimeValue {
     private final List<RuntimeValue> fields;
     private final List<RuntimeValue> arrayElements;
 
-    public RuntimeValue(
+    protected RuntimeValue(
             @JsonProperty("kind") Kind kind,
             @JsonProperty("name") String name,
             @JsonProperty("type") String type,
@@ -60,6 +61,38 @@ public class RuntimeValue {
         return arrayElements;
     }
 
+    public static RuntimeValue fromObservation(
+        Kind kind,
+        String name,
+        String type,
+        Object value,
+        List<RuntimeValue> fields,
+        List<RuntimeValue> arrayElements
+    ) {
+        if (Classes.isArrayBasicallyPrimitive(value)) {
+            return new RuntimeValue(
+                kind, name, type, value, fields, List.of()
+            );
+        } else {
+            return new RuntimeValue(
+                kind, name, type, Classes.simplifyValue(value), fields, arrayElements
+            );
+        }
+    }
+
+    public static RuntimeValue fromRaw(
+        Kind kind,
+        String name,
+        String type,
+        Object value,
+        List<RuntimeValue> fields,
+        List<RuntimeValue> arrayElements
+    ) {
+        return new RuntimeValue(
+            kind, name, type, value, fields, arrayElements
+        );
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -96,13 +129,8 @@ public class RuntimeValue {
             serializers.defaultSerializeField("name", value.name, gen);
             serializers.defaultSerializeField("type", value.type, gen);
             serializers.defaultSerializeField("fields", value.fields, gen);
-            if (Classes.isArrayBasicallyPrimitive(value.getValue())) {
-                serializers.defaultSerializeField("arrayElements", List.of(), gen);
-                serializers.defaultSerializeField("value", value.value, gen);
-            } else {
-                serializers.defaultSerializeField("value", Classes.simplifyValue(value), gen);
-                serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
-            }
+            serializers.defaultSerializeField("value", value.value, gen);
+            serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
             gen.writeEndObject();
         }
     }

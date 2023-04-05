@@ -89,7 +89,7 @@ public class ObjectIntrospection {
         List<RuntimeValue> fields = getFieldValues(returned, 1, receiverClass);
         List<RuntimeValue> arrayValues = getArrayValues(returned, 1);
 
-        return new RuntimeReturnedValue(
+        return RuntimeReturnedValue.fromObservation(
                 RuntimeValue.Kind.RETURN,
                 methodName,
                 Classes.getCanonicalClassName(getType(returned, returnType)),
@@ -124,7 +124,8 @@ public class ObjectIntrospection {
             arrayElements = getArrayValues(object, depth);
         }
 
-        return new RuntimeValue(kind, name, getCanonicalClassName(type), object, fields, arrayElements);
+        return RuntimeValue
+            .fromObservation(kind, name, getCanonicalClassName(type), object, fields,arrayElements);
     }
 
     /**

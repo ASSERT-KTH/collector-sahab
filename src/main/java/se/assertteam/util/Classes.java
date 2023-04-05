@@ -88,8 +88,7 @@ public class Classes {
         return true;
     }
 
-    public static Object simplifyValue(RuntimeValue runtimeValue) {
-        Object value = runtimeValue.getValue();
+    public static Object simplifyValue(Object value) {
         if (value == null) {
             return null;
         }

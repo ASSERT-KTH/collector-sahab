@@ -23,6 +23,18 @@ public class ContextCollector {
         ObjectIntrospection.setExecutionDepth(depth);
     }
 
+    public static List<RuntimeValue> convertLocalVariables(LocalVariable[] variables) {
+        try {
+            List<RuntimeValue> values = new ArrayList<>();
+            for (LocalVariable variable : variables) {
+                values.add(INTROSPECTOR.introspectVariable(variable));
+            }
+            return values;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void logLine(
             String className, int lineNumber, Object receiver, LocalVariable[] localVariables, Class<?> receiverClass) {
         try {
@@ -35,11 +47,7 @@ public class ContextCollector {
     private static void logLineImpl(
             String className, int lineNumber, Object receiver, LocalVariable[] localVariables, Class<?> receiverClass)
             throws ReflectiveOperationException {
-        List<RuntimeValue> values = new ArrayList<>();
-        for (LocalVariable variable : localVariables) {
-            values.add(INTROSPECTOR.introspectVariable(variable));
-        }
-
+        List<RuntimeValue> values = convertLocalVariables(localVariables);
         values.addAll(INTROSPECTOR.introspectReceiverFields(receiver, receiverClass));
 
         StackFrameContext stackFrameContext = StackFrameContext.forValues(values);
@@ -53,17 +61,13 @@ public class ContextCollector {
             String methodName,
             Class<?> returnTypeClass,
             Class<?> receiverClass,
-            LocalVariable[] parameters) {
+            List<RuntimeValue> parameters) {
         try {
             List<StackWalker.StackFrame> stacktrace = StackFrameContext.getStacktrace();
-            List<RuntimeValue> arguments = new ArrayList<>();
-            for (LocalVariable parameter : parameters) {
-                arguments.add(INTROSPECTOR.introspectVariable(parameter));
-            }
             RuntimeReturnedValue returned = INTROSPECTOR.introspectReturnValue(
                     methodName,
                     returnValue,
-                    arguments,
+                    parameters,
                     stacktrace.stream()
                             .map(StackFrameContext::stackFrameToString)
                             .collect(Collectors.toList()),

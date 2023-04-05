@@ -17,7 +17,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
 
     private final String location;
 
-    public RuntimeReturnedValue(
+    protected RuntimeReturnedValue(
             @JsonProperty("kind") Kind kind,
             @JsonProperty("methodName") String name,
             @JsonProperty("type") String type,
@@ -46,6 +46,30 @@ public class RuntimeReturnedValue extends RuntimeValue {
         return location;
     }
 
+    public static RuntimeReturnedValue fromObservation(
+        @JsonProperty("kind") Kind kind,
+        @JsonProperty("methodName") String name,
+        @JsonProperty("type") String type,
+        @JsonProperty("value") Object value,
+        @JsonProperty("fields") List<RuntimeValue> fields,
+        @JsonProperty("arrayElements") List<RuntimeValue> arrayElements,
+        @JsonProperty("parameterValues") List<RuntimeValue> parameters,
+        @JsonProperty("stackTrace") List<String> stackTrace,
+        @JsonProperty("location") String location
+    ) {
+        if (Classes.isArrayBasicallyPrimitive(value)) {
+            return new RuntimeReturnedValue(
+                kind, name, type, value, fields, List.of(), parameters, stackTrace, location
+            );
+        } else {
+            return new RuntimeReturnedValue(
+                kind, name, type, Classes.simplifyValue(value), fields, arrayElements, parameters,
+                stackTrace, location
+            );
+        }
+    }
+
+
     static class RuntimeReturnedValueSerializer extends JsonSerializer<RuntimeReturnedValue> {
 
         @Override
@@ -56,13 +80,8 @@ public class RuntimeReturnedValue extends RuntimeValue {
             serializers.defaultSerializeField("methodName", value.getName(), gen);
             serializers.defaultSerializeField("stackTrace", value.getStackTrace(), gen);
             serializers.defaultSerializeField("type", value.getType(), gen);
-            if (Classes.isArrayBasicallyPrimitive(value.getValue())) {
-                serializers.defaultSerializeField("arrayElements", List.of(), gen);
-                serializers.defaultSerializeField("value", value.getValue(), gen);
-            } else {
-                serializers.defaultSerializeField("value", Classes.simplifyValue(value), gen);
-                serializers.defaultSerializeField("arrayElements", value.getArrayElements(), gen);
-            }
+            serializers.defaultSerializeField("value", value.getValue(), gen);
+            serializers.defaultSerializeField("arrayElements", value.getArrayElements(), gen);
             serializers.defaultSerializeField("fields", value.getFields(), gen);
             serializers.defaultSerializeField("location", value.getLocation(), gen);
             serializers.defaultSerializeField("parameterValues", value.getArguments(), gen);
