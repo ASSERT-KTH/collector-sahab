@@ -149,6 +149,9 @@ public class CollectorAgent {
                         if (localVariable.start == currentNode) {
                             liveVariables.add(localVariable);
                         }
+                        if (localVariable.end == currentNode) {
+                            liveVariables.remove(localVariable);
+                        }
                     }
                 }
                 if (instruction instanceof LineNumberNode) {
