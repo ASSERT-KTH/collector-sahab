@@ -27,67 +27,50 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import se.assertteam.runtime.output.FileAndBreakpoint;
+import se.assertteam.runtime.output.MethodForExitEvent;
 import se.kth.debug.MatchedLineFinder;
-import se.kth.debug.struct.FileAndBreakpoint;
-import se.kth.debug.struct.MethodForExitEvent;
 
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");
 
-    private static final List<String> IGNORE_TESTS =
-            List.of(
-                    // ToDo: Can be fixed after
-                    // https://github.com/SpoonLabs/gumtree-spoon-ast-diff/issues/245
-                    "nested-lambda",
-                    "anonymous-class",
-                    "nested-anonymous-class",
-                    "multiple-nested-types");
+    private static final List<String> IGNORE_TESTS = List.of(
+            // ToDo: Can be fixed after
+            // https://github.com/SpoonLabs/gumtree-spoon-ast-diff/issues/245
+            "nested-lambda", "anonymous-class", "nested-anonymous-class", "multiple-nested-types");
 
     @ParameterizedTest
     @ArgumentsSource(ResourceProvider.Patch.class)
-    void should_correctlyGenerateAllInputFilesForCollectorSahab(
-            ResourceProvider.TestResource sources) throws Exception {
+    void should_correctlyGenerateAllInputFilesForCollectorSahab(ResourceProvider.TestResource sources)
+            throws Exception {
         if (IGNORE_TESTS.contains(sources.dir)) {
             assumeTrue(false);
         }
-        Triple<String, String, String> inputsForCollectorSahab =
-                MatchedLineFinder.invoke(sources.left, sources.right);
+        Triple<String, String, String> inputsForCollectorSahab = MatchedLineFinder.invoke(sources.left, sources.right);
         assertInputsAreAsExpected(inputsForCollectorSahab, sources.expected);
     }
 
-    private void assertInputsAreAsExpected(
-            Triple<String, String, String> input, Path dirContainingExpectedFiles)
+    private void assertInputsAreAsExpected(Triple<String, String, String> input, Path dirContainingExpectedFiles)
             throws IOException {
-        List<FileAndBreakpoint> actualBreakpointLeft =
-                deserialiseFileAndBreakpoint(input.getLeft());
-        List<FileAndBreakpoint> actualBreakpointRight =
-                deserialiseFileAndBreakpoint(input.getRight());
+        List<FileAndBreakpoint> actualBreakpointLeft = deserialiseFileAndBreakpoint(input.getLeft());
+        List<FileAndBreakpoint> actualBreakpointRight = deserialiseFileAndBreakpoint(input.getRight());
 
         List<FileAndBreakpoint> expectedBreakpointLeft =
-                deserialiseFileAndBreakpoint(
-                        Files.readString(dirContainingExpectedFiles.resolve("input-left.txt")));
+                deserialiseFileAndBreakpoint(Files.readString(dirContainingExpectedFiles.resolve("input-left.txt")));
         List<FileAndBreakpoint> expectedBreakpointRight =
-                deserialiseFileAndBreakpoint(
-                        Files.readString(dirContainingExpectedFiles.resolve("input-right.txt")));
+                deserialiseFileAndBreakpoint(Files.readString(dirContainingExpectedFiles.resolve("input-right.txt")));
 
         if (dirContainingExpectedFiles.resolve("methods.json").toFile().exists()) {
-            List<MethodForExitEvent> actualMethods =
-                    deserialiseMethodForExitEvent(input.getMiddle());
+            List<MethodForExitEvent> actualMethods = deserialiseMethodForExitEvent(input.getMiddle());
             List<MethodForExitEvent> expectedMethods =
-                    deserialiseMethodForExitEvent(
-                            Files.readString(dirContainingExpectedFiles.resolve("methods.json")));
+                    deserialiseMethodForExitEvent(Files.readString(dirContainingExpectedFiles.resolve("methods.json")));
 
-            assertThat(
-                    actualMethods,
-                    containsInAnyOrder(expectedMethods.toArray(new MethodForExitEvent[0])));
+            assertThat(actualMethods, containsInAnyOrder(expectedMethods.toArray(new MethodForExitEvent[0])));
         }
 
+        assertThat(actualBreakpointLeft, containsInAnyOrder(expectedBreakpointLeft.toArray(new FileAndBreakpoint[0])));
         assertThat(
-                actualBreakpointLeft,
-                containsInAnyOrder(expectedBreakpointLeft.toArray(new FileAndBreakpoint[0])));
-        assertThat(
-                actualBreakpointRight,
-                containsInAnyOrder(expectedBreakpointRight.toArray(new FileAndBreakpoint[0])));
+                actualBreakpointRight, containsInAnyOrder(expectedBreakpointRight.toArray(new FileAndBreakpoint[0])));
     }
 
     private List<FileAndBreakpoint> deserialiseFileAndBreakpoint(String json) {
@@ -107,9 +90,7 @@ class MatchedLineFinderTest {
         File right = BASE_DIR.resolve("EXCLUDE_no-diff").resolve("right.java").toFile();
 
         // assert
-        assertThrowsExactly(
-                MatchedLineFinder.NoDiffException.class,
-                () -> MatchedLineFinder.invoke(left, right));
+        assertThrowsExactly(MatchedLineFinder.NoDiffException.class, () -> MatchedLineFinder.invoke(left, right));
     }
 
     @Nested
@@ -118,11 +99,10 @@ class MatchedLineFinderTest {
                 throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
                         IllegalAccessException {
             // arrange
-            File base = TestHelper.PATH_TO_SAMPLE_MAVEN_PROJECT.toFile();
+            File base = Paths.get("src/test/resources/basic-math").toFile();
 
             Class<?> mlf = Class.forName("se.kth.debug.MatchedLineFinder");
-            Method method =
-                    mlf.getDeclaredMethod("resolveFilenameWithGivenBase", File.class, String.class);
+            Method method = mlf.getDeclaredMethod("resolveFilenameWithGivenBase", File.class, String.class);
             method.setAccessible(true);
 
             return method.invoke(null, base, filename);
@@ -134,11 +114,7 @@ class MatchedLineFinderTest {
                         IllegalAccessException {
             // arrange
             String filename =
-                    String.join(
-                            File.separator,
-                            new String[] {
-                                "src", "main", "java", "foo", "collections", "Primitive.java"
-                            });
+                    String.join(File.separator, new String[] {"src", "main", "java", "foo", "BasicMath.java"});
 
             // act
             File resolvedFile = (File) resolveFilename(filename);
@@ -151,14 +127,11 @@ class MatchedLineFinderTest {
         void throws_FileNotFoundException() {
             // arrange
             String filename =
-                    String.join(
-                            File.separator,
-                            new String[] {"src", "main", "java", "foo", "blah", "Bar.java"});
+                    String.join(File.separator, new String[] {"src", "main", "java", "foo", "blah", "Bar.java"});
 
             // assert
             Throwable exceptionWrapper =
-                    assertThrowsExactly(
-                            InvocationTargetException.class, () -> resolveFilename(filename));
+                    assertThrowsExactly(InvocationTargetException.class, () -> resolveFilename(filename));
             assertThat(exceptionWrapper.getCause(), instanceOf(FileNotFoundException.class));
         }
     }
@@ -196,9 +169,8 @@ class ResourceProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
-            return Arrays.stream(
-                            Objects.requireNonNull(
-                                    MatchedLineFinderTest.BASE_DIR.toFile().listFiles()))
+            return Arrays.stream(Objects.requireNonNull(
+                            MatchedLineFinderTest.BASE_DIR.toFile().listFiles()))
                     .filter(File::isDirectory)
                     .filter(dir -> !dir.getName().startsWith("EXCLUDE_"))
                     .map(TestResource::fromTestDirectory)

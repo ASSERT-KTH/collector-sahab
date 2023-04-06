@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "NonStaticField",
+        "breakpoints": [23]
+    }
+]

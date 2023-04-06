@@ -1,6 +1,0 @@
-[
-    {
-        "fileName": "foo.SpecialFloatingPointValue",
-        "breakpoints": [5, 6, 7, 11]
-    }
-]

@@ -1,6 +1,0 @@
-[
-    {
-        "fileName": "foo.collections.OneLevelCollections",
-        "breakpoints": [12]
-    }
-]

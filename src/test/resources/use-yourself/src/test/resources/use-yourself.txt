@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "foo/UseYourself",
+        "breakpoints": [10]
+    }
+]
