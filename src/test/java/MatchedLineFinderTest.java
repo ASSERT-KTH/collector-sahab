@@ -5,8 +5,8 @@ import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -73,14 +73,16 @@ class MatchedLineFinderTest {
                 actualBreakpointRight, containsInAnyOrder(expectedBreakpointRight.toArray(new FileAndBreakpoint[0])));
     }
 
-    private List<FileAndBreakpoint> deserialiseFileAndBreakpoint(String json) {
-        final Gson gson = new Gson();
-        return gson.fromJson(json, new TypeToken<List<FileAndBreakpoint>>() {}.getType());
+    private List<FileAndBreakpoint> deserialiseFileAndBreakpoint(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(
+                json, mapper.getTypeFactory().constructCollectionType(List.class, FileAndBreakpoint.class));
     }
 
-    private List<MethodForExitEvent> deserialiseMethodForExitEvent(String json) {
-        final Gson gson = new Gson();
-        return gson.fromJson(json, new TypeToken<List<MethodForExitEvent>>() {}.getType());
+    private List<MethodForExitEvent> deserialiseMethodForExitEvent(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(
+                json, mapper.getTypeFactory().constructCollectionType(List.class, MethodForExitEvent.class));
     }
 
     @Test

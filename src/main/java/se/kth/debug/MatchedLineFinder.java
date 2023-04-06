@@ -1,15 +1,15 @@
 package se.kth.debug;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import se.assertteam.runtime.output.FileAndBreakpoint;
+import se.assertteam.runtime.output.MethodForExitEvent;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.*;
@@ -311,25 +311,23 @@ public class MatchedLineFinder {
         return new File(revisionDirectory.toURI().resolve(diffedFile.getName()).getPath());
     }
 
-    private static String serialiseBreakpoints(String fullyQualifiedClassName, Set<Integer> breakpoints) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonArray array = new JsonArray();
-        JsonObject object = new JsonObject();
-        object.addProperty("fileName", fullyQualifiedClassName);
-        object.add("breakpoints", gson.toJsonTree(breakpoints));
-        array.add(object);
+    private static String serialiseBreakpoints(String fullyQualifiedClassName, Set<Integer> breakpoints)
+            throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Integer> uniqueBreakpoints = new ArrayList<>(breakpoints);
+        FileAndBreakpoint fileAndBreakpoint = new FileAndBreakpoint(fullyQualifiedClassName, uniqueBreakpoints);
+        List<FileAndBreakpoint> fileAndBreakpoints = List.of(fileAndBreakpoint);
 
-        return gson.toJson(array);
+        return mapper.writeValueAsString(fileAndBreakpoints);
     }
 
-    private static String serialiseMethods(String fullyQualifiedClassName, String methodName) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonArray array = new JsonArray();
-        JsonObject object = new JsonObject();
-        object.addProperty("className", fullyQualifiedClassName);
-        object.addProperty("name", methodName);
-        array.add(object);
-        return gson.toJson(array);
+    private static String serialiseMethods(String fullyQualifiedClassName, String methodName)
+            throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        MethodForExitEvent fileAndMethod = new MethodForExitEvent(methodName, fullyQualifiedClassName);
+        List<MethodForExitEvent> fileAndMethods = List.of(fileAndMethod);
+
+        return mapper.writeValueAsString(fileAndMethods);
     }
 
     private static void createInputFile(String content, String filename) throws IOException {
