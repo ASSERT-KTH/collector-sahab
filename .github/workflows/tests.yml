@@ -22,4 +22,4 @@ jobs:
       - name: Run test phase
         run: 'mvn test'
       - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
