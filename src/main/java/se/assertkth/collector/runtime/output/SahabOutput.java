@@ -1,11 +1,11 @@
-package se.assertteam.runtime.output;
+package se.assertkth.collector.runtime.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import se.assertteam.runtime.LineSnapshot;
-import se.assertteam.runtime.RuntimeReturnedValue;
+import se.assertkth.collector.runtime.LineSnapshot;
+import se.assertkth.collector.runtime.RuntimeReturnedValue;
 
 public class SahabOutput {
 

@@ -1,4 +1,4 @@
-package se.assertteam;
+package se.assertkth.collector;
 
 import static org.objectweb.asm.Opcodes.ATHROW;
 import static org.objectweb.asm.Opcodes.IRETURN;
@@ -44,13 +44,13 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.ParameterNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
-import se.assertteam.module.ModuleCracker;
-import se.assertteam.runtime.LocalVariable;
-import se.assertteam.runtime.output.FileAndBreakpoint;
-import se.assertteam.runtime.output.MethodForExitEvent;
-import se.assertteam.util.ByteBuddyHelper;
-import se.assertteam.util.Classes;
-import se.assertteam.util.ContextCollector;
+import se.assertkth.collector.module.ModuleCracker;
+import se.assertkth.collector.runtime.LocalVariable;
+import se.assertkth.collector.runtime.output.FileAndBreakpoint;
+import se.assertkth.collector.runtime.output.MethodForExitEvent;
+import se.assertkth.collector.util.ByteBuddyHelper;
+import se.assertkth.collector.util.Classes;
+import se.assertkth.collector.util.ContextCollector;
 
 public class CollectorAgent {
 

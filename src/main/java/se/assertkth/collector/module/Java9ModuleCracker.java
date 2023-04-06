@@ -1,4 +1,4 @@
-package se.assertteam.module;
+package se.assertkth.collector.module;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import se.assertteam.CollectorAgent;
+import se.assertkth.collector.CollectorAgent;
 
 public class Java9ModuleCracker implements ModuleCracker {
 

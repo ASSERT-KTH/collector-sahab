@@ -1,14 +1,14 @@
-package se.assertteam.util;
+package se.assertkth.collector.util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import se.assertteam.runtime.LineSnapshot;
-import se.assertteam.runtime.LocalVariable;
-import se.assertteam.runtime.RuntimeReturnedValue;
-import se.assertteam.runtime.RuntimeValue;
-import se.assertteam.runtime.StackFrameContext;
-import se.assertteam.runtime.output.SahabOutput;
+import se.assertkth.collector.runtime.LineSnapshot;
+import se.assertkth.collector.runtime.LocalVariable;
+import se.assertkth.collector.runtime.RuntimeReturnedValue;
+import se.assertkth.collector.runtime.RuntimeValue;
+import se.assertkth.collector.runtime.StackFrameContext;
+import se.assertkth.collector.runtime.output.SahabOutput;
 
 public class ContextCollector {
 

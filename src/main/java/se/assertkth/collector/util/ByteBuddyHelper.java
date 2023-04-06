@@ -1,4 +1,4 @@
-package se.assertteam.util;
+package se.assertkth.collector.util;
 
 import java.util.ArrayList;
 import java.util.List;

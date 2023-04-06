@@ -1,4 +1,4 @@
-package se.assertteam.runtime;
+package se.assertkth.collector.runtime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

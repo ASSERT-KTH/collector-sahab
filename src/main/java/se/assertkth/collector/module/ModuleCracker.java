@@ -1,4 +1,4 @@
-package se.assertteam.module;
+package se.assertkth.collector.module;
 
 import java.lang.instrument.Instrumentation;
 
@@ -18,7 +18,7 @@ public interface ModuleCracker {
         }
 
         try {
-            return (ModuleCracker) Class.forName("se.assertteam.module.Java9ModuleCracker")
+            return (ModuleCracker) Class.forName("se.assertkth.collector.module.Java9ModuleCracker")
                     .getDeclaredConstructors()[0]
                     .newInstance(instrumentation);
         } catch (ReflectiveOperationException e) {
