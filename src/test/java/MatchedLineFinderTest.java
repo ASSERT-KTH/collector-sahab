@@ -27,8 +27,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import se.assertteam.runtime.output.FileAndBreakpoint;
-import se.assertteam.runtime.output.MethodForExitEvent;
+import se.assertkth.collector.runtime.output.FileAndBreakpoint;
+import se.assertkth.collector.runtime.output.MethodForExitEvent;
 import se.kth.debug.MatchedLineFinder;
 
 class MatchedLineFinderTest {

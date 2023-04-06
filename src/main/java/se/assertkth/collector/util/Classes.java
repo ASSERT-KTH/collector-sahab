@@ -1,4 +1,4 @@
-package se.assertteam.util;
+package se.assertkth.collector.util;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;

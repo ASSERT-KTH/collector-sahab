@@ -1,12 +1,12 @@
-package se.assertteam;
+package se.assertkth.collector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import se.assertteam.runtime.output.FileAndBreakpoint;
-import se.assertteam.runtime.output.MethodForExitEvent;
+import se.assertkth.collector.runtime.output.FileAndBreakpoint;
+import se.assertkth.collector.runtime.output.MethodForExitEvent;
 
 public class CollectorAgentOptions {
 
