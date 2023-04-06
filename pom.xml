@@ -49,7 +49,6 @@
       <version>2.14.2</version>
     </dependency>
 
-
     <!--        This dependency is already in `junit-platform-console-standalone`.-->
     <!--        However, without explicitly mentioning `junit-jupiter`, the tests were not being detected by JUnit runner.-->
     <dependency>
