@@ -124,8 +124,7 @@ public class ObjectIntrospection {
             arrayElements = getArrayValues(object, depth);
         }
 
-        return RuntimeValue
-            .fromObservation(kind, name, getCanonicalClassName(type), object, fields,arrayElements);
+        return RuntimeValue.fromObservation(kind, name, getCanonicalClassName(type), object, fields, arrayElements);
     }
 
     /**

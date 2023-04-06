@@ -47,28 +47,31 @@ public class RuntimeReturnedValue extends RuntimeValue {
     }
 
     public static RuntimeReturnedValue fromObservation(
-        @JsonProperty("kind") Kind kind,
-        @JsonProperty("methodName") String name,
-        @JsonProperty("type") String type,
-        @JsonProperty("value") Object value,
-        @JsonProperty("fields") List<RuntimeValue> fields,
-        @JsonProperty("arrayElements") List<RuntimeValue> arrayElements,
-        @JsonProperty("parameterValues") List<RuntimeValue> parameters,
-        @JsonProperty("stackTrace") List<String> stackTrace,
-        @JsonProperty("location") String location
-    ) {
+            @JsonProperty("kind") Kind kind,
+            @JsonProperty("methodName") String name,
+            @JsonProperty("type") String type,
+            @JsonProperty("value") Object value,
+            @JsonProperty("fields") List<RuntimeValue> fields,
+            @JsonProperty("arrayElements") List<RuntimeValue> arrayElements,
+            @JsonProperty("parameterValues") List<RuntimeValue> parameters,
+            @JsonProperty("stackTrace") List<String> stackTrace,
+            @JsonProperty("location") String location) {
         if (Classes.isArrayBasicallyPrimitive(value)) {
             return new RuntimeReturnedValue(
-                kind, name, type, value, fields, List.of(), parameters, stackTrace, location
-            );
+                    kind, name, type, value, fields, List.of(), parameters, stackTrace, location);
         } else {
             return new RuntimeReturnedValue(
-                kind, name, type, Classes.simplifyValue(value), fields, arrayElements, parameters,
-                stackTrace, location
-            );
+                    kind,
+                    name,
+                    type,
+                    Classes.simplifyValue(value),
+                    fields,
+                    arrayElements,
+                    parameters,
+                    stackTrace,
+                    location);
         }
     }
-
 
     static class RuntimeReturnedValueSerializer extends JsonSerializer<RuntimeReturnedValue> {
 

@@ -1,6 +1,5 @@
 package se.assertteam.runtime;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -62,35 +61,27 @@ public class RuntimeValue {
     }
 
     public static RuntimeValue fromObservation(
-        Kind kind,
-        String name,
-        String type,
-        Object value,
-        List<RuntimeValue> fields,
-        List<RuntimeValue> arrayElements
-    ) {
+            Kind kind,
+            String name,
+            String type,
+            Object value,
+            List<RuntimeValue> fields,
+            List<RuntimeValue> arrayElements) {
         if (Classes.isArrayBasicallyPrimitive(value)) {
-            return new RuntimeValue(
-                kind, name, type, value, fields, List.of()
-            );
+            return new RuntimeValue(kind, name, type, value, fields, List.of());
         } else {
-            return new RuntimeValue(
-                kind, name, type, Classes.simplifyValue(value), fields, arrayElements
-            );
+            return new RuntimeValue(kind, name, type, Classes.simplifyValue(value), fields, arrayElements);
         }
     }
 
     public static RuntimeValue fromRaw(
-        Kind kind,
-        String name,
-        String type,
-        Object value,
-        List<RuntimeValue> fields,
-        List<RuntimeValue> arrayElements
-    ) {
-        return new RuntimeValue(
-            kind, name, type, value, fields, arrayElements
-        );
+            Kind kind,
+            String name,
+            String type,
+            Object value,
+            List<RuntimeValue> fields,
+            List<RuntimeValue> arrayElements) {
+        return new RuntimeValue(kind, name, type, value, fields, arrayElements);
     }
 
     @Override
@@ -102,9 +93,12 @@ public class RuntimeValue {
             return false;
         }
         RuntimeValue that = (RuntimeValue) o;
-        return kind == that.kind && Objects.equals(name, that.name) && Objects.equals(
-            type, that.type) && Objects.equals(value, that.value) && Objects.equals(
-            fields, that.fields) && Objects.equals(arrayElements, that.arrayElements);
+        return kind == that.kind
+                && Objects.equals(name, that.name)
+                && Objects.equals(type, that.type)
+                && Objects.equals(value, that.value)
+                && Objects.equals(fields, that.fields)
+                && Objects.equals(arrayElements, that.arrayElements);
     }
 
     @Override

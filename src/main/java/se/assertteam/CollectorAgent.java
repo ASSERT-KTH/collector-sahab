@@ -211,11 +211,8 @@ public class CollectorAgent {
         manipulations.add(arrayFactory.withValues(arguments));
 
         // Convert them to freeze their values
-        manipulations.add(
-            MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(
-                ContextCollector.class.getMethod("convertLocalVariables", LocalVariable[].class)
-            ))
-        );
+        manipulations.add(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(
+                ContextCollector.class.getMethod("convertLocalVariables", LocalVariable[].class))));
 
         manipulations.add(MethodVariableAccess.of(ForLoadedType.of(List.class))
                 .storeAt(indexOfLastLocalVariable(method) + STACK_OFFSET));
@@ -295,12 +292,9 @@ public class CollectorAgent {
                 // , Class<?> type
                 ClassConstant.of(type),
                 // , Object value
-                MethodVariableAccess.of(type)
-                        .loadFrom(readIndex),
+                MethodVariableAccess.of(type).loadFrom(readIndex),
                 Assigner.GENERICS_AWARE.assign(
-                        type.asGenericType(),
-                        TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(Object.class),
-                        Assigner.Typing.STATIC),
+                        type.asGenericType(), ForLoadedType.of(Object.class), Assigner.Typing.STATIC),
                 // );
                 MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(
                         LocalVariable.class.getConstructor(String.class, Class.class, Object.class)))));
@@ -314,14 +308,16 @@ public class CollectorAgent {
 
         // public static void logReturn(
         //   Object returnValue,
-        Generic typeDesc = getLatentType(Type.getMethodType(method.desc).getReturnType()).asGenericType();
+        Generic typeDesc =
+                getLatentType(Type.getMethodType(method.desc).getReturnType()).asGenericType();
         manipulations.add(Duplication.of(typeDesc));
         manipulations.add(
                 Assigner.GENERICS_AWARE.assign(typeDesc, ForLoadedType.of(Object.class), Assigner.Typing.DYNAMIC));
         //   String methodName,
         manipulations.add(new TextConstant(method.name));
         //   Class<?> returnTypeName
-        manipulations.add(ClassConstant.of(getLatentType(Type.getMethodType(method.desc).getReturnType())));
+        manipulations.add(
+                ClassConstant.of(getLatentType(Type.getMethodType(method.desc).getReturnType())));
 
         //   Class<?> className
         manipulations.add(ClassConstant.of(getLatentType(className.replace('/', '.'))));
