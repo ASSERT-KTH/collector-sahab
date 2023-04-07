@@ -5,7 +5,6 @@
     <groupId>se.assertkth</groupId>
     <artifactId>collector-sahab</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../</relativePath>
   </parent>
   <artifactId>trace-collector</artifactId>
   <name>Trace Collector</name>
