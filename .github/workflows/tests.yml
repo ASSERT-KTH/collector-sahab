@@ -17,6 +17,8 @@ jobs:
           java-version: 11
       - name: Style check using spotless
         run: 'mvn spotless:check'
+      - name: Prepare parent pom
+        run: 'mvn install -pl se.assertkth:collector-sahab'
       - name: Install common utilities # We need the commons before we run tests
         run: 'mvn install -pl commons'
       - name: Create agent jar # We need the agent before we run tests
