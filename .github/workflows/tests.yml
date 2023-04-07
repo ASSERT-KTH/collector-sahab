@@ -18,8 +18,6 @@ jobs:
       - name: Style check using spotless
         run: 'mvn spotless:check'
       - name: Create agent jar # We need the agent before we run tests
-        run: 'mvn package -DskipTests'
+        run: 'mvn package -DskipTests -pl trace-collector'
       - name: Run test phase
         run: 'mvn test'
-      - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v3
