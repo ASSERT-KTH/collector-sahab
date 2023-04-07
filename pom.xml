@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>se.assertkth</groupId>
-  <artifactId>collector-sahab</artifactId>
+  <artifactId>collector-sahab-parent-pom</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Collector Sahab</name>
+  <name>Collector Sahab Parent POM</name>
   <modules>
     <module>trace-collector</module>
     <module>matched-line-finder</module>

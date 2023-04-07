@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>se.assertkth</groupId>
-    <artifactId>collector-sahab</artifactId>
+    <artifactId>collector-sahab-parent-pom</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>matched-line-finder</artifactId>
