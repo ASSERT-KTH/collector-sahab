@@ -17,9 +17,12 @@ jobs:
           java-version: 11
       - name: Style check using spotless
         run: 'mvn spotless:check'
+      - name: Prepare all poms
+        # We need the poms to be ready before we run tests
+        # And we cannot run tests in the same step as we need the agent jar
+        # Includes test of matched-line-finder
+        run: 'mvn install -pl se.assertkth:collector-sahab,commons,matched-line-finder'
       - name: Create agent jar # We need the agent before we run tests
-        run: 'mvn package -DskipTests'
+        run: 'mvn package -DskipTests -pl trace-collector'
       - name: Run test phase
-        run: 'mvn test'
-      - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v3
+        run: 'mvn test -pl trace-collector'
