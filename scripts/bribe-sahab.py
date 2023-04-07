@@ -43,7 +43,7 @@ def _find_matched_lines(project, filename, left, right):
   cmd = (
     "java "
     f"-classpath {COLLECTOR_JAR} "
-    "se.kth.debug.MatchedLineFinder "
+    "se.kth.debug.se.assertkth.mlf.MatchedLineFinder "
     f"{project} {shlex.quote(filename)} {left} {right}"
   )
   subprocess.run(cmd, shell=True)
