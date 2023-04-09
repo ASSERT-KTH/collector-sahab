@@ -20,6 +20,8 @@ public class CollectorAgentOptions {
 
     private boolean extractParameters = false;
 
+    public CollectorAgentOptions() {}
+
     public CollectorAgentOptions(String javaAgentArgs) {
         if (javaAgentArgs == null || javaAgentArgs.isEmpty()) {
             return;
@@ -104,5 +106,31 @@ public class CollectorAgentOptions {
         } catch (IllegalArgumentException e) {
             return List.of();
         }
+    }
+
+    public void setClassesAndBreakpoints(File classesAndBreakpoints) {
+        this.classesAndBreakpoints = classesAndBreakpoints;
+    }
+
+    public void setMethodsForExitEvent(File methodsForExitEvent) {
+        this.methodsForExitEvent = methodsForExitEvent;
+    }
+
+    public void setExecutionDepth(int executionDepth) {
+        this.executionDepth = executionDepth;
+    }
+
+    public void setOutput(File output) {
+        this.output = output;
+    }
+
+    @Override
+    public String toString() {
+        return "classesAndBreakpoints=" + classesAndBreakpoints + ","
+                + "methodsForExitEvent=" + methodsForExitEvent + ","
+                + "output=" + output + ","
+                + "executionDepth=" + executionDepth + ","
+                + "numberOfArrayElements=" + numberOfArrayElements + ","
+                + "extractParameters=" + extractParameters;
     }
 }

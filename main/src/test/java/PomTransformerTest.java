@@ -79,7 +79,7 @@ class PomTransformerTest {
                     configuration.getChild("argLine").getValue(),
                     is(
                             equalTo(
-                                    "-javaagent:trace-collector.jar= -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")));
+                                    "-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")));
         }
 
         @Test
@@ -98,7 +98,11 @@ class PomTransformerTest {
             // assert
             Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
             assertThat(configuration.getChildCount(), is(equalTo(1)));
-            assertThat(configuration.getChild("argLine").getValue(), is(equalTo("-javaagent:trace-collector.jar=")));
+            assertThat(
+                    configuration.getChild("argLine").getValue(),
+                    is(
+                            equalTo(
+                                    "-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false")));
         }
 
         @Test
@@ -118,7 +122,7 @@ class PomTransformerTest {
             String originalPomString = Files.readString(originalPom);
             String actualPomString = Files.readString(actualPom);
             String argLine =
-                    "<argLine>-javaagent:trace-collector.jar= -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</argLine>";
+                    "<argLine>-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</argLine>";
             assertThat(originalPomString, not(containsString(argLine)));
             assertThat(actualPomString, containsString(argLine));
         }

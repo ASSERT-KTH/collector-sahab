@@ -3,7 +3,10 @@ package se.assertkth.mlf;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,25 +22,6 @@ import spoon.reflect.visitor.CtScanner;
 public class MatchedLineFinder {
 
     private static final Logger LOGGER = Logger.getLogger("MLF");
-
-    public static void main(String[] args) throws Exception {
-        File project = new File(args[0]);
-        File diffedFile = resolveFilenameWithGivenBase(project, args[1]);
-        String left = args[2];
-        String right = args[3];
-
-        final String LEFT_FOLDER_NAME = "gumtree-left";
-        final String RIGHT_FOLDER_NAME = "gumtree-right";
-
-        File leftJava = prepareFileForGumtree(project, left, diffedFile, LEFT_FOLDER_NAME);
-        File rightJava = prepareFileForGumtree(project, right, diffedFile, RIGHT_FOLDER_NAME);
-
-        Triple<String, String, String> output = invoke(leftJava, rightJava);
-
-        createInputFile(output.getLeft(), "input-left_" + right + ".txt");
-        createInputFile(output.getRight(), "input-right_" + right + ".txt");
-        createInputFile(output.getMiddle(), "methods_" + right + ".json");
-    }
 
     /**
      * Find the matched line between two Java source files.
@@ -55,7 +39,7 @@ public class MatchedLineFinder {
         Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methods.getLeft());
         Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methods.getRight());
         String fullyQualifiedNameOfContainerClass =
-                methods.getLeft().getParent(CtType.class).getQualifiedName();
+                methods.getLeft().getParent(CtType.class).getQualifiedName().replace(".", "/");
 
         String breakpointsLeft = serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
         String breakpointsRight = serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
@@ -76,8 +60,17 @@ public class MatchedLineFinder {
     private static Pair<Set<Integer>, Set<Integer>> getDiffLines(File left, File right) throws IOException {
         Set<Integer> src = new HashSet<>();
         Set<Integer> dst = new HashSet<>();
-        ProcessBuilder pb = new ProcessBuilder(
-                "./src/main/resources/diffn.sh", "--no-index", left.getAbsolutePath(), right.getAbsolutePath());
+
+        Path script = Files.createTempFile(
+                null, ".sh", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-rw-r--")));
+
+        try (InputStream embeddedScript = MatchedLineFinder.class.getResourceAsStream("/diffn.sh")) {
+            Files.copy(embeddedScript, script, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        String[] cmd = {"bash", script.toString(), "--no-index", left.getAbsolutePath(), right.getAbsolutePath()};
+
+        ProcessBuilder pb = new ProcessBuilder(cmd);
         Process p = pb.start();
         InputStreamReader isr = new InputStreamReader(p.getInputStream());
         BufferedReader rdr = new BufferedReader(isr);
@@ -270,15 +263,6 @@ public class MatchedLineFinder {
         public NoDiffException(String message) {
             super(message);
         }
-    }
-
-    private static File resolveFilenameWithGivenBase(File base, String filename) throws FileNotFoundException {
-        File absolutePath = Paths.get(base.getAbsolutePath()).resolve(filename).toFile();
-
-        if (!absolutePath.exists()) {
-            throw new FileNotFoundException(filename + " does not exist in " + base.getAbsolutePath());
-        }
-        return absolutePath;
     }
 
     private static File prepareFileForGumtree(File cwd, String commit, File diffedFile, String revision)
