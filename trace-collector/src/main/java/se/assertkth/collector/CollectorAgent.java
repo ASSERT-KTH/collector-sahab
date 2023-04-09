@@ -49,6 +49,7 @@ import se.assertkth.collector.runtime.LocalVariable;
 import se.assertkth.collector.util.ByteBuddyHelper;
 import se.assertkth.collector.util.Classes;
 import se.assertkth.collector.util.ContextCollector;
+import se.assertkth.cs.commons.CollectorAgentOptions;
 import se.assertkth.cs.commons.FileAndBreakpoint;
 import se.assertkth.cs.commons.MethodForExitEvent;
 

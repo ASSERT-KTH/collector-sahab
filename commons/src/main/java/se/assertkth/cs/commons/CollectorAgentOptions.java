@@ -1,12 +1,10 @@
-package se.assertkth.collector;
+package se.assertkth.cs.commons;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import se.assertkth.cs.commons.FileAndBreakpoint;
-import se.assertkth.cs.commons.MethodForExitEvent;
 
 public class CollectorAgentOptions {
 
@@ -19,6 +17,8 @@ public class CollectorAgentOptions {
     private int executionDepth = 0;
 
     private boolean extractParameters = false;
+
+    public CollectorAgentOptions() {}
 
     public CollectorAgentOptions(String javaAgentArgs) {
         if (javaAgentArgs == null || javaAgentArgs.isEmpty()) {
@@ -104,5 +104,31 @@ public class CollectorAgentOptions {
         } catch (IllegalArgumentException e) {
             return List.of();
         }
+    }
+
+    public void setClassesAndBreakpoints(File classesAndBreakpoints) {
+        this.classesAndBreakpoints = classesAndBreakpoints;
+    }
+
+    public void setMethodsForExitEvent(File methodsForExitEvent) {
+        this.methodsForExitEvent = methodsForExitEvent;
+    }
+
+    public void setExecutionDepth(int executionDepth) {
+        this.executionDepth = executionDepth;
+    }
+
+    public void setOutput(File output) {
+        this.output = output;
+    }
+
+    @Override
+    public String toString() {
+        return "classesAndBreakpoints=" + classesAndBreakpoints + ","
+                + "methodsForExitEvent=" + methodsForExitEvent + ","
+                + "output=" + output + ","
+                + "executionDepth=" + executionDepth + ","
+                + "numberOfArrayElements=" + numberOfArrayElements + ","
+                + "extractParameters=" + extractParameters;
     }
 }

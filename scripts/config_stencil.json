@@ -1,4 +1,0 @@
-{
-  "collectorJar": "<Path to JAR of collector sahab>",
-  "outputDirectory": "<Path to trace output>"
-}
