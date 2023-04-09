@@ -15,7 +15,7 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import picocli.CommandLine;
-import se.assertkth.collector.CollectorAgentOptions;
+import se.assertkth.cs.commons.CollectorAgentOptions;
 import se.assertkth.cs.commons.Pair;
 import se.assertkth.cs.commons.Revision;
 import se.assertkth.cs.preprocess.PomTransformer;

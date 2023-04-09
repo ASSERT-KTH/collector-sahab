@@ -39,7 +39,7 @@ public class MatchedLineFinder {
         Set<Integer> matchedLinesLeft = getMatchedLines(diffLines.getLeft(), methods.getLeft());
         Set<Integer> matchedLinesRight = getMatchedLines(diffLines.getRight(), methods.getRight());
         String fullyQualifiedNameOfContainerClass =
-                methods.getLeft().getParent(CtType.class).getQualifiedName().replace(".", "/");
+                methods.getLeft().getParent(CtType.class).getQualifiedName();
 
         String breakpointsLeft = serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesLeft);
         String breakpointsRight = serialiseBreakpoints(fullyQualifiedNameOfContainerClass, matchedLinesRight);
@@ -297,6 +297,9 @@ public class MatchedLineFinder {
 
     private static String serialiseBreakpoints(String fullyQualifiedClassName, Set<Integer> breakpoints)
             throws JsonProcessingException {
+        // classfile convention is to use / instead of . for package names
+        fullyQualifiedClassName = fullyQualifiedClassName.replace("/", ".");
+
         ObjectMapper mapper = new ObjectMapper();
         List<Integer> uniqueBreakpoints = new ArrayList<>(breakpoints);
         FileAndBreakpoint fileAndBreakpoint = new FileAndBreakpoint(fullyQualifiedClassName, uniqueBreakpoints);
@@ -307,6 +310,9 @@ public class MatchedLineFinder {
 
     private static String serialiseMethods(String fullyQualifiedClassName, String methodName)
             throws JsonProcessingException {
+        // classfile convention is to use / instead of . for package names
+        fullyQualifiedClassName = fullyQualifiedClassName.replace("/", ".");
+
         ObjectMapper mapper = new ObjectMapper();
         MethodForExitEvent fileAndMethod = new MethodForExitEvent(methodName, fullyQualifiedClassName);
         List<MethodForExitEvent> fileAndMethods = List.of(fileAndMethod);

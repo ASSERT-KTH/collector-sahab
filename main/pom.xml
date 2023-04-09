@@ -17,11 +17,6 @@
     </dependency>
     <dependency>
       <groupId>se.assertkth</groupId>
-      <artifactId>trace-collector</artifactId>
-      <version>${pom.parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>se.assertkth</groupId>
       <artifactId>matched-line-finder</artifactId>
       <version>${pom.parent.version}</version>
     </dependency>

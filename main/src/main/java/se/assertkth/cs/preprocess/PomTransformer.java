@@ -14,7 +14,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import se.assertkth.collector.CollectorAgentOptions;
+import se.assertkth.cs.commons.CollectorAgentOptions;
 import se.assertkth.cs.commons.Revision;
 
 public class PomTransformer {
