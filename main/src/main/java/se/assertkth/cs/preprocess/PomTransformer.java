@@ -24,7 +24,7 @@ public class PomTransformer {
 
     private final CollectorAgentOptions options;
 
-    private static final String AGENT_JAR =
+    public static String AGENT_JAR =
             "/home/aman/assert-achievements/collector-sahab/trace-collector/target/trace-collector.jar";
 
     public PomTransformer(Revision revision, CollectorAgentOptions options) throws IOException, XmlPullParserException {

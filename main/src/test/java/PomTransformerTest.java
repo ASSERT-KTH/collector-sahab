@@ -15,12 +15,19 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import se.assertkth.cs.preprocess.PomTransformer;
 
 class PomTransformerTest {
+
+    @BeforeAll
+    static void setup() {
+        PomTransformer.AGENT_JAR = "trace-collector.jar";
+    }
+
     @Nested
     class Surefire {
 
@@ -47,7 +54,11 @@ class PomTransformerTest {
 
             Xpp3Dom configuration = (Xpp3Dom) addedPlugin.getConfiguration();
             assertThat(configuration.getChildCount(), is(equalTo(1)));
-            assertThat(configuration.getChild("argLine").getValue(), is(equalTo("-javaagent:trace-collector.jar=")));
+            assertThat(
+                    configuration.getChild("argLine").getValue(),
+                    is(
+                            equalTo(
+                                    "-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false")));
         }
 
         @Test
