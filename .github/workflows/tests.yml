@@ -21,7 +21,7 @@ jobs:
         # We need the poms to be ready before we run tests
         # And we cannot run tests in the same step as we need the agent jar
         # Includes test of matched-line-finder
-        run: 'mvn install -pl se.assertkth:collector-sahab-parent-pom,commons,matched-line-finder'
+        run: 'mvn install -pl se.assertkth:collector-sahab-parent-pom,commons,matched-line-finder,main'
       - name: Create agent jar # We need the agent before we run tests
         run: 'mvn package -DskipTests -pl trace-collector'
       - name: Run test phase
