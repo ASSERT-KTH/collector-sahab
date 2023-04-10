@@ -1,6 +1,6 @@
 [
   {
-    "fileName": "org.apache.commons.math.analysis.solvers.BaseSecantSolver",
+    "fileName": "org/apache/commons/math/analysis/solvers/BaseSecantSolver",
     "breakpoints": [
       130,
       131,

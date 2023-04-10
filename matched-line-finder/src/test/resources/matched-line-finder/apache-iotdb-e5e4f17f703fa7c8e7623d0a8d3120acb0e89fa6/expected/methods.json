@@ -1,6 +1,6 @@
 [
   {
-    "className": "org.apache.iotdb.db.query.context.QueryContext",
+    "className": "org/apache/iotdb/db/query/context/QueryContext",
     "name": "getPathModifications"
   }
 ]

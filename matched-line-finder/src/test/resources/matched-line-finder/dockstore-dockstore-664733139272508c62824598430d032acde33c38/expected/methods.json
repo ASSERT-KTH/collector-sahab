@@ -1,6 +1,6 @@
 [
   {
-    "className": "io.dockstore.webservice.helpers.EntryVersionHelper",
+    "className": "io/dockstore/webservice/helpers/EntryVersionHelper",
     "name": "getSourceFiles"
   }
 ]

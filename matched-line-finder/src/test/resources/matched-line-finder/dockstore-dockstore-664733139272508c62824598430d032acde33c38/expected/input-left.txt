@@ -1,6 +1,6 @@
 [
   {
-    "fileName": "io.dockstore.webservice.helpers.EntryVersionHelper",
+    "fileName": "io/dockstore/webservice/helpers/EntryVersionHelper",
     "breakpoints": [
       257,
       259,

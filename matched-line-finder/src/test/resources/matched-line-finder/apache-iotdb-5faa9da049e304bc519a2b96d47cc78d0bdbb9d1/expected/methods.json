@@ -1,6 +1,6 @@
 [
   {
-    "className": "org.apache.iotdb.db.mpp.transformation.dag.memory.LayerMemoryAssigner",
+    "className": "org/apache/iotdb/db/mpp/transformation/dag/memory/LayerMemoryAssigner",
     "name": "build"
   }
 ]

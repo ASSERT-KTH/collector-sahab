@@ -298,7 +298,7 @@ public class MatchedLineFinder {
     private static String serialiseBreakpoints(String fullyQualifiedClassName, Set<Integer> breakpoints)
             throws JsonProcessingException {
         // classfile convention is to use / instead of . for package names
-        fullyQualifiedClassName = fullyQualifiedClassName.replace("/", ".");
+        fullyQualifiedClassName = fullyQualifiedClassName.replace(".", "/");
 
         ObjectMapper mapper = new ObjectMapper();
         List<Integer> uniqueBreakpoints = new ArrayList<>(breakpoints);
@@ -311,7 +311,7 @@ public class MatchedLineFinder {
     private static String serialiseMethods(String fullyQualifiedClassName, String methodName)
             throws JsonProcessingException {
         // classfile convention is to use / instead of . for package names
-        fullyQualifiedClassName = fullyQualifiedClassName.replace("/", ".");
+        fullyQualifiedClassName = fullyQualifiedClassName.replace(".", "/");
 
         ObjectMapper mapper = new ObjectMapper();
         MethodForExitEvent fileAndMethod = new MethodForExitEvent(methodName, fullyQualifiedClassName);
