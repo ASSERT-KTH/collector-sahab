@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -27,14 +29,15 @@ public class PomTransformer {
     public static String AGENT_JAR =
             "/home/aman/assert-achievements/collector-sahab/trace-collector/target/trace-collector.jar";
 
-    public PomTransformer(Revision revision, CollectorAgentOptions options) throws IOException, XmlPullParserException {
+    public PomTransformer(Revision revision, CollectorAgentOptions options, List<String> tests)
+            throws IOException, XmlPullParserException {
         this.revision = revision;
         this.options = options;
         Path pomFile = revision.resolveFilename("pom.xml");
         MavenXpp3Reader reader = new MavenXpp3Reader();
         this.model = reader.read(new FileReader(pomFile.toFile(), StandardCharsets.UTF_8));
         preprocessPom();
-        modifySurefirePlugin();
+        modifySurefirePlugin(tests);
         modifyCompilerPlugin();
         MavenXpp3Writer writer = new MavenXpp3Writer();
         writer.write(new FileWriter(pomFile.toFile(), StandardCharsets.UTF_8), model);
@@ -55,15 +58,18 @@ public class PomTransformer {
         this.model = reader.read(new FileReader(pomFile.toFile(), StandardCharsets.UTF_8));
     }
 
-    public void modifySurefirePlugin() {
+    public void modifySurefirePlugin(List<String> tests) {
         Build build = model.getBuild();
         Optional<Plugin> candidate = build.getPlugins().stream()
                 .filter(plugin -> "maven-surefire-plugin".equals(plugin.getArtifactId()))
                 .findFirst();
+
+        String sanitizedTests = parseTestsForSurefire(tests);
+
         if (candidate.isPresent()) {
             Plugin plugin = candidate.get();
             Object configuration = plugin.getConfiguration();
-            Xpp3Dom modifiedConfig = getModifiedSurefireConfiguration((Xpp3Dom) configuration, options);
+            Xpp3Dom modifiedConfig = getModifiedSurefireConfiguration((Xpp3Dom) configuration, options, sanitizedTests);
             plugin.setConfiguration(modifiedConfig);
         } else {
             Plugin surefirePlugin = new Plugin();
@@ -73,11 +79,24 @@ public class PomTransformer {
 
             Xpp3Dom configuration = new Xpp3Dom("configuration");
             Xpp3Dom argLine = new Xpp3Dom("argLine");
+
+            if (!sanitizedTests.isEmpty()) {
+                Xpp3Dom test = new Xpp3Dom("test");
+                test.setValue(sanitizedTests);
+                configuration.addChild(test);
+            }
+
             argLine.setValue("-javaagent:" + AGENT_JAR + "=" + options.toString());
             configuration.addChild(argLine);
             surefirePlugin.setConfiguration(configuration);
             build.getPlugins().add(surefirePlugin);
         }
+    }
+
+    private static String parseTestsForSurefire(List<String> tests) {
+        List<String> sanitizedTests =
+                tests.stream().map(test -> test.replace("::", "#")).collect(Collectors.toList());
+        return String.join(",", sanitizedTests);
     }
 
     public void modifyCompilerPlugin() {
@@ -108,7 +127,8 @@ public class PomTransformer {
         }
     }
 
-    private static Xpp3Dom getModifiedSurefireConfiguration(Xpp3Dom configuration, CollectorAgentOptions options) {
+    private static Xpp3Dom getModifiedSurefireConfiguration(
+            Xpp3Dom configuration, CollectorAgentOptions options, String sanitizedTests) {
         //        <configuration>
         //
         // <argLine>-javaagent:../../../../target/trace-collector.jar=classesAndBreakpoints=src/test/resources/basic-math.txt,methodsForExitEvent=src/test/resources/basic-math.json</argLine>
@@ -117,6 +137,11 @@ public class PomTransformer {
             configuration = new Xpp3Dom("configuration");
         }
         Xpp3Dom argLine = configuration.getChild("argLine");
+        if (!sanitizedTests.isEmpty()) {
+            Xpp3Dom testNode = new Xpp3Dom("test");
+            testNode.setValue(sanitizedTests);
+            configuration.addChild(testNode);
+        }
         if (argLine == null) {
             argLine = new Xpp3Dom("argLine");
             argLine.setValue("-javaagent:" + AGENT_JAR + "=" + options.toString());
