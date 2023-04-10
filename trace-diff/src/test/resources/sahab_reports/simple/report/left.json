@@ -3,7 +3,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1142,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1142",
@@ -220,7 +220,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1142,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1142",
@@ -437,7 +437,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1143,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1143",
@@ -761,7 +761,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1143,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1143",
@@ -1085,7 +1085,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1144,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1144",
@@ -1516,7 +1516,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1144,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1144",
@@ -1947,7 +1947,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1154,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1154",
@@ -2378,7 +2378,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1154,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1154",
@@ -2809,7 +2809,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1142,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1142",
@@ -3023,7 +3023,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1142,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1142",
@@ -3237,7 +3237,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1143,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1143",
@@ -3558,7 +3558,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1143,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1143",
@@ -3879,7 +3879,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1144,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1144",
@@ -4307,7 +4307,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1144,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1144",
@@ -4735,7 +4735,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1154,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1154",
@@ -5163,7 +5163,7 @@
     {
       "file": "org/joda/time/tz/DateTimeZoneBuilder.java",
       "lineNumber": 1154,
-      "stackFrameContexts": [
+      "stackFrameContext": [
         {
           "positionFromTopInStackTrace": 1,
           "location": "org.joda.time.tz.DateTimeZoneBuilder$RuleSet:1154",

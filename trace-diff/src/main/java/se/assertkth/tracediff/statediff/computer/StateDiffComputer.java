@@ -201,7 +201,7 @@ public class StateDiffComputer {
 
                 if (selectedVarVal != null && firstUniqueStateSummary.getFirstUniqueVarVal() == null) {
                     String executedTest = getMatchingTest((JSONArray) ((JSONObject)
-                                    ((JSONArray) ((JSONObject) jsonStates.get(i)).get("stackFrameContexts")).get(0))
+                                    ((JSONArray) ((JSONObject) jsonStates.get(i)).get("stackFrameContext")).get(0))
                             .get("stackTrace"));
                     firstUniqueStateSummary.setDifferencingTest(executedTest);
                     firstUniqueStateSummary.setFirstUniqueVarValLine(lineNumber);
@@ -343,7 +343,7 @@ public class StateDiffComputer {
 
     private JSONArray breakpointStateToValueCollection(JSONObject state) {
         return (JSONArray)
-                ((JSONObject) ((JSONArray) state.get("stackFrameContexts")).get(0)).get("runtimeValueCollection");
+                ((JSONObject) ((JSONArray) state.get("stackFrameContext")).get(0)).get("runtimeValueCollection");
     }
 
     // Gives Json indices that correspond to states of a line
@@ -386,7 +386,7 @@ public class StateDiffComputer {
     // Left of return is the lineNumber and right is the state hashhash
     private Pair<Integer, Integer> breakpointStateJsonToHashedStatePair(JSONObject stateJO) {
         int lineNumber = Integer.parseInt(stateJO.get("lineNumber").toString());
-        stateJO = (JSONObject) ((JSONArray) stateJO.get("stackFrameContexts")).get(0);
+        stateJO = (JSONObject) ((JSONArray) stateJO.get("stackFrameContext")).get(0);
         return Pair.of(
                 lineNumber, stateJO.get("runtimeValueCollection").toString().hashCode());
     }

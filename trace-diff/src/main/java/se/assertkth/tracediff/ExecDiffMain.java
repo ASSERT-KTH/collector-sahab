@@ -13,6 +13,7 @@ import se.assertkth.tracediff.trace.ExecFreqDiffCommand;
         synopsisSubcommandLabel = "<COMMAND>")
 public class ExecDiffMain {
     public static void main(String[] args) {
+        System.setProperty("webdriver.chrome.driver", "/usr/share/chromedriver");
         int exitCode = new CommandLine(new ExecDiffMain()).execute(args);
         System.exit(exitCode);
     }

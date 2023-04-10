@@ -20,6 +20,11 @@
       <artifactId>matched-line-finder</artifactId>
       <version>${pom.parent.version}</version>
     </dependency>
+    <dependency>
+      <groupId>se.assertkth</groupId>
+      <artifactId>trace-diff</artifactId>
+      <version>${pom.parent.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>info.picocli</groupId>
