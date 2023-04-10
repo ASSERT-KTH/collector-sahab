@@ -74,13 +74,12 @@ public class ProgramStateDiff {
 
         @Override
         public String toString() {
-            return "UniqueReturnSummary{" +
-                    "differencingTest=" + differencingTest +
-                    ", firstUniqueVarValLine=" + firstUniqueVarValLine +
-                    ", firstUniqueReturnLine=" + firstUniqueReturnLine +
-                    ", firstUniqueReturnHash=" + firstUniqueReturnHash +
-                    ", firstUniqueVarVal='" + firstUniqueVarVal + '\'' +
-                    '}';
+            return "UniqueReturnSummary{" + "differencingTest="
+                    + differencingTest + ", firstUniqueVarValLine="
+                    + firstUniqueVarValLine + ", firstUniqueReturnLine="
+                    + firstUniqueReturnLine + ", firstUniqueReturnHash="
+                    + firstUniqueReturnHash + ", firstUniqueVarVal='"
+                    + firstUniqueVarVal + '\'' + '}';
         }
 
         public String getDifferencingTest() {
@@ -130,13 +129,12 @@ public class ProgramStateDiff {
 
         @Override
         public String toString() {
-            return "UniqueStateSummary{" +
-                    "differencingTest=" + differencingTest +
-                    ", firstUniqueStateLine=" + firstUniqueStateLine +
-                    ", firstUniqueVarValLine=" + firstUniqueVarValLine +
-                    ", firstUniqueStateHash=" + firstUniqueStateHash +
-                    ", firstUniqueVarVal='" + firstUniqueVarVal + '\'' +
-                    '}';
+            return "UniqueStateSummary{" + "differencingTest="
+                    + differencingTest + ", firstUniqueStateLine="
+                    + firstUniqueStateLine + ", firstUniqueVarValLine="
+                    + firstUniqueVarValLine + ", firstUniqueStateHash="
+                    + firstUniqueStateHash + ", firstUniqueVarVal='"
+                    + firstUniqueVarVal + '\'' + '}';
         }
 
         public String getDifferencingTest() {
@@ -150,11 +148,10 @@ public class ProgramStateDiff {
 
     @Override
     public String toString() {
-        return "ProgramStateDiff{" +
-                "firstOriginalUniqueStateSummary=" + firstOriginalUniqueStateSummary +
-                ", firstPatchedUniqueStateSummary=" + firstPatchedUniqueStateSummary +
-                ", originalUniqueReturn=" + originalUniqueReturn +
-                ", patchedUniqueReturn=" + patchedUniqueReturn +
-                '}';
+        return "ProgramStateDiff{" + "firstOriginalUniqueStateSummary="
+                + firstOriginalUniqueStateSummary + ", firstPatchedUniqueStateSummary="
+                + firstPatchedUniqueStateSummary + ", originalUniqueReturn="
+                + originalUniqueReturn + ", patchedUniqueReturn="
+                + patchedUniqueReturn + '}';
     }
 }

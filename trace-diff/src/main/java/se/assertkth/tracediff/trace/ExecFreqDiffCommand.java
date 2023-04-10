@@ -1,12 +1,11 @@
 package se.assertkth.tracediff.trace;
 
-import picocli.CommandLine;
-import se.assertkth.tracediff.Constants;
-import se.assertkth.tracediff.sharedutils.GHHelper;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
+import picocli.CommandLine;
+import se.assertkth.tracediff.Constants;
+import se.assertkth.tracediff.sharedutils.GHHelper;
 
 @CommandLine.Command(
         name = Constants.EXEC_FREQ_DIFF_COMMAND_NAME,
@@ -57,10 +56,16 @@ public class ExecFreqDiffCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         new TraceAnalyzer()
-                .generateTraceDiffsForGHChange(slug, commit, originalDir, patchedDir,
-                        outputDir, fullReportLink, Arrays.asList(new String[]{
-                                changedFilePath
-                        }), GHHelper.ChangeType.COMMIT, selectedTests);
+                .generateTraceDiffsForGHChange(
+                        slug,
+                        commit,
+                        originalDir,
+                        patchedDir,
+                        outputDir,
+                        fullReportLink,
+                        Arrays.asList(new String[] {changedFilePath}),
+                        GHHelper.ChangeType.COMMIT,
+                        selectedTests);
         return 0;
     }
 }

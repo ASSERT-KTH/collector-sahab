@@ -1,11 +1,5 @@
 package se.assertkth.tracediff;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 public class Constants {
     public static final String EXEC_DIFF_COMMAND_NAME = "EXEC-DIFF";
 

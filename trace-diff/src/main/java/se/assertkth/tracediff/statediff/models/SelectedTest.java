@@ -3,7 +3,7 @@ package se.assertkth.tracediff.statediff.models;
 public class SelectedTest {
     private String testName, testLink;
 
-    public SelectedTest(String testName, String testLink){
+    public SelectedTest(String testName, String testLink) {
         this.testName = testName;
         this.testLink = testLink;
     }

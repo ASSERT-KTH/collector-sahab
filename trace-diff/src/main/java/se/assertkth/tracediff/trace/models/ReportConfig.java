@@ -3,12 +3,12 @@ package se.assertkth.tracediff.trace.models;
 public class ReportConfig {
     private boolean showHits, allColors;
 
-    public  ReportConfig(){
+    public ReportConfig() {
         this.showHits = true;
         this.allColors = true;
     }
 
-    public ReportConfig(String configStr){
+    public ReportConfig(String configStr) {
         // TODO: clean it!
         this.showHits = configStr.contains("showHits");
         this.allColors = configStr.contains("allColors");

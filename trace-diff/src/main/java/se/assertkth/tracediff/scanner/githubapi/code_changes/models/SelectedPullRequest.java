@@ -70,12 +70,11 @@ public class SelectedPullRequest {
 
     @Override
     public String toString() {
-        return "SelectedPullRequest{" +
-                "id=" + id +
-                ", number=" + number +
-                ", url='" + url + '\'' +
-                ", headCommitSHA1='" + headCommitSHA1 + '\'' +
-                ", repoName='" + repoName + '\'' +
-                '}';
+        return "SelectedPullRequest{" + "id="
+                + id + ", number="
+                + number + ", url='"
+                + url + '\'' + ", headCommitSHA1='"
+                + headCommitSHA1 + '\'' + ", repoName='"
+                + repoName + '\'' + '}';
     }
 }

@@ -1,14 +1,13 @@
 package se.assertkth.tracediff.scanner.githubapi.code_changes;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.kohsuke.github.*;
 import se.assertkth.tracediff.scanner.githubapi.GAA;
 import se.assertkth.tracediff.scanner.githubapi.code_changes.models.FetchMode;
 import se.assertkth.tracediff.scanner.githubapi.code_changes.models.SelectedPullRequest;
 import se.assertkth.tracediff.scanner.githubapi.repositories.GithubAPIRepoAdapter;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class GithubAPIPullRequestAdapter {
 
@@ -21,14 +20,9 @@ public class GithubAPIPullRequestAdapter {
         return _instance;
     }
 
-    public List<SelectedPullRequest> getSingleLinePRs
-            (
-                    GHRepository repo,
-                    long startDateForScanning,
-                    long since,
-                    boolean isFirstScan,
-                    FetchMode fetchMode
-            ) throws IOException {
+    public List<SelectedPullRequest> getSingleLinePRs(
+            GHRepository repo, long startDateForScanning, long since, boolean isFirstScan, FetchMode fetchMode)
+            throws IOException {
 
         List<SelectedPullRequest> res = new ArrayList<>();
 
@@ -54,20 +48,27 @@ public class GithubAPIPullRequestAdapter {
             allPullRequests.forEach(pullRequest -> {
                 try {
                     List<GHIssueComment> comments = pullRequest.getComments();
-                    List<GHPullRequestReviewComment> pullRequestReviewComments = pullRequest.listReviewComments().toList();
+                    List<GHPullRequestReviewComment> pullRequestReviewComments =
+                            pullRequest.listReviewComments().toList();
 
                     boolean isUpdateToConsider = true;
 
-                    if (pullRequest.getCreatedAt().getTime() >= startDateForScanning && pullRequest.getUpdatedAt().getTime() >= since) {
+                    if (pullRequest.getCreatedAt().getTime() >= startDateForScanning
+                            && pullRequest.getUpdatedAt().getTime() >= since) {
                         // Avoid considering updates that are related to the addition of a new comment
                         if (!comments.isEmpty()) {
-                            if (comments.get(comments.size() - 1).getUpdatedAt().compareTo(pullRequest.getUpdatedAt()) == 0) {
+                            if (comments.get(comments.size() - 1).getUpdatedAt().compareTo(pullRequest.getUpdatedAt())
+                                    == 0) {
                                 isUpdateToConsider = false;
                             }
                         }
                         // Avoid considering updates that are related to the addition of a new review comment
                         if (isUpdateToConsider && !pullRequestReviewComments.isEmpty()) {
-                            if (pullRequestReviewComments.get(pullRequestReviewComments.size() - 1).getUpdatedAt().compareTo(pullRequest.getUpdatedAt()) == 0) {
+                            if (pullRequestReviewComments
+                                            .get(pullRequestReviewComments.size() - 1)
+                                            .getUpdatedAt()
+                                            .compareTo(pullRequest.getUpdatedAt())
+                                    == 0) {
                                 isUpdateToConsider = false;
                             }
                         }
@@ -89,14 +90,17 @@ public class GithubAPIPullRequestAdapter {
             // It checks for pull requests whose head commit has a failure
             List<GHPullRequestCommitDetail> commits = pullRequest.listCommits().toList();
             String headCommitSHA = commits.get(commits.size() - 1).getSha();
-            List<GHCommitStatus> statuses = repo.getCommit(headCommitSHA).listStatuses().toList();
+            List<GHCommitStatus> statuses =
+                    repo.getCommit(headCommitSHA).listStatuses().toList();
 
-            List<GHCheckRun> checkRuns = repo.getCommit(headCommitSHA).getCheckRuns().toList();
+            List<GHCheckRun> checkRuns =
+                    repo.getCommit(headCommitSHA).getCheckRuns().toList();
 
             // Check if a pull request has some failed checks
             for (int i = 0; i < checkRuns.size(); i++) {
-                if (checkRuns.get(i) != null && checkRuns.get(i).getConclusion() != null &&
-                        checkRuns.get(i).getConclusion().name().equalsIgnoreCase("FAILURE")) {
+                if (checkRuns.get(i) != null
+                        && checkRuns.get(i).getConclusion() != null
+                        && checkRuns.get(i).getConclusion().name().equalsIgnoreCase("FAILURE")) {
                     isGithubPullRequestFailed = true;
                     break;
                 }
@@ -105,7 +109,9 @@ public class GithubAPIPullRequestAdapter {
             // Another check using the status of a commit instead of the check runs
             if (!isGithubPullRequestFailed) {
                 for (int i = 0; i < statuses.size(); i++) {
-                    if (statuses.get(i) != null && statuses.get(i).getState() != null && statuses.get(i).getState().name().equalsIgnoreCase("failure")) {
+                    if (statuses.get(i) != null
+                            && statuses.get(i).getState() != null
+                            && statuses.get(i).getState().name().equalsIgnoreCase("failure")) {
                         isGithubPullRequestFailed = true;
                         break;
                     }
@@ -114,15 +120,21 @@ public class GithubAPIPullRequestAdapter {
 
             switch (fetchMode) {
                 case ALL:
-                    res.add(new SelectedPullRequest(pullRequest.getId(),
-                            pullRequest.getNumber(), pullRequest.getUrl().toString(),
-                            headCommitSHA, pullRequest.getRepository().getFullName()));
+                    res.add(new SelectedPullRequest(
+                            pullRequest.getId(),
+                            pullRequest.getNumber(),
+                            pullRequest.getUrl().toString(),
+                            headCommitSHA,
+                            pullRequest.getRepository().getFullName()));
                     break;
                 case FAILED:
                     if (isGithubPullRequestFailed) {
-                        res.add(new SelectedPullRequest(pullRequest.getId(),
-                                pullRequest.getNumber(), pullRequest.getUrl().toString(),
-                                headCommitSHA, pullRequest.getRepository().getFullName()));
+                        res.add(new SelectedPullRequest(
+                                pullRequest.getId(),
+                                pullRequest.getNumber(),
+                                pullRequest.getUrl().toString(),
+                                headCommitSHA,
+                                pullRequest.getRepository().getFullName()));
                     }
                     break;
             }
@@ -130,14 +142,12 @@ public class GithubAPIPullRequestAdapter {
         return res;
     }
 
-    public List<SelectedPullRequest> getSingleLinePRs
-            (
-                    long startDateForScanning,
-                    long intervalStart,
-                    boolean isFirstScan,
-                    FetchMode fetchMode,
-                    String fixedRepos
-            ) {
+    public List<SelectedPullRequest> getSingleLinePRs(
+            long startDateForScanning,
+            long intervalStart,
+            boolean isFirstScan,
+            FetchMode fetchMode,
+            String fixedRepos) {
 
         List<SelectedPullRequest> selectedPullRequests = Collections.synchronizedList(new ArrayList<>());
 
@@ -167,11 +177,7 @@ public class GithubAPIPullRequestAdapter {
         return selectedPullRequests;
     }
 
-    public List<SelectedPullRequest> getSingleLinePRs
-            (
-                    long intervalStart,
-                    int minStars
-            ) throws IOException {
+    public List<SelectedPullRequest> getSingleLinePRs(long intervalStart, int minStars) throws IOException {
         final Set<String> repositories = GithubAPIRepoAdapter.getInstance()
                 .listJavaRepositories(intervalStart, minStars, GithubAPIRepoAdapter.MAX_STARS);
 
@@ -192,8 +198,7 @@ public class GithubAPIPullRequestAdapter {
                             || treeEntry.getPath().contains("codecov.yml")) {
                         hasTestCI = true;
                     }
-                    if(isMaven && hasTestCI)
-                        break;
+                    if (isMaven && hasTestCI) break;
                 }
 
                 if (!isMaven || !hasTestCI) {

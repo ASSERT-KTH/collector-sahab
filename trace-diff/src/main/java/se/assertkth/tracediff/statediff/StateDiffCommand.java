@@ -1,11 +1,10 @@
 package se.assertkth.tracediff.statediff;
 
+import java.io.File;
+import java.util.concurrent.Callable;
 import picocli.CommandLine;
 import se.assertkth.tracediff.Constants;
 import se.assertkth.tracediff.statediff.ui.StateDiffUIManipulator;
-
-import java.io.File;
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = Constants.STATE_DIFF_COMMAND_NAME,
@@ -70,18 +69,19 @@ public class StateDiffCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-        new StateDiffUIManipulator().addStateDiffToExecDiffUI(
-                slug,
-                commit,
-                leftReport,
-                rightReport,
-                leftSrc,
-                rightSrc,
-                traceDiffFullReport,
-                testName,
-                testLink,
-                outputPath,
-                allDiffsReportPath);
+        new StateDiffUIManipulator()
+                .addStateDiffToExecDiffUI(
+                        slug,
+                        commit,
+                        leftReport,
+                        rightReport,
+                        leftSrc,
+                        rightSrc,
+                        traceDiffFullReport,
+                        testName,
+                        testLink,
+                        outputPath,
+                        allDiffsReportPath);
         return 0;
     }
 }

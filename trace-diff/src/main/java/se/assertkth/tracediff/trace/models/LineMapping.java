@@ -9,14 +9,14 @@ public class LineMapping {
     private Map<Integer, Integer> srcToDst, dstToSrc;
     private Set<Integer> srcNewLines, dstNewLines;
 
-    public LineMapping(){
+    public LineMapping() {
         srcToDst = new HashMap<>();
         dstToSrc = new HashMap<>();
         srcNewLines = new HashSet<>();
         dstNewLines = new HashSet<>();
     }
 
-    public void addMapping(int src, int dst){
+    public void addMapping(int src, int dst) {
         srcToDst.put(src, dst);
         dstToSrc.put(dst, src);
     }

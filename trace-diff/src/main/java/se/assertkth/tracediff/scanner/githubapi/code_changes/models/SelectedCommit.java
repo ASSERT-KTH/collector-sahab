@@ -7,12 +7,7 @@ public class SelectedCommit {
     private String repoName;
     private String commitUrl;
 
-    public SelectedCommit
-            (
-                    Boolean isGithubActionsFailed,
-                    String commitId,
-                    String repoName
-            ) {
+    public SelectedCommit(Boolean isGithubActionsFailed, String commitId, String repoName) {
         this.isGithubActionsFailed = isGithubActionsFailed;
         this.commitId = commitId;
         this.repoName = repoName;
@@ -53,9 +48,6 @@ public class SelectedCommit {
 
     @Override
     public String toString() {
-        return "SelectedCommit{" +
-                "commitId='" + commitId + '\'' +
-                ", repoName='" + repoName + '\'' +
-                '}';
+        return "SelectedCommit{" + "commitId='" + commitId + '\'' + ", repoName='" + repoName + '\'' + '}';
     }
 }

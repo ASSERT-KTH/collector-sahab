@@ -6,7 +6,7 @@ public class GHReports {
     private String expandedReport, unexpandedReport;
     private ReportSummary summary;
 
-    public GHReports(String expandedReport, String unexpandedReport, ReportSummary summary){
+    public GHReports(String expandedReport, String unexpandedReport, ReportSummary summary) {
         this.expandedReport = expandedReport;
         this.unexpandedReport = unexpandedReport;
         this.summary = summary;
@@ -36,18 +36,15 @@ public class GHReports {
         this.summary = summary;
     }
 
-
-    public static class ReportSummary{
+    public static class ReportSummary {
         private int linesWithMoreExec, linesWithFewerExec, linesWithEqualExec;
         private Map<String, String> pathToSummaryHTML;
 
-        public ReportSummary
-                (
-                        int linesWithMoreExec,
-                        int linesWithFewerExec,
-                        int linesWithEqualExec,
-                        Map<String, String> pathToSummaryHTML
-                ){
+        public ReportSummary(
+                int linesWithMoreExec,
+                int linesWithFewerExec,
+                int linesWithEqualExec,
+                Map<String, String> pathToSummaryHTML) {
             this.linesWithMoreExec = linesWithMoreExec;
             this.linesWithFewerExec = linesWithFewerExec;
             this.linesWithEqualExec = linesWithEqualExec;

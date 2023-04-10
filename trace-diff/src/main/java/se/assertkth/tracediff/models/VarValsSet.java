@@ -6,7 +6,7 @@ public class VarValsSet {
     private Set<String> allVals;
     private String selectedVal;
 
-    public VarValsSet(Set<String> allVals, String selectedVal){
+    public VarValsSet(Set<String> allVals, String selectedVal) {
         this.allVals = allVals;
         this.selectedVal = selectedVal;
     }

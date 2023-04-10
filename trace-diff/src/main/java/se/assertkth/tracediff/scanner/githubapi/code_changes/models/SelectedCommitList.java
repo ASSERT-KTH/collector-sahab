@@ -6,7 +6,7 @@ public class SelectedCommitList {
     private List<SelectedCommit> selectedCommits;
     private Integer totalCount;
 
-    public SelectedCommitList(List<SelectedCommit> selectedCommits){
+    public SelectedCommitList(List<SelectedCommit> selectedCommits) {
         this.selectedCommits = selectedCommits;
         this.totalCount = selectedCommits.size();
     }

@@ -1,5 +1,8 @@
 package se.assertkth.tracediff.scanner.githubapi.code_changes;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.kohsuke.github.*;
 import org.kohsuke.github.GHCheckRun.Conclusion;
 import se.assertkth.tracediff.scanner.githubapi.GAA;
@@ -7,26 +10,16 @@ import se.assertkth.tracediff.scanner.githubapi.code_changes.models.FetchMode;
 import se.assertkth.tracediff.scanner.githubapi.code_changes.models.SelectedCommit;
 import se.assertkth.tracediff.scanner.githubapi.repositories.GithubAPIRepoAdapter;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class GithubAPICommitAdapter {
     private static GithubAPICommitAdapter _instance;
 
     public static GithubAPICommitAdapter getInstance() {
-        if (_instance == null)
-            _instance = new GithubAPICommitAdapter();
+        if (_instance == null) _instance = new GithubAPICommitAdapter();
         return _instance;
     }
 
-    public List<SelectedCommit> getSelectedCommits
-            (
-                    GHRepository repo,
-                    long since,
-                    long until,
-                    FetchMode fetchMode
-            ) throws IOException {
+    public List<SelectedCommit> getSelectedCommits(GHRepository repo, long since, long until, FetchMode fetchMode)
+            throws IOException {
         List<SelectedCommit> res = new ArrayList<>();
 
         GHCommitQueryBuilder query = repo.queryCommits().since(since).until(until);
@@ -37,25 +30,27 @@ public class GithubAPICommitAdapter {
             for (GHCheckRun check : checkRuns) {
                 if (check.getApp().getName().equals("GitHub Actions")) {
                     Conclusion conclusion = check.getConclusion();
-                    if (conclusion != null && (conclusion != Conclusion.SUCCESS
-                            && conclusion != Conclusion.NEUTRAL && conclusion != Conclusion.SKIPPED)) {
+                    if (conclusion != null
+                            && (conclusion != Conclusion.SUCCESS
+                                    && conclusion != Conclusion.NEUTRAL
+                                    && conclusion != Conclusion.SKIPPED)) {
                         isGithubActionsFailed = true;
                         break;
                     }
                 }
             }
 
-            switch(fetchMode) {
+            switch (fetchMode) {
                 case ALL:
                     res.add(new SelectedCommit(isGithubActionsFailed, commit.getSHA1(), repo.getFullName()));
                     break;
                 case PASSING:
-                    if(!isGithubActionsFailed)
+                    if (!isGithubActionsFailed)
                         res.add(new SelectedCommit(isGithubActionsFailed, commit.getSHA1(), repo.getFullName()));
                     break;
                 case FAILED:
                 default:
-                    if(isGithubActionsFailed)
+                    if (isGithubActionsFailed)
                         res.add(new SelectedCommit(isGithubActionsFailed, commit.getSHA1(), repo.getFullName()));
                     break;
             }
@@ -64,20 +59,16 @@ public class GithubAPICommitAdapter {
         return res;
     }
 
-    public List<SelectedCommit> getSelectedCommits
-            (
-                    long intervalStart,
-                    long intervalEnd,
-                    FetchMode fetchMode,
-                    Set<String> fixedRepos
-            ) throws IOException {
-         final Set<String> repositories = fixedRepos == null ? GithubAPIRepoAdapter.getInstance()
-                .listJavaRepositories(intervalStart, 0, GithubAPIRepoAdapter.MAX_STARS) : fixedRepos;
-
+    public List<SelectedCommit> getSelectedCommits(
+            long intervalStart, long intervalEnd, FetchMode fetchMode, Set<String> fixedRepos) throws IOException {
+        final Set<String> repositories = fixedRepos == null
+                ? GithubAPIRepoAdapter.getInstance()
+                        .listJavaRepositories(intervalStart, 0, GithubAPIRepoAdapter.MAX_STARS)
+                : fixedRepos;
 
         AtomicInteger cnt = new AtomicInteger(0);
         List<SelectedCommit> selectedCommits = Collections.synchronizedList(new ArrayList<>());
-        repositories.parallelStream().forEach( repoName -> {
+        repositories.parallelStream().forEach(repoName -> {
             try {
                 GHRepository repo = GAA.g().getRepository(repoName);
                 System.out.println("Checking commits for: " + repo.getName() + " " + cnt.incrementAndGet() + " from "
@@ -106,5 +97,4 @@ public class GithubAPICommitAdapter {
 
         return selectedCommits;
     }
-
 }
