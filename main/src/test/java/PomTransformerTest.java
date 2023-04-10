@@ -55,7 +55,7 @@ class PomTransformerTest {
             assertThat(addedPlugin.getVersion(), is(equalTo("3.0.0")));
 
             Xpp3Dom configuration = (Xpp3Dom) addedPlugin.getConfiguration();
-            assertThat(configuration.getChildCount(), is(equalTo(1)));
+            assertThat(configuration.getChildCount(), is(equalTo(2)));
             assertThat(
                     configuration.getChild("argLine").getValue(),
                     is(
@@ -87,7 +87,7 @@ class PomTransformerTest {
             Plugin modifiedPlugin = transformedModel.getBuild().getPlugins().get(0);
 
             Xpp3Dom configuration = (Xpp3Dom) modifiedPlugin.getConfiguration();
-            assertThat(configuration.getChildCount(), is(equalTo(1)));
+            assertThat(configuration.getChildCount(), is(equalTo(2)));
             assertThat(
                     configuration.getChild("argLine").getValue(),
                     is(
@@ -106,11 +106,10 @@ class PomTransformerTest {
 
             // act
             transformer.modifySurefirePlugin(List.of());
-            Model transformedModel = transformer.getModel();
 
             // assert
             Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
-            assertThat(configuration.getChildCount(), is(equalTo(1)));
+            assertThat(configuration.getChildCount(), is(equalTo(2)));
             assertThat(
                     configuration.getChild("argLine").getValue(),
                     is(

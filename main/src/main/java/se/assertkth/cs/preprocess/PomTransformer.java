@@ -86,6 +86,10 @@ public class PomTransformer {
                 configuration.addChild(test);
             }
 
+            Xpp3Dom failIfNoTests = new Xpp3Dom("failIfNoTests");
+            failIfNoTests.setValue("false");
+            configuration.addChild(failIfNoTests);
+
             argLine.setValue("-javaagent:" + AGENT_JAR + "=" + options.toString());
             configuration.addChild(argLine);
             surefirePlugin.setConfiguration(configuration);
@@ -149,6 +153,9 @@ public class PomTransformer {
         } else {
             argLine.setValue("-javaagent:" + AGENT_JAR + "=" + options.toString() + " " + argLine.getValue());
         }
+        Xpp3Dom failIfNoTests = new Xpp3Dom("failIfNoTests");
+        failIfNoTests.setValue("false");
+        configuration.addChild(failIfNoTests);
         return configuration;
     }
 
