@@ -7,8 +7,8 @@ CLI to collect runtime context of a Java class.
 ## Structure of the project
 
 The project is divided into multiple submodules.
-1. `common`: Contains common classes used by other modules.
-1. `collector-sahab`: The main module which contains the CLI and runs all the following modules.
+1. `commons`: Contains common classes used by other modules.
+1. `main`: The main module which contains the CLI and runs all the following modules.
 1. `matched-line-finder`: A submodule which is used to find the _non-diffed_ line numbers
    in the left and right commits.
 1. `trace-collector`: A submodule which is a java agent which collects runtime data
