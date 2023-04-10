@@ -67,6 +67,14 @@ public class Main implements Callable<Integer> {
             required = false)
     private int executionDepth = 0;
 
+    @CommandLine.Option(
+            names = {Constants.ARG_SELECTED_TESTS},
+            description = "The selected tests",
+            split = ",",
+            required = false)
+    // Runs all test by default
+    private List<String> selectedTests = List.of();
+
     public static void main(String[] args) {
         new CommandLine(new Main()).execute(args);
     }
@@ -95,7 +103,7 @@ public class Main implements Callable<Integer> {
         optionsLeft.setExecutionDepth(executionDepth);
         optionsLeft.setOutput(outputLeft.toAbsolutePath().toFile());
 
-        new PomTransformer(left, optionsLeft);
+        new PomTransformer(left, optionsLeft, selectedTests);
 
         CollectorAgentOptions optionsRight = new CollectorAgentOptions();
         optionsRight.setClassesAndBreakpoints(inputRight.toAbsolutePath().toFile());
@@ -103,7 +111,7 @@ public class Main implements Callable<Integer> {
         optionsRight.setExecutionDepth(executionDepth);
         optionsRight.setOutput(outputRight.toAbsolutePath().toFile());
 
-        new PomTransformer(right, optionsRight);
+        new PomTransformer(right, optionsRight, selectedTests);
 
         InvocationResult leftInvocation = mavenTestInvoker(left);
         if (leftInvocation.getExitCode() != 0) {
@@ -141,7 +149,7 @@ public class Main implements Callable<Integer> {
             right.resolveFilename(classfileName).toAbsolutePath().toString(),
             // ghFullDiff is null
             Constants.ARG_SELECTED_TESTS,
-            "", // empty test string
+            String.join(",", selectedTests),
             Constants.ARG_TEST_LINK,
             "https://github.com/ASSERT-KTH",
             Constants.ARG_OUTPUT_PATH,

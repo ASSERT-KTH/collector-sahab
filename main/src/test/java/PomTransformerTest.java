@@ -1,5 +1,6 @@
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -39,7 +41,7 @@ class PomTransformerTest {
             assertThat(transformer.getModel().getBuild().getPlugins().size(), is(equalTo(1)));
 
             // act
-            transformer.modifySurefirePlugin();
+            transformer.modifySurefirePlugin(List.of());
             Model transformedModel = transformer.getModel();
 
             // assert
@@ -77,7 +79,7 @@ class PomTransformerTest {
                     is(equalTo("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")));
 
             // act
-            transformer.modifySurefirePlugin();
+            transformer.modifySurefirePlugin(List.of());
             Model transformedModel = transformer.getModel();
 
             // assert
@@ -103,7 +105,7 @@ class PomTransformerTest {
             assertThat(surefire.getConfiguration(), is(equalTo(null)));
 
             // act
-            transformer.modifySurefirePlugin();
+            transformer.modifySurefirePlugin(List.of());
             Model transformedModel = transformer.getModel();
 
             // assert
@@ -124,7 +126,7 @@ class PomTransformerTest {
             PomTransformer transformer = new PomTransformer(originalPom);
 
             // act
-            transformer.modifySurefirePlugin();
+            transformer.modifySurefirePlugin(List.of());
             Path actualPom = tempDir.resolve("modify.xml");
             MavenXpp3Writer writer = new MavenXpp3Writer();
             writer.write(new FileWriter(actualPom.toFile()), transformer.getModel());
@@ -136,6 +138,39 @@ class PomTransformerTest {
                     "<argLine>-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</argLine>";
             assertThat(originalPomString, not(containsString(argLine)));
             assertThat(actualPomString, containsString(argLine));
+        }
+
+        @Test
+        void modifySurefirePlugin_addTestsToExistingPlugin() throws XmlPullParserException, IOException {
+            // arrange;
+            Path originalPom = Paths.get("src/test/resources/surefire/add-tests-to-existing-plugin.xml");
+            PomTransformer transformer = new PomTransformer(originalPom);
+            Plugin surefire = transformer.getModel().getBuild().getPlugins().get(0);
+
+            // act
+            transformer.modifySurefirePlugin(List.of("com.example.Test1", "com.example.Test2::testMethod"));
+
+            // assert
+            Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
+            Xpp3Dom test = configuration.getChild("test");
+            assertThat(test.getValue(), is(equalTo("com.example.Test1,com.example.Test2#testMethod")));
+        }
+
+        @Test
+        void modifySurefirePlugin_addTestsToNewPlugin() throws XmlPullParserException, IOException {
+            // arrange;
+            Path originalPom = Paths.get("src/test/resources/surefire/add-tests-to-new-plugin.xml");
+            PomTransformer transformer = new PomTransformer(originalPom);
+            assertThat(transformer.getModel().getBuild().getPlugins(), is(empty()));
+
+            // act
+            transformer.modifySurefirePlugin(List.of("se.kth.A$B", "com.example.Test2#testMethod"));
+
+            // assert
+            Plugin surefire = transformer.getModel().getBuild().getPlugins().get(0);
+            Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
+            Xpp3Dom test = configuration.getChild("test");
+            assertThat(test.getValue(), is(equalTo("se.kth.A$B,com.example.Test2#testMethod")));
         }
     }
 
