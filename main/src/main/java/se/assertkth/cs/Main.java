@@ -20,6 +20,8 @@ import se.assertkth.cs.commons.Pair;
 import se.assertkth.cs.commons.Revision;
 import se.assertkth.cs.preprocess.PomTransformer;
 import se.assertkth.mlf.MatchedLineFinder;
+import se.assertkth.tracediff.Constants;
+import se.assertkth.tracediff.ExecDiffMain;
 
 @CommandLine.Command(name = "collector-sahab", mixinStandardHelpOptions = true)
 public class Main implements Callable<Integer> {
@@ -28,6 +30,18 @@ public class Main implements Callable<Integer> {
             description = "Left commit hash",
             required = true)
     private String leftHash;
+
+    @CommandLine.Option(
+            names = {Constants.ARG_SLUG},
+            description = "The slug of the commit repo.",
+            required = true)
+    private String slug;
+
+    @CommandLine.Option(
+            names = {Constants.ARG_OUTPUT_PATH},
+            description = "The path to the output file.",
+            defaultValue = "output.html")
+    String outputPath;
 
     @CommandLine.Option(
             names = {"-r", "--right"},
@@ -100,6 +114,40 @@ public class Main implements Callable<Integer> {
             throw new RuntimeException("Could not generate test data for right commit");
         }
 
+        //        String slug,
+        //        String commit,
+        //        File leftReport,
+        //        File rightReport,
+        //        File srcFile,
+        //        File dstFile,
+        //        File ghFullDiff,
+        //        String testsStr,
+        //        String testLink,
+        //        String outputPath,
+        //        String allDiffsReportPath)
+        String[] cmd = {
+            "sdiff",
+            Constants.ARG_SLUG,
+            slug,
+            Constants.ARG_COMMIT,
+            right.getHash(),
+            Constants.ARG_LEFT_REPORT_PATH,
+            outputLeft.toAbsolutePath().toString(),
+            Constants.ARG_RIGHT_REPORT_PATH,
+            outputRight.toAbsolutePath().toString(),
+            Constants.ARG_LEFT_SRC_PATH,
+            left.resolveFilename(classfileName).toAbsolutePath().toString(),
+            Constants.ARG_RIGHT_SRC_PATH,
+            right.resolveFilename(classfileName).toAbsolutePath().toString(),
+            // ghFullDiff is null
+            Constants.ARG_SELECTED_TESTS,
+            "", // empty test string
+            Constants.ARG_TEST_LINK,
+            "https://github.com/ASSERT-KTH",
+            Constants.ARG_OUTPUT_PATH,
+            outputPath,
+        };
+        ExecDiffMain.main(cmd);
         return 0;
     }
 
