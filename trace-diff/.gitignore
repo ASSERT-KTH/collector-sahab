@@ -1,0 +1,38 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+.flattened-pom.xml
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Exclude maven wrapper
+!/.mvn/wrapper/maven-wrapper.jar
+.idea/
+*.iml
+local_project_list.txt
+workspace/
+*.z3
+localScripts/
+log
+localoutput/
+repairnator/nopol
+.classpath
+.settings
+*.log
+*.jar
+.project
+repairnator/repairconfig.ini
+dockerImage/.credentials
+dockerImage/client_secret.json
+dockerImage/repairnator-pipeline.jar
+repairnator/docker-images/pipeline-dockerimage/version.ini
+repairnator/repairnator-pipeline/spooned*
+repairnator/repairnator-pipeline/output_astor
+/bin/
+*.java-version
