@@ -1,6 +1,6 @@
 [
   {
-    "className": "org.apache.iotdb.commons.partition.SchemaPartition",
+    "className": "org/apache/iotdb/commons/partition/SchemaPartition",
     "name": "getSchemaRegionReplicaSet"
   }
 ]

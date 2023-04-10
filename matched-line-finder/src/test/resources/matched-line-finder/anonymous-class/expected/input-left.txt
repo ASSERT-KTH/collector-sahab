@@ -1,13 +1,13 @@
 [
     {
-        "fileName":"foo.AnonymousClass",
+        "fileName":"foo/AnonymousClass",
         "breakpoints":[
             5,
             12
         ]
     },
     {
-        "fileName":"foo.AnonymousClass$1",
+        "fileName":"foo/AnonymousClass$1",
         "breakpoints":[
             9
         ]

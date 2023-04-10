@@ -1,6 +1,6 @@
 [
   {
-    "fileName": "jmri.jmrix.openlcb.swing.monitor.MonitorPane",
+    "fileName": "jmri/jmrix/openlcb/swing/monitor/MonitorPane",
     "breakpoints": [
       256,
       257,
