@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Execution Trace Diff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+* {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 50%;
+  padding: 10px;
+  height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.test {
+    border: 1px solid darkblue;
+    padding-left: 10px;
+}
+</style>
+</head>
+<body>
+<div class="row test">
+    <h2>Differencing Test:</h2>
+    <code>
+        <pre>
+@Test <br>
+public void test_main(){ <br>
+    String ret = NumberAnalyzer.analyze(1); <br>
+    assertThat(ret, containsString("greater")); <br>
+}
+        </pre>
+    </code>
+</div>
+<div class="row">
+    <div class="column">
+        <h2>Original Code:</h2>
+        <code>
+            <pre id="original-trace">
+
+            </pre>
+        </code>
+    </div>
+    <div class="column">
+        <h2>Patched Code:</h2>
+        <code>
+            <pre id="patched-trace">
+
+            </pre>
+        </code>
+    </div>
+</div>
+</body>
+</html>
