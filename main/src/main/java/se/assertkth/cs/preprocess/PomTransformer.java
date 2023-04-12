@@ -1,5 +1,7 @@
 package se.assertkth.cs.preprocess;
 
+import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,8 +28,16 @@ public class PomTransformer {
 
     private final CollectorAgentOptions options;
 
-    public static String AGENT_JAR =
-            "/home/aman/assert-achievements/collector-sahab/trace-collector/target/trace-collector.jar";
+    public static String AGENT_JAR;
+
+    static {
+        try {
+            AGENT_JAR = getAgentPath();
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Could not fetch trace-collector.jar. Please package `trace-collector` module again.");
+        }
+    }
 
     public PomTransformer(Revision revision, CollectorAgentOptions options, List<String> tests)
             throws IOException, XmlPullParserException {

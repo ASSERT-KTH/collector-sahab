@@ -25,6 +25,13 @@
       <artifactId>trace-diff</artifactId>
       <version>${pom.parent.version}</version>
     </dependency>
+    <!-- We only need this to get the JAR from resources -->
+    <!-- Inspiration: https://github.com/jacoco/jacoco/tree/master/org.jacoco.agent -->
+    <dependency>
+      <groupId>se.assertkth</groupId>
+      <artifactId>trace-collector</artifactId>
+      <version>${pom.parent.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>info.picocli</groupId>
