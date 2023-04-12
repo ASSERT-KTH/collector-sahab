@@ -70,7 +70,7 @@ $ sudo apt install gawk
          {
             "file": "foo/BasicMath.java",
             "lineNumber": 5,
-            "stackFrameContexts": [
+            "stackFrameContext": [
             {
                "positionFromTopInStackTrace": 1,
                "location": "foo.BasicMath:5",
@@ -105,7 +105,7 @@ $ sudo apt install gawk
       {
          "file": "foo/BasicMath.java",
          "lineNumber": 9,
-         "stackFrameContexts": [
+         "stackFrameContext": [
             {
                "positionFromTopInStackTrace": 1,
                "location": "foo.BasicMath:9",
