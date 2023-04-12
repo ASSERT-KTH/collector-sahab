@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import org.apache.commons.lang3.tuple.Pair;
+import se.assertkth.cs.commons.Pair;
 import se.assertkth.cs.commons.runtime.LineSnapshot;
 import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
 import se.assertkth.cs.commons.runtime.RuntimeValue;
@@ -95,7 +95,7 @@ public class StateDiffComputer {
 
         for (int i = 0; i < hashes.size(); i++) {
             Pair<Integer, Integer> p = hashes.get(i);
-            int lineNumber = p.getKey(), stateHash = p.getValue();
+            int lineNumber = p.getLeft(), stateHash = p.getRight();
 
             if (!lineMapping.containsKey(lineNumber)) continue;
 
@@ -176,7 +176,7 @@ public class StateDiffComputer {
         ProgramStateDiff.UniqueStateSummary firstUniqueStateSummary = new ProgramStateDiff.UniqueStateSummary();
         for (int i = 0; i < hashes.size(); i++) {
             Pair<Integer, Integer> p = hashes.get(i);
-            int lineNumber = p.getKey(), stateHash = p.getValue();
+            int lineNumber = p.getLeft(), stateHash = p.getRight();
 
             if (!lineMapping.containsKey(lineNumber)) continue;
 
@@ -362,7 +362,7 @@ public class StateDiffComputer {
         Map<Integer, List<Integer>> ret = new HashMap<>();
 
         for (int i = 0; i < lineToHashes.size(); i++) {
-            int lineNumber = lineToHashes.get(i).getKey();
+            int lineNumber = lineToHashes.get(i).getLeft();
             if (!ret.containsKey(lineNumber)) ret.put(lineNumber, new ArrayList<>());
             ret.get(lineNumber).add(i);
         }
@@ -374,7 +374,7 @@ public class StateDiffComputer {
         Map<Integer, Set<Integer>> ret = new HashMap<>();
 
         for (Pair<Integer, Integer> p : lineToHashes) {
-            int lineNumber = p.getKey(), state = p.getValue();
+            int lineNumber = p.getLeft(), state = p.getRight();
             if (!ret.containsKey(lineNumber)) ret.put(lineNumber, new HashSet<>());
             ret.get(lineNumber).add(state);
         }
@@ -397,14 +397,14 @@ public class StateDiffComputer {
     private Pair<Integer, Integer> breakpointStateJsonToHashedStatePair(LineSnapshot stateJO) {
         int lineNumber = stateJO.getLineNumber();
         StackFrameContext stackFrameContextJO = stateJO.getStackFrameContext().get(0);
-        return Pair.of(
+        return new Pair<>(
                 lineNumber,
                 stackFrameContextJO.getRuntimeValueCollection().toString().hashCode());
     }
 
     private Pair<Integer, Integer> returnStateJsonToHash(RuntimeReturnedValue stateJO) {
         int lineNumber = Integer.parseInt(stateJO.getLocation().split(":")[1]);
-        return Pair.of(
+        return new Pair<>(
                 lineNumber, ("" + stateJO.getFields() + stateJO.getValue() + stateJO.getArrayElements()).hashCode());
     }
 }
