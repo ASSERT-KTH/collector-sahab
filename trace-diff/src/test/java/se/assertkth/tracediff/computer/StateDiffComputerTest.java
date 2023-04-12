@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Test;
 import se.assertkth.tracediff.statediff.computer.StateDiffComputer;
 import se.assertkth.tracediff.statediff.models.ProgramStateDiff;
@@ -18,7 +17,7 @@ public class StateDiffComputerTest<R> {
 
     // data from https://github.com/khaes-kth/drr-execdiff/commit/649e9234549d2c74f1279499011da87638c2d718, depth=3
     @Test
-    void computeStateDiff_simple_diffIsGenerated() throws IOException, ParseException {
+    void computeStateDiff_simple_diffIsGenerated() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple");
         File leftSahabReport = simpleSahabDirectory.resolve("report/left.json").toFile(),
                 rightSahabReport =
@@ -65,7 +64,7 @@ public class StateDiffComputerTest<R> {
     // breakpoint from: https://github.com/khaes-kth/drr-execdiff/commit/1c04679173a46faa59e73f68def33f60843f8beb
     // only a part of breakpoint data is stored in right.json
     @Test
-    void computeStateDiff_complex_diffIsGenerated() throws IOException, ParseException {
+    void computeStateDiff_complex_diffIsGenerated() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/complex");
         File leftSahabReport = simpleSahabDirectory.resolve("report/left.json").toFile(),
                 rightSahabReport =
@@ -109,7 +108,7 @@ public class StateDiffComputerTest<R> {
     // depth=1
     // only a part of breakpoint data is stored in right.json
     @Test
-    void computeStateDiff_simple_diffIsGenerated_two() throws IOException, ParseException {
+    void computeStateDiff_simple_diffIsGenerated_two() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple_two");
         File leftSahabReport = simpleSahabDirectory.resolve("report/left.json").toFile(),
                 rightSahabReport =

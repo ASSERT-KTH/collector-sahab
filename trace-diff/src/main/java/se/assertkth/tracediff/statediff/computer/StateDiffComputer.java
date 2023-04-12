@@ -1,15 +1,19 @@
 package se.assertkth.tracediff.statediff.computer;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import se.assertkth.cs.commons.runtime.LineSnapshot;
+import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
+import se.assertkth.cs.commons.runtime.RuntimeValue;
+import se.assertkth.cs.commons.runtime.StackFrameContext;
+import se.assertkth.cs.commons.runtime.output.SahabOutput;
 import se.assertkth.tracediff.Constants;
 import se.assertkth.tracediff.models.VarValsSet;
 import se.assertkth.tracediff.statediff.models.ProgramStateDiff;
@@ -38,7 +42,7 @@ public class StateDiffComputer {
         this.tests = tests;
     }
 
-    public ProgramStateDiff computeProgramStateDiff(PrintWriter diffPrinter) throws IOException, ParseException {
+    public ProgramStateDiff computeProgramStateDiff(PrintWriter diffPrinter) throws IOException {
         ProgramStateDiff programStateDiff = new ProgramStateDiff();
 
         programStateDiff.setFirstOriginalUniqueStateSummary(getFirstDistinctStateOnRelevantLine(
@@ -69,12 +73,16 @@ public class StateDiffComputer {
             File sahabReportFile,
             File oppositeSahabReportFile,
             PrintWriter diffPrinter)
-            throws IOException, ParseException {
+            throws IOException {
 
-        JSONParser parser = new JSONParser();
-        JSONArray jsonStates = (JSONArray) ((JSONObject) parser.parse(new FileReader(sahabReportFile))).get("return"),
-                oppositeJsonStates =
-                        (JSONArray) ((JSONObject) parser.parse(new FileReader(oppositeSahabReportFile))).get("return");
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput sahabOutputLeft =
+                mapper.readValue(new FileReader(sahabReportFile, StandardCharsets.UTF_8), SahabOutput.class);
+        List<RuntimeReturnedValue> jsonStates = sahabOutputLeft.getReturns();
+
+        SahabOutput sahabOutputRight =
+                mapper.readValue(new FileReader(oppositeSahabReportFile, StandardCharsets.UTF_8), SahabOutput.class);
+        List<RuntimeReturnedValue> oppositeJsonStates = sahabOutputRight.getReturns();
 
         List<Pair<Integer, Integer>> hashes = getHashedReturnStates(jsonStates),
                 oppositeHashes = getHashedReturnStates(oppositeJsonStates);
@@ -108,9 +116,7 @@ public class StateDiffComputer {
                 }
 
                 VarValsSet distinctVarVals = identifyDistinctReturnVarVal(
-                        (JSONObject) jsonStates.get(i),
-                        oppositeJsonStates,
-                        oppositeLineToStateIndices.get(oppositeLineNumber));
+                        jsonStates.get(i), oppositeJsonStates, oppositeLineToStateIndices.get(oppositeLineNumber));
 
                 for (String varVal : distinctVarVals.getAllVals()) {
                     printIfNeeded("Unique return var-val at line " + lineNumber, varVal, diffPrinter);
@@ -119,8 +125,7 @@ public class StateDiffComputer {
                 String selectedVarVal = distinctVarVals.getSelectedVal();
 
                 if (selectedVarVal != null && firstUniqueReturnSummary.getFirstUniqueVarVal() == null) {
-                    String executedTest =
-                            getMatchingTest((JSONArray) ((JSONObject) jsonStates.get(i)).get("stackTrace"));
+                    String executedTest = getMatchingTest(jsonStates.get(i).getStackTrace());
                     firstUniqueReturnSummary.setDifferencingTest(executedTest);
                     firstUniqueReturnSummary.setFirstUniqueVarValLine(lineNumber);
                     firstUniqueReturnSummary.setFirstUniqueVarVal(selectedVarVal);
@@ -133,11 +138,11 @@ public class StateDiffComputer {
         return firstUniqueReturnSummary;
     }
 
-    private List<Pair<Integer, Integer>> getHashedReturnStates(JSONArray ja) {
+    private List<Pair<Integer, Integer>> getHashedReturnStates(List<RuntimeReturnedValue> ja) {
         List<Pair<Integer, Integer>> hashes = new ArrayList<>();
 
         for (int i = 0; i < ja.size(); i++) {
-            JSONObject jo = (JSONObject) ja.get(i);
+            RuntimeReturnedValue jo = ja.get(i);
             hashes.add(returnStateJsonToHash(jo));
         }
 
@@ -151,13 +156,15 @@ public class StateDiffComputer {
             File sahabReportFile,
             File oppositeSahabReportFile,
             PrintWriter diffPrinter)
-            throws IOException, ParseException {
-        JSONParser parser = new JSONParser();
-        JSONArray
-                jsonStates = (JSONArray) ((JSONObject) parser.parse(new FileReader(sahabReportFile))).get("breakpoint"),
-                oppositeJsonStates =
-                        (JSONArray)
-                                ((JSONObject) parser.parse(new FileReader(oppositeSahabReportFile))).get("breakpoint");
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput sahabOutputLeft =
+                mapper.readValue(new FileReader(sahabReportFile, StandardCharsets.UTF_8), new TypeReference<>() {});
+        List<LineSnapshot> jsonStates = sahabOutputLeft.getBreakpoint();
+
+        SahabOutput sahabOutputRight = mapper.readValue(
+                new FileReader(oppositeSahabReportFile, StandardCharsets.UTF_8), new TypeReference<>() {});
+        List<LineSnapshot> oppositeJsonStates = sahabOutputRight.getBreakpoint();
 
         List<Pair<Integer, Integer>> hashes = getHashedBreakpointStates(jsonStates),
                 oppositeHashes = getHashedBreakpointStates(oppositeJsonStates);
@@ -188,7 +195,7 @@ public class StateDiffComputer {
                 }
 
                 VarValsSet distinctVarVals = identifyDistinctBreakpointVarVal(
-                        (JSONObject) jsonStates.get(i),
+                        jsonStates.get(i),
                         lineToVars.get(lineNumber),
                         oppositeJsonStates,
                         oppositeLineToStateIndices.get(oppositeLineNumber));
@@ -200,9 +207,8 @@ public class StateDiffComputer {
                 String selectedVarVal = distinctVarVals.getSelectedVal();
 
                 if (selectedVarVal != null && firstUniqueStateSummary.getFirstUniqueVarVal() == null) {
-                    String executedTest = getMatchingTest((JSONArray) ((JSONObject)
-                                    ((JSONArray) ((JSONObject) jsonStates.get(i)).get("stackFrameContext")).get(0))
-                            .get("stackTrace"));
+                    String executedTest = getMatchingTest(
+                            jsonStates.get(i).getStackFrameContext().get(0).getStackTrace());
                     firstUniqueStateSummary.setDifferencingTest(executedTest);
                     firstUniqueStateSummary.setFirstUniqueVarValLine(lineNumber);
                     firstUniqueStateSummary.setFirstUniqueVarVal(selectedVarVal);
@@ -214,15 +220,14 @@ public class StateDiffComputer {
         return firstUniqueStateSummary;
     }
 
-    private String getMatchingTest(JSONArray stackTraceJa) {
+    private String getMatchingTest(List<String> stackTraceJa) {
         if (tests.size() == 1) return tests.get(0);
 
         for (String test : tests) {
             String[] testParts = test.split(Constants.TEST_METHOD_NAME_SEPARATOR);
             String testClass = testParts[0], testMethod = testParts.length > 1 ? testParts[1] : null;
 
-            for (int i = 0; i < stackTraceJa.size(); i++) {
-                String stackItem = stackTraceJa.get(i).toString();
+            for (String stackItem : stackTraceJa) {
                 if (stackItem.contains(testClass) && (testMethod != null && stackItem.contains(testMethod)))
                     return test;
             }
@@ -231,13 +236,15 @@ public class StateDiffComputer {
     }
 
     private VarValsSet identifyDistinctReturnVarVal(
-            JSONObject jsonState, JSONArray oppositeJsonStates, List<Integer> oppositeTargetStateIndices)
+            RuntimeReturnedValue jsonState,
+            List<RuntimeReturnedValue> oppositeJsonStates,
+            List<Integer> oppositeTargetStateIndices)
             throws IOException {
         Set<String> distinctVarVals = extractVarVals("{return-object}", jsonState);
 
         if (oppositeTargetStateIndices != null)
             for (int ind : oppositeTargetStateIndices) {
-                JSONObject oppositeState = ((JSONObject) oppositeJsonStates.get(ind));
+                RuntimeReturnedValue oppositeState = oppositeJsonStates.get(ind);
                 distinctVarVals.removeAll(extractVarVals("{return-object}", oppositeState));
             }
 
@@ -260,19 +267,19 @@ public class StateDiffComputer {
     }
 
     private VarValsSet identifyDistinctBreakpointVarVal(
-            JSONObject jsonState,
+            LineSnapshot jsonState,
             Set<String> lineVars,
-            JSONArray oppositeJsonStates,
+            List<LineSnapshot> oppositeJsonStates,
             List<Integer> oppositeTargetStateIndices)
             throws IOException {
-        JSONArray valueCollection = breakpointStateToValueCollection(jsonState);
+        List<RuntimeValue> valueCollection = breakpointStateToValueCollection(jsonState);
 
         Set<String> distinctVarVals = extractVarVals(valueCollection, lineVars, true);
 
         if (oppositeTargetStateIndices != null)
             for (int ind : oppositeTargetStateIndices) {
-                JSONArray oppositeValueCollection =
-                        breakpointStateToValueCollection((JSONObject) oppositeJsonStates.get(ind));
+                List<RuntimeValue> oppositeValueCollection =
+                        breakpointStateToValueCollection(oppositeJsonStates.get(ind));
                 distinctVarVals.removeAll(extractVarVals(oppositeValueCollection, lineVars, true));
             }
 
@@ -294,56 +301,60 @@ public class StateDiffComputer {
         return new VarValsSet(distinctVarVals, shortestDistinctVarVal);
     }
 
-    private Set<String> extractVarVals(JSONArray valueCollection, Set<String> lineVarsLst, boolean checkLineVars)
-            throws IOException {
+    private Set<String> extractVarVals(
+            List<RuntimeValue> valueCollection, Set<String> lineVarsLst, boolean checkLineVars) {
         Set<String> varVals = new HashSet<>();
 
-        for (int i = 0; i < valueCollection.size(); i++) {
-            JSONObject valueJo = (JSONObject) valueCollection.get(i);
-
+        for (RuntimeValue valueJo : valueCollection) {
             // a variable that is not important in this line should be ignored
-            if (checkLineVars
-                    && (lineVarsLst == null
-                            || !lineVarsLst.contains(valueJo.get("name").toString()))) continue;
+            if (checkLineVars && (lineVarsLst == null || !lineVarsLst.contains(valueJo.getName()))) continue;
 
             varVals.addAll(extractVarVals("", valueJo));
         }
         return varVals;
     }
 
-    private Set<String> extractVarVals(String prefix, JSONObject valueJo) throws IOException {
+    private Set<String> extractVarVals(String prefix, RuntimeValue valueJo) {
         Set<String> varVals = new HashSet<>();
-        if (valueJo.get("fields") != null && ((JSONArray) valueJo.get("fields")).size() > 0) {
-            prefix += (valueJo.containsKey("name") ? valueJo.get("name") : "").toString() + ".";
-            JSONArray nestedTypes = (JSONArray) valueJo.get("fields");
+        if (valueJo.getFields() != null && !valueJo.getFields().isEmpty()) {
+            if (valueJo.getKind() == RuntimeValue.Kind.RETURN) {
+                prefix += ".";
+            } else {
+                prefix += (valueJo.getName() == null ? "" : valueJo.getName() + ".");
+            }
+            List<RuntimeValue> nestedTypes = valueJo.getFields();
 
-            for (int i = 0; i < nestedTypes.size(); i++) {
-                JSONObject nestedObj = (JSONObject) nestedTypes.get(i);
+            for (RuntimeValue nestedObj : nestedTypes) {
                 varVals.addAll(extractVarVals(prefix, nestedObj));
             }
-        } else if (valueJo.get("arrayElements") != null && ((JSONArray) valueJo.get("arrayElements")).size() > 0) {
-            JSONArray nestedTypes = (JSONArray) valueJo.get("arrayElements");
+        } else if (valueJo.getArrayElements() != null
+                && !valueJo.getArrayElements().isEmpty()) {
+            List<RuntimeValue> nestedTypes = valueJo.getArrayElements();
 
-            prefix += (valueJo.containsKey("name") ? valueJo.get("name") : "").toString();
+            prefix += (valueJo.getName() == null ? "" : valueJo.getName());
 
             for (int i = 0; i < nestedTypes.size(); i++) {
-                JSONObject nestedObj = (JSONObject) nestedTypes.get(i);
+                RuntimeValue nestedObj = nestedTypes.get(i);
                 String currentPrefix = prefix + "[" + i + "]";
                 varVals.addAll(extractVarVals(currentPrefix, nestedObj));
             }
         } else {
             // it's a leaf node
-            String currentPrefix = prefix + (valueJo.containsKey("name") ? valueJo.get("name") : "");
-            String value = valueJo.get("value") + "";
+            String currentPrefix;
+            if (valueJo.getKind() == RuntimeValue.Kind.RETURN) {
+                currentPrefix = prefix;
+            } else {
+                currentPrefix = prefix + (valueJo.getName() == null ? "" : valueJo.getName());
+            }
+            String value = String.valueOf(valueJo.getValue());
             varVals.add(currentPrefix + "=" + value);
         }
 
         return varVals;
     }
 
-    private JSONArray breakpointStateToValueCollection(JSONObject state) {
-        return (JSONArray)
-                ((JSONObject) ((JSONArray) state.get("stackFrameContext")).get(0)).get("runtimeValueCollection");
+    private List<RuntimeValue> breakpointStateToValueCollection(LineSnapshot state) {
+        return state.getStackFrameContext().get(0).getRuntimeValueCollection();
     }
 
     // Gives Json indices that correspond to states of a line
@@ -372,11 +383,10 @@ public class StateDiffComputer {
     }
 
     // returns pair of (lineNumber, stateHash)
-    private List<Pair<Integer, Integer>> getHashedBreakpointStates(JSONArray ja) throws IOException, ParseException {
+    private List<Pair<Integer, Integer>> getHashedBreakpointStates(List<LineSnapshot> ja) {
         List<Pair<Integer, Integer>> hashedStates = new ArrayList<>();
 
-        for (int i = 0; i < ja.size(); i++) {
-            JSONObject jo = (JSONObject) ja.get(i);
+        for (LineSnapshot jo : ja) {
             hashedStates.add(breakpointStateJsonToHashedStatePair(jo));
         }
 
@@ -384,17 +394,17 @@ public class StateDiffComputer {
     }
 
     // Left of return is the lineNumber and right is the state hashhash
-    private Pair<Integer, Integer> breakpointStateJsonToHashedStatePair(JSONObject stateJO) {
-        int lineNumber = Integer.parseInt(stateJO.get("lineNumber").toString());
-        stateJO = (JSONObject) ((JSONArray) stateJO.get("stackFrameContext")).get(0);
-        return Pair.of(
-                lineNumber, stateJO.get("runtimeValueCollection").toString().hashCode());
-    }
-
-    private Pair<Integer, Integer> returnStateJsonToHash(JSONObject stateJO) {
-        int lineNumber = Integer.parseInt(stateJO.get("location").toString().split(":")[1]);
+    private Pair<Integer, Integer> breakpointStateJsonToHashedStatePair(LineSnapshot stateJO) {
+        int lineNumber = stateJO.getLineNumber();
+        StackFrameContext stackFrameContextJO = stateJO.getStackFrameContext().get(0);
         return Pair.of(
                 lineNumber,
-                ("" + stateJO.get("fields") + stateJO.get("value") + stateJO.get("arrayElements")).hashCode());
+                stackFrameContextJO.getRuntimeValueCollection().toString().hashCode());
+    }
+
+    private Pair<Integer, Integer> returnStateJsonToHash(RuntimeReturnedValue stateJO) {
+        int lineNumber = Integer.parseInt(stateJO.getLocation().split(":")[1]);
+        return Pair.of(
+                lineNumber, ("" + stateJO.getFields() + stateJO.getValue() + stateJO.getArrayElements()).hashCode());
     }
 }
