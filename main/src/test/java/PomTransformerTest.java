@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.fail;
+import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,18 +18,12 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import se.assertkth.cs.preprocess.PomTransformer;
 
 class PomTransformerTest {
-
-    @BeforeAll
-    static void setup() {
-        PomTransformer.AGENT_JAR = "trace-collector.jar";
-    }
 
     @Nested
     class Surefire {
@@ -60,7 +55,8 @@ class PomTransformerTest {
                     configuration.getChild("argLine").getValue(),
                     is(
                             equalTo(
-                                    "-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false")));
+                                    "-javaagent:" + getAgentPath()
+                                            + "=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false")));
         }
 
         @Test
@@ -92,7 +88,8 @@ class PomTransformerTest {
                     configuration.getChild("argLine").getValue(),
                     is(
                             equalTo(
-                                    "-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")));
+                                    "-javaagent:" + getAgentPath()
+                                            + "=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")));
         }
 
         @Test
@@ -114,7 +111,8 @@ class PomTransformerTest {
                     configuration.getChild("argLine").getValue(),
                     is(
                             equalTo(
-                                    "-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false")));
+                                    "-javaagent:" + getAgentPath()
+                                            + "=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false")));
         }
 
         @Test
@@ -133,8 +131,8 @@ class PomTransformerTest {
             // assert
             String originalPomString = Files.readString(originalPom);
             String actualPomString = Files.readString(actualPom);
-            String argLine =
-                    "<argLine>-javaagent:trace-collector.jar=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</argLine>";
+            String argLine = "<argLine>-javaagent:" + getAgentPath()
+                    + "=classesAndBreakpoints=null,methodsForExitEvent=null,output=target/output.json,executionDepth=0,numberOfArrayElements=10,extractParameters=false -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</argLine>";
             assertThat(originalPomString, not(containsString(argLine)));
             assertThat(actualPomString, containsString(argLine));
         }
