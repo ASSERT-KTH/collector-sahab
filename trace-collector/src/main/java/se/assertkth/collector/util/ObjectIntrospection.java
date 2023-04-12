@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import se.assertkth.collector.CollectorAgent;
 import se.assertkth.collector.module.ModuleCracker;
-import se.assertkth.collector.runtime.LocalVariable;
-import se.assertkth.collector.runtime.RuntimeReturnedValue;
-import se.assertkth.collector.runtime.RuntimeValue;
+import se.assertkth.cs.commons.runtime.LocalVariable;
+import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
+import se.assertkth.cs.commons.runtime.RuntimeValue;
+import se.assertkth.cs.commons.util.Classes;
 
 public class ObjectIntrospection {
 

@@ -1,11 +1,11 @@
-package se.assertkth.collector.runtime.output;
+package se.assertkth.cs.commons.runtime.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import se.assertkth.collector.runtime.LineSnapshot;
-import se.assertkth.collector.runtime.RuntimeReturnedValue;
+import se.assertkth.cs.commons.runtime.LineSnapshot;
+import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
 
 public class SahabOutput {
 

@@ -3,12 +3,12 @@ package se.assertkth.collector.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import se.assertkth.collector.runtime.LineSnapshot;
-import se.assertkth.collector.runtime.LocalVariable;
-import se.assertkth.collector.runtime.RuntimeReturnedValue;
-import se.assertkth.collector.runtime.RuntimeValue;
-import se.assertkth.collector.runtime.StackFrameContext;
-import se.assertkth.collector.runtime.output.SahabOutput;
+import se.assertkth.cs.commons.runtime.LineSnapshot;
+import se.assertkth.cs.commons.runtime.LocalVariable;
+import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
+import se.assertkth.cs.commons.runtime.RuntimeValue;
+import se.assertkth.cs.commons.runtime.StackFrameContext;
+import se.assertkth.cs.commons.runtime.output.SahabOutput;
 
 public class ContextCollector {
 

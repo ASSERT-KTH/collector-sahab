@@ -22,12 +22,12 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.assertkth.collector.runtime.LineSnapshot;
-import se.assertkth.collector.runtime.RuntimeReturnedValue;
-import se.assertkth.collector.runtime.RuntimeValue;
-import se.assertkth.collector.runtime.RuntimeValue.Kind;
-import se.assertkth.collector.runtime.StackFrameContext;
-import se.assertkth.collector.runtime.output.SahabOutput;
+import se.assertkth.cs.commons.runtime.LineSnapshot;
+import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
+import se.assertkth.cs.commons.runtime.RuntimeValue;
+import se.assertkth.cs.commons.runtime.RuntimeValue.Kind;
+import se.assertkth.cs.commons.runtime.StackFrameContext;
+import se.assertkth.cs.commons.runtime.output.SahabOutput;
 
 class NewCollectorTest {
     @Test
