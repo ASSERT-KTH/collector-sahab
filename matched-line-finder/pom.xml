@@ -13,7 +13,12 @@
     <dependency>
       <groupId>se.assertkth</groupId>
       <artifactId>collector-sahab-commons</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${pom.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>fr.inria.gforge.spoon</groupId>
+      <artifactId>spoon-core</artifactId>
+      <version>10.4.0-beta-1</version>
     </dependency>
 
     <dependency>
