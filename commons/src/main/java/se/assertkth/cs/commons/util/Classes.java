@@ -1,4 +1,4 @@
-package se.assertkth.collector.util;
+package se.assertkth.cs.commons.util;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;

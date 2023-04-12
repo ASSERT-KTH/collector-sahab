@@ -45,13 +45,13 @@ import org.objectweb.asm.tree.ParameterNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 import se.assertkth.collector.module.ModuleCracker;
-import se.assertkth.collector.runtime.LocalVariable;
 import se.assertkth.collector.util.ByteBuddyHelper;
-import se.assertkth.collector.util.Classes;
 import se.assertkth.collector.util.ContextCollector;
 import se.assertkth.cs.commons.CollectorAgentOptions;
 import se.assertkth.cs.commons.FileAndBreakpoint;
 import se.assertkth.cs.commons.MethodForExitEvent;
+import se.assertkth.cs.commons.runtime.LocalVariable;
+import se.assertkth.cs.commons.util.Classes;
 
 public class CollectorAgent {
 

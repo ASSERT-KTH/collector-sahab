@@ -1,4 +1,4 @@
-package se.assertkth.collector.runtime;
+package se.assertkth.cs.commons.runtime;
 
 import java.util.Objects;
 

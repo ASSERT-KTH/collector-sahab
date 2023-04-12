@@ -1,4 +1,4 @@
-package se.assertkth.collector.runtime;
+package se.assertkth.cs.commons.runtime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.IOException;
 import java.util.List;
-import se.assertkth.collector.util.Classes;
+import se.assertkth.cs.commons.util.Classes;
 
 @JsonSerialize(using = RuntimeReturnedValue.RuntimeReturnedValueSerializer.class)
 public class RuntimeReturnedValue extends RuntimeValue {
