@@ -113,14 +113,8 @@ public class Main implements Callable<Integer> {
 
         new PomTransformer(right, optionsRight, selectedTests);
 
-        InvocationResult leftInvocation = mavenTestInvoker(left);
-        if (leftInvocation.getExitCode() != 0) {
-            throw new RuntimeException("Could not generate test data for left commit");
-        }
-        InvocationResult rightInvocation = mavenTestInvoker(right);
-        if (rightInvocation.getExitCode() != 0) {
-            throw new RuntimeException("Could not generate test data for right commit");
-        }
+        mavenTestInvoker(left);
+        mavenTestInvoker(right);
 
         //        String slug,
         //        String commit,

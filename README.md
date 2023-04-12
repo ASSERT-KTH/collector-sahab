@@ -26,21 +26,20 @@ The project is divided into multiple submodules.
 $ sudo apt install gawk
 ```
 
+You also need to have ChromeDriver installed at path `/usr/share/chromedriver`.
+
 ### Setup project for collecting runtime statistics
 
 1. Package the entire project
     ```bash
    $ mvn package -DskipTests
     ```
-2. You will get the agent at this path `trace-collector/target/trace-collector.jar`.
-   Copy this anywhere in the system and paste its path in `PomTransformer.AGENT_JAR`.
-   > See issue [#149](https://github.com/ASSERT-KTH/collector-sahab/issues/149). 
-
-3. Package the project again so that the path gets registered.
+2. (Optional) Run the tests
     ```bash
-   $ mvn package -DskipTests
+   $ mvn test
     ```
-4. Prepare for execution of `collector sahab` by running. The following are the required parameters.
+
+3. Prepare for execution of `collector sahab` by running. The following are the required parameters.
    ```bash
    $ java -jar main/target/collector-sahab-1.0-SNAPSHOT-jar-with-dependencies.jar \
           -p <path/to/project>
