@@ -14,7 +14,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          token: ${{ secrets.SUBMODULE_TOKEN }}
       - name: Set up JDK 11 for running tests
         uses: actions/setup-java@v3
         with:
