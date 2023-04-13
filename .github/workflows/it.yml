@@ -21,4 +21,4 @@ jobs:
         # and installed locally.
         run: 'mvn install -DskipTests'
       - name: Run the integration tests
-        run: 'mvn failsafe:integration-test -pl main'
+        run: 'mvn failsafe:integration-test failsafe:verify -pl main'
