@@ -64,6 +64,26 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>dep-plug</id>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <phase>prepare-package</phase>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <includeArtifactIds>trace-collector</includeArtifactIds>
+              <stripClassifier>true</stripClassifier>
+              <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <archive>
