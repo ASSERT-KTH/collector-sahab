@@ -34,6 +34,8 @@ class CollectorSahabIT {
     void test(@TempDir Path tempDir) throws Exception {
         // arrange
         Path projectDirectory = Paths.get("src/test/resources/it/cdk");
+        assertThat("cdk submodule should exist", Files.exists(projectDirectory));
+
         Path classFilePath = Paths.get("base/standard/src/main/java/org/openscience/cdk/tools/HOSECodeGenerator.java");
         String selectedTests =
                 "org.openscience.cdk.reaction.type.RadicalSiteHrBetaReactionTest#testInitiate_IAtomContainerSet_IAtomContainerSet";
