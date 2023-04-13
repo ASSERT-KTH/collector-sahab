@@ -22,6 +22,7 @@ class CollectorSahabIT {
     static void setUp() {
         // Prevent the JVM from exiting when System.exit() is called
         System.setSecurityManager(new DoNotExitJVM());
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
     }
 
     @AfterAll
