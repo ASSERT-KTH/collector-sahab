@@ -2,6 +2,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -12,7 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -21,6 +24,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import se.assertkth.cs.commons.Pair;
 import se.assertkth.cs.preprocess.PomTransformer;
 
 class PomTransformerTest {
@@ -50,7 +54,19 @@ class PomTransformerTest {
             assertThat(addedPlugin.getVersion(), is(equalTo("3.0.0")));
 
             Xpp3Dom configuration = (Xpp3Dom) addedPlugin.getConfiguration();
-            assertThat(configuration.getChildCount(), is(equalTo(2)));
+            assertThat(configuration.getChildCount(), is(equalTo(4)));
+
+            Xpp3Dom[] children = configuration.getChildren();
+            List<Pair> attributes = Arrays.stream(children)
+                    .map(child -> new Pair(child.getName(), child.getValue()))
+                    .collect(Collectors.toList());
+            assertThat(
+                    attributes,
+                    hasItems(
+                            new Pair<>("failIfNoTests", "false"),
+                            new Pair<>("testFailureIgnore", "true"),
+                            new Pair<>("failIfNoSpecifiedTests", "false")));
+
             assertThat(
                     configuration.getChild("argLine").getValue(),
                     is(
@@ -83,7 +99,17 @@ class PomTransformerTest {
             Plugin modifiedPlugin = transformedModel.getBuild().getPlugins().get(0);
 
             Xpp3Dom configuration = (Xpp3Dom) modifiedPlugin.getConfiguration();
-            assertThat(configuration.getChildCount(), is(equalTo(2)));
+            assertThat(configuration.getChildCount(), is(equalTo(4)));
+            Xpp3Dom[] children = configuration.getChildren();
+            List<Pair> attributes = Arrays.stream(children)
+                    .map(child -> new Pair(child.getName(), child.getValue()))
+                    .collect(Collectors.toList());
+            assertThat(
+                    attributes,
+                    hasItems(
+                            new Pair<>("failIfNoTests", "false"),
+                            new Pair<>("testFailureIgnore", "true"),
+                            new Pair<>("failIfNoSpecifiedTests", "false")));
             assertThat(
                     configuration.getChild("argLine").getValue(),
                     is(
@@ -106,7 +132,18 @@ class PomTransformerTest {
 
             // assert
             Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
-            assertThat(configuration.getChildCount(), is(equalTo(2)));
+            assertThat(configuration.getChildCount(), is(equalTo(4)));
+            Xpp3Dom[] children = configuration.getChildren();
+            List<Pair> attributes = Arrays.stream(children)
+                    .map(child -> new Pair(child.getName(), child.getValue()))
+                    .collect(Collectors.toList());
+            assertThat(
+                    attributes,
+                    hasItems(
+                            new Pair<>("failIfNoTests", "false"),
+                            new Pair<>("testFailureIgnore", "true"),
+                            new Pair<>("failIfNoSpecifiedTests", "false")));
+            // last child which is argLine
             assertThat(
                     configuration.getChild("argLine").getValue(),
                     is(
@@ -168,6 +205,38 @@ class PomTransformerTest {
             Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
             Xpp3Dom test = configuration.getChild("test");
             assertThat(test.getValue(), is(equalTo("se.kth.A$B,com.example.Test2#testMethod")));
+        }
+
+        @Test
+        void modifySurefirePlugin_modifyAttributes() throws XmlPullParserException, IOException {
+            // arrange;
+            Path originalPom = Paths.get("src/test/resources/surefire/modify-attributes.xml");
+            PomTransformer transformer = new PomTransformer(originalPom);
+            Plugin surefire = transformer.getModel().getBuild().getPlugins().get(0);
+            Xpp3Dom configuration = (Xpp3Dom) surefire.getConfiguration();
+
+            Xpp3Dom failIfNoTests = configuration.getChild("failIfNoTests");
+            assertThat(failIfNoTests.getValue(), is(equalTo("true")));
+
+            Xpp3Dom testFailureIgnore = configuration.getChild("testFailureIgnore");
+            assertThat(testFailureIgnore.getValue(), is(equalTo("false")));
+
+            Xpp3Dom failIfNoSpecifiedTests = configuration.getChild("failIfNoSpecifiedTests");
+            assertThat(failIfNoSpecifiedTests.getValue(), is(equalTo("true")));
+
+            // act
+            transformer.modifySurefirePlugin(List.of());
+
+            // assert
+            configuration = (Xpp3Dom) surefire.getConfiguration();
+            failIfNoTests = configuration.getChild("failIfNoTests");
+            assertThat(failIfNoTests.getValue(), is(equalTo("false")));
+
+            testFailureIgnore = configuration.getChild("testFailureIgnore");
+            assertThat(testFailureIgnore.getValue(), is(equalTo("true")));
+
+            failIfNoSpecifiedTests = configuration.getChild("failIfNoSpecifiedTests");
+            assertThat(failIfNoSpecifiedTests.getValue(), is(equalTo("false")));
         }
     }
 
