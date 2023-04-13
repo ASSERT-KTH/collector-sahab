@@ -2,7 +2,7 @@ package it;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.Files;
@@ -64,37 +64,11 @@ class CollectorSahabIT {
         // assert
         assertThat("Exit code should be 0", exit.status, equalTo(0));
 
-        Path expectedOutputPath = Paths.get("src/test/resources/it/resources/cdk_5a7d75b_d500be0_3.html");
+        List<String> actual = Files.readAllLines(outputPath);
+        List<String> expected =
+                Files.readAllLines(Paths.get("src/test/resources/it/resources/cdk_5a7d75b_d500be0_3.txt"));
 
-        assertLinesMatch(Files.readAllLines(outputPath), Files.readAllLines(expectedOutputPath));
-    }
-
-    private static void assertLinesMatch(List<String> actual, List<String> expected) {
-        // the following lines are not deterministic and should be ignored
-        for (int i = 0; i < actual.size(); i++) {
-            if (actual.get(i).contains("<meta name=\"request-id\"")) {
-                continue;
-            }
-            if (actual.get(i).contains("<meta name=\"voltron-timing\"")) {
-                continue;
-            }
-            if (actual.get(i)
-                    .contains(
-                            "<input type=\"hidden\" data-csrf=\"true\" class=\"js-data-jump-to-suggestions-path-csrf\"")) {
-                continue;
-            }
-            if (actual.get(i)
-                    .contains(
-                            "<!-- '\"` --><!-- </textarea></xmp> --><form data-turbo=\"false\" action=\"/users/diffview\"")) {
-                continue;
-            }
-            if (actual.get(i)
-                    .contains(
-                            "<div id=\"partial-timeline-marker\" class=\"js-timeline-marker js-socket-channel js-updatable-content\"")) {
-                continue;
-            }
-            assertThat(actual.get(i) + ":: but was ::" + expected.get(i), actual.get(i), is(expected.get(i)));
-        }
+        assertThat(actual, hasItems(expected.toArray(new String[0])));
     }
 
     private static class DoNotExitJVM extends SecurityManager {
