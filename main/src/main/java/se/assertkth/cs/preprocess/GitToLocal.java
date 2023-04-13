@@ -9,7 +9,7 @@ import se.assertkth.cs.commons.Revision;
 public class GitToLocal {
     public static Pair<Revision, Revision> getRevisions(Path project, String leftHash, String rightHash)
             throws IOException, InterruptedException {
-        String hashMix = leftHash.substring(0, 7) + "_" + rightHash.substring(0, 7);
+        String hashMix = leftHash.substring(0, 7) + "_" + rightHash.substring(0, 7) + "_";
         String prefix = project.getFileName().toString() + "_" + hashMix;
         Path tempDirectory = Files.createTempDirectory(prefix);
 
