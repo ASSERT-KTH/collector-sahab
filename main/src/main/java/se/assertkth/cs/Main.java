@@ -77,7 +77,8 @@ public class Main implements Callable<Integer> {
     private List<String> selectedTests = List.of();
 
     public static void main(String[] args) {
-        new CommandLine(new Main()).execute(args);
+        int exitCode = new CommandLine(new Main()).execute(args);
+        System.exit(exitCode);
     }
 
     @Override

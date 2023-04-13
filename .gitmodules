@@ -1,0 +1,3 @@
+[submodule "main/src/test/resources/it/cdk"]
+	path = main/src/test/resources/it/cdk
+	url = git@github.com:cdk/cdk.git

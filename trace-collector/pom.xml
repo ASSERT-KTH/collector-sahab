@@ -75,9 +75,6 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.4.1</version>
         <configuration>
-          <finalName>${project.artifactId}</finalName>
-          <!--          Inspiration: https://github.com/jacoco/jacoco/tree/master/org.jacoco.agent-->
-          <outputDirectory>${project.build.directory}/classes</outputDirectory>
           <createDependencyReducedPom>false</createDependencyReducedPom>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -124,6 +121,17 @@
               <goal>shade</goal>
             </goals>
             <phase>package</phase>
+          </execution>
+          <execution>
+            <id>shade-for-test</id>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+              <finalName>${project.artifactId}</finalName>
+            </configuration>
           </execution>
         </executions>
       </plugin>
