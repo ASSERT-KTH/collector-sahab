@@ -1,6 +1,7 @@
 # Collector Sahab
 
-[![GHA tests Workflow Status](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml/badge.svg)](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml)
+[![test](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml/badge.svg)](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml)
+[![integration-test](https://github.com/ASSERT-KTH/collector-sahab/actions/workflows/it.yml/badge.svg)](https://github.com/ASSERT-KTH/collector-sahab/actions/workflows/it.yml)
 
 CLI to collect runtime context of a Java class.
 
