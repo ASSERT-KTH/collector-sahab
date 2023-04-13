@@ -21,7 +21,6 @@ public class GitToLocal {
     private static int checkout(Path cwd, String commit) throws IOException, InterruptedException {
         ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
         checkoutBuilder.directory(cwd.toFile());
-        checkoutBuilder.redirectErrorStream(true);
         Process p = checkoutBuilder.start();
         return p.waitFor();
     }
