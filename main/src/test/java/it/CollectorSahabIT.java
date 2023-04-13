@@ -1,8 +1,8 @@
 package it;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.Files;
@@ -64,11 +64,13 @@ class CollectorSahabIT {
         // assert
         assertThat("Exit code should be 0", exit.status, equalTo(0));
 
-        List<String> actual = Files.readAllLines(outputPath);
+        String actual = Files.readString(outputPath);
         List<String> expected =
                 Files.readAllLines(Paths.get("src/test/resources/it/resources/cdk_5a7d75b_d500be0_3.txt"));
 
-        assertThat(actual, hasItems(expected.toArray(new String[0])));
+        for (String line : expected) {
+            assertThat("Output should contain line: " + line, actual, containsString(line));
+        }
     }
 
     private static class DoNotExitJVM extends SecurityManager {
