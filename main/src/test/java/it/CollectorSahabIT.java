@@ -3,7 +3,6 @@ package it;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,7 +59,7 @@ class CollectorSahabIT {
         };
         // act
         Main.main(args);
-//        ExitException exit = assertThrows(ExitException.class, () -> Main.main(args));
+        //        ExitException exit = assertThrows(ExitException.class, () -> Main.main(args));
 
         // assert
         assertThat("Exit code should be 0", 0, equalTo(0));

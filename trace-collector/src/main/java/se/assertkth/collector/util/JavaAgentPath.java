@@ -21,8 +21,12 @@ public class JavaAgentPath {
             return traceCollector.toAbsolutePath().toString();
         }
 
+        System.out.println("Copying trace-collector.jar to " + traceCollector);
+
         try (InputStream traceCollectorStream = CollectorAgent.class.getResourceAsStream("/trace-collector.jar")) {
             Files.copy(traceCollectorStream, traceCollector, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new IOException(e.getCause());
         }
 
         return traceCollector.toAbsolutePath().toString();
