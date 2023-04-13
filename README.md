@@ -29,6 +29,8 @@ $ sudo apt install gawk
 
 You also need to have ChromeDriver installed at path `/usr/share/chromedriver`.
 
+And finally, a maven project hosted on GitHub. :smile:
+
 ### Setup project for collecting runtime statistics
 
 1. Package the entire project
