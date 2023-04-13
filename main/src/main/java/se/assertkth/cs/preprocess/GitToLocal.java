@@ -22,6 +22,7 @@ public class GitToLocal {
         ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
         checkoutBuilder.directory(cwd.toFile());
         checkoutBuilder.redirectErrorStream(true);
+        checkoutBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         Process p = checkoutBuilder.start();
         return p.waitFor();
     }
