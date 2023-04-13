@@ -76,7 +76,6 @@
             <configuration>
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>
               <includeArtifactIds>trace-collector</includeArtifactIds>
-              <stripClassifier>true</stripClassifier>
               <stripVersion>true</stripVersion>
             </configuration>
           </execution>
