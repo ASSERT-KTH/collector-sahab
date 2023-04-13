@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -103,7 +104,12 @@ public class Main implements Callable<Integer> {
         optionsLeft.setExecutionDepth(executionDepth);
         optionsLeft.setOutput(outputLeft.toAbsolutePath().toFile());
 
-        new PomTransformer(left, optionsLeft, selectedTests);
+        List<Path> pomFiles = Files.walk(left.getPath())
+                .filter(path -> path.getFileName().toString().equals("pom.xml"))
+                .collect(Collectors.toList());
+        for (Path pomFile : pomFiles) {
+            new PomTransformer(new Revision(pomFile.getParent(), leftHash), optionsLeft, selectedTests);
+        }
 
         CollectorAgentOptions optionsRight = new CollectorAgentOptions();
         optionsRight.setClassesAndBreakpoints(inputRight.toAbsolutePath().toFile());
@@ -111,7 +117,12 @@ public class Main implements Callable<Integer> {
         optionsRight.setExecutionDepth(executionDepth);
         optionsRight.setOutput(outputRight.toAbsolutePath().toFile());
 
-        new PomTransformer(right, optionsRight, selectedTests);
+        List<Path> pomFilesRight = Files.walk(right.getPath())
+                .filter(path -> path.getFileName().toString().equals("pom.xml"))
+                .collect(Collectors.toList());
+        for (Path pomFile : pomFilesRight) {
+            new PomTransformer(new Revision(pomFile.getParent(), rightHash), optionsRight, selectedTests);
+        }
 
         mavenTestInvoker(left);
         mavenTestInvoker(right);
