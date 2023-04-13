@@ -141,3 +141,7 @@ You also need to have ChromeDriver installed at path `/usr/share/chromedriver`.
 }
 ```
 
+## Example Diff
+
+![example-diff.png](readme_assets/example-diff.png)
+
