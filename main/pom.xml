@@ -93,7 +93,9 @@
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
       <plugin>
-        <!--        Execute it via mvn failsafe:integration-test -pl main -->
+        <!--        Execute it via mvn failsafe:integration-test failsafe:verify -pl main -->
+        <!--        `integration-test` runs the test -->
+        <!--        `verify` checks the result and passes or fails the build -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0</version>
