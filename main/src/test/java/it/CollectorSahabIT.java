@@ -31,7 +31,7 @@ class CollectorSahabIT {
     }
 
     @Test
-    void test(@TempDir Path tempDir) throws Exception {
+    void cdk_5a7d75b_d500be0_3(@TempDir Path tempDir) throws Exception {
         // arrange
         Path projectDirectory = Paths.get("src/test/resources/it/cdk");
         assertThat("cdk submodule should exist", Files.exists(projectDirectory));
