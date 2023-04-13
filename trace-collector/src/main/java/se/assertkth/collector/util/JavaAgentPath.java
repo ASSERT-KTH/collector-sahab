@@ -25,6 +25,7 @@ public class JavaAgentPath {
 
         try (InputStream traceCollectorStream = CollectorAgent.class.getResourceAsStream("/trace-collector.jar")) {
             Files.copy(traceCollectorStream, traceCollector, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Copied trace-collector.jar to " + traceCollector);
         } catch (IOException e) {
             throw new IOException(e.getCause());
         }

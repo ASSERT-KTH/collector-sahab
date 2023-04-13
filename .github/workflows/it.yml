@@ -25,3 +25,7 @@ jobs:
         run: 'mvn install -DskipTests'
       - name: Run the integration tests
         run: 'mvn failsafe:integration-test failsafe:verify -pl main'
+      - uses: actions/upload-artifact@v3
+        with:
+          name: it
+          path: /home/runner/work/collector-sahab/collector-sahab/main/target/failsafe-reports
