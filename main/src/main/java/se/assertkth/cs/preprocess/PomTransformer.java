@@ -96,9 +96,12 @@ public class PomTransformer {
                 configuration.addChild(test);
             }
 
-            Xpp3Dom failIfNoTests = new Xpp3Dom("failIfNoTests");
-            failIfNoTests.setValue("false");
-            configuration.addChild(failIfNoTests);
+            // Some modules may not have any tests, so we prevent its build from failing.
+            addIfDoesNotExist("failIfNoTests", "false", configuration);
+            // The build should continue even if a test fails because we still need the data from instrumentations.
+            addIfDoesNotExist("testFailureIgnore", "true", configuration);
+            // Some modules may not have the specified tests, so we prevent its build from failing.
+            addIfDoesNotExist("failIfNoSpecifiedTests", "false", configuration);
 
             argLine.setValue("-javaagent:" + AGENT_JAR + "=" + options.toString());
             configuration.addChild(argLine);
@@ -163,10 +166,23 @@ public class PomTransformer {
         } else {
             argLine.setValue("-javaagent:" + AGENT_JAR + "=" + options.toString() + " " + argLine.getValue());
         }
-        Xpp3Dom failIfNoTests = new Xpp3Dom("failIfNoTests");
-        failIfNoTests.setValue("false");
-        configuration.addChild(failIfNoTests);
+
+        addIfDoesNotExist("failIfNoTests", "false", configuration);
+        addIfDoesNotExist("testFailureIgnore", "true", configuration);
+        addIfDoesNotExist("failIfNoSpecifiedTests", "false", configuration);
+
         return configuration;
+    }
+
+    private static void addIfDoesNotExist(String attribute, String value, Xpp3Dom configuration) {
+        Xpp3Dom attributeNode = configuration.getChild(attribute);
+        if (attributeNode == null) {
+            attributeNode = new Xpp3Dom(attribute);
+            attributeNode.setValue(value);
+            configuration.addChild(attributeNode);
+        } else {
+            attributeNode.setValue(value);
+        }
     }
 
     private static Xpp3Dom getModifiedCompilerConfiguration(Xpp3Dom configuration) {
