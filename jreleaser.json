@@ -29,12 +29,6 @@
         "format": "- {{commitShortHash}} {{commitTitle}}",
         "contributors": {
           "format": "- {{contributorName}} ({{contributorUsernameAsLink}})"
-        },
-        "hide": {
-          "contributors": [
-            "[bot]",
-            "GitHub"
-          ]
         }
       }
     }
