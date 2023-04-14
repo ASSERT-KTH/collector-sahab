@@ -29,6 +29,9 @@ public class Constants {
     public static final String TEST_METHOD_NAME_SEPARATOR = "::";
     public static final String UNKNOWN_TEST = "unknown::unknown";
     public static final int REPEATS_FOR_RANDOM_EXCLUSION = 3;
+<<<<<<< HEAD:trace-diff/src/main/java/io/github/chains_project/tracediff/Constants.java
     public static final List<String> FILE_RELATED_CLASSES = Arrays.asList("java.io.File", "java.nio.file.Path", "sun.nio.fs.UnixPath",
             "sun.nio.fs.WindowsPath");
+=======
+>>>>>>> chore: updated integration between main and diff-computer:trace-diff/src/main/java/se/assertkth/tracediff/Constants.java
 }
