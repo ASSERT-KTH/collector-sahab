@@ -95,7 +95,7 @@ jobs:
         uses: actions-js/push@master
         with:
           github_token: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
-          message: 'chore: setting SNAPSHOT version ${{ env.NEXT_VERSION }}'
+          message: 'chore: setting SNAPSHOT version ${{ env.NEXT_RELEASE_VERSION }}'
 
       # Log failure:
       - name: JReleaser release output
