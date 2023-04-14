@@ -87,7 +87,7 @@ jobs:
           echo "NEXT_RELEASE_VERSION=$(semver next patch $NEXT_VERSION)-SNAPSHOT" >> $GITHUB_ENV
           echo "NEXT_RELEASE_VERSION_WITHOUT_SNAPSHOT=$(semver next patch $NEXT_VERSION)" >> $GITHUB_ENV
       - name: Set release version
-        run: mvn --no-transfer-progress --batch-mode versions:set -DnewVersion=$NEXT_RELEASE_VERSION -DprocessAllModules
+        run: mvn --no-transfer-progress --batch-mode versions:set -DnewVersion=$NEXT_RELEASE_VERSION -DprocessAllModules -DgenerateBackupPoms=false
 
       # Time to update some files with the new version
       # Commit and push changes
