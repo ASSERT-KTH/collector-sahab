@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+preferred-citation:
+  title: "Augmenting Diffs With Runtime Information"
+  doi: "https://doi.org/10.48550/arXiv.2212.11077"
+  year: "2022"
+  type: article
+  journal: "arXiv preprint"
+  authors:
+    - family-names: Etemadi
+      given-names: Khashayar
+    - family-names: Sharma
+      given-names: Aman
+    - family-names: Madeiral
+      given-names: Fernanda
+    - family-names: Monperrus
+      given-names: Martin
