@@ -27,8 +27,8 @@ The project is divided into multiple submodules.
 $ sudo apt install gawk
 ```
 
-You also need to have ChromeDriver installed at path `/usr/share/chromedriver`
-or `/usr/bin/chromedriver`. Run the following command to get it:
+You also need to have ChromeDriver installed at path `/usr/bin/chromedriver`.
+Run the following command to get it:
 ```shell
 $ sudo apt install chromium-chromedriver
 ```
