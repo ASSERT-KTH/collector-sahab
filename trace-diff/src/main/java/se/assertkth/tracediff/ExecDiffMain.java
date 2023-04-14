@@ -1,7 +1,5 @@
 package se.assertkth.tracediff;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import picocli.CommandLine;
 import se.assertkth.tracediff.statediff.StateDiffCommand;
 import se.assertkth.tracediff.trace.ExecFreqDiffCommand;
@@ -15,11 +13,8 @@ import se.assertkth.tracediff.trace.ExecFreqDiffCommand;
         synopsisSubcommandLabel = "<COMMAND>")
 public class ExecDiffMain {
     public static void main(String[] args) {
-        if (Files.exists(Path.of("/usr/share/chromedriver"))) {
-            System.setProperty("webdriver.chrome.driver", "/usr/share/chromedriver");
-        } else {
-            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-        }
+        // Make sure to run `sudo apt install chromium-chromedriver` before running the main jar.
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         new CommandLine(new ExecDiffMain()).execute(args);
     }
 }
