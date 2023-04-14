@@ -41,7 +41,9 @@
   },
 
   "distributions": {
-    "app": {
+    "collector-sahab": {
+      "type": "SINGLE_JAR",
+      "stereotype": "CLI",
       "artifacts": [
         {
           "path": "main/target/{{distributionName}}-{{projectVersion}}-jar-with-dependencies.jar"
