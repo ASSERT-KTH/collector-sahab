@@ -17,10 +17,6 @@ public class JavaAgentPath {
         String tempDir = System.getProperty("java.io.tmpdir");
         Path traceCollector = Path.of(tempDir, "trace-collector.jar");
 
-        if (Files.exists(traceCollector)) {
-            return traceCollector.toAbsolutePath().toString();
-        }
-
         try (InputStream traceCollectorStream = CollectorAgent.class.getResourceAsStream("/trace-collector.jar")) {
             Files.copy(traceCollectorStream, traceCollector, StandardCopyOption.REPLACE_EXISTING);
         }
