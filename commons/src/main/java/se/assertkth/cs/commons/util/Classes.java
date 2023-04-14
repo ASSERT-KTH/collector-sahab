@@ -97,27 +97,6 @@ public class Classes {
             }
             return value.toString();
         }
-        if (hasImplementedToString(value.getClass())) {
-            return value.toString();
-        }
         return getCanonicalClassName(value.getClass());
-    }
-
-    /**
-     * Returns whether the type declares `toString`.
-     */
-    public static boolean hasImplementedToString(Class<?> type) {
-        try {
-            if (type == null) {
-                return false;
-            }
-            if (!CACHED_CLASSES.containsKey(type)) {
-                CACHED_CLASSES.put(type, type.getMethod("toString").getDeclaringClass() != Object.class);
-            }
-
-            return CACHED_CLASSES.get(type);
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError("Unreachable", e);
-        }
     }
 }
