@@ -22,7 +22,21 @@
 
   "release": {
     "github": {
-      "owner": "ASSERT-KTH"
+      "owner": "ASSERT-KTH",
+      "changelog": {
+        "formatted": "ALWAYS",
+        "preset": "conventional-commits",
+        "format": "- {{commitShortHash}} {{commitTitle}}",
+        "contributors": {
+          "format": "- {{contributorName}} ({{contributorUsernameAsLink}})"
+        },
+        "hide": {
+          "contributors": [
+            "[bot]",
+            "GitHub"
+          ]
+        }
+      }
     }
   },
 
@@ -30,7 +44,7 @@
     "app": {
       "artifacts": [
         {
-          "path": "main/target/collector-sahab-0.0.1-SNAPSHOT-jar-with-dependencies.jar"
+          "path": "main/target/{{distributionName}}-{{projectVersion}}.jar"
         }
       ]
     }
