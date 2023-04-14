@@ -1,0 +1,1024 @@
+[INFO]  JReleaser 1.4.0
+------------------------------------------------------------
+jreleaser 1.4.0
+------------------------------------------------------------
+Build time:   2022-12-29 15:08:38Z
+Revision:     b977b66baed1e4761af054c5d747a0804f457252
+JVM:          11.0.18 (Eclipse Adoptium 11.0.18+10)
+------------------------------------------------------------
+[INFO]  Configuring with jreleaser.json
+[INFO]    - basedir set to /home/runner/work/collector-sahab/collector-sahab
+[INFO]    - outputdir set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser
+[INFO]  Reading configuration
+[DEBUG]   - basedir set to /home/runner/work/collector-sahab/collector-sahab
+[DEBUG]   - baseOutputDirectory set to /home/runner/work/collector-sahab/collector-sahab/out
+[DEBUG]   - outputDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser
+[DEBUG]   - checksumDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/checksums
+[DEBUG]   - signaturesDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/signatures
+[DEBUG]   - prepareDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/prepare
+[DEBUG]   - packageDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/package
+[DEBUG]   - downloadDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/download
+[DEBUG]   - assembleDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/assemble
+[DEBUG]   - artifactsDirectory set to /home/runner/work/collector-sahab/collector-sahab/out/jreleaser/artifacts
+[INFO]  git-root-search set to false
+[INFO]  Loading variables from /home/runner/.jreleaser/config.properties
+[WARN]  Variables source /home/runner/.jreleaser/config.properties does not exist
+[INFO]  Validating configuration
+[INFO]  Strict mode set to false
+[DEBUG] adjusting distributions with assemblies
+[DEBUG]   [validation] --== ASSEMBLE ==--
+[DEBUG]   [validation] hooks
+[DEBUG]   [validation] hooks.command
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] project
+[DEBUG]   [validation] download
+[DEBUG]   [validation] assemble
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] signing
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] release
+[DEBUG]   [validation] release.github
+[DEBUG]   [validation] checksum
+[DEBUG]   [validation] deploy
+[DEBUG]   [validation] deploy.maven
+[DEBUG]   [validation] upload
+[DEBUG]   [validation] distributions
+[DEBUG]   [validation] announce
+[DEBUG]   [validation] - disabled
+[DEBUG]   [postvalidation] project
+[DEBUG]   [postvalidation] assemble
+[DEBUG]   [postvalidation] assemble.jpackage
+[DEBUG]   [resolution] assemble
+[DEBUG]   [validation] --== FULL ==--
+[DEBUG]   [validation] hooks
+[DEBUG]   [validation] hooks.command
+[DEBUG]   [validation] project
+[DEBUG]   [validation] project.java
+[DEBUG]   [validation] download
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] assemble
+[DEBUG]   [validation] signing
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] release
+[DEBUG]   [validation] release.github
+[DEBUG]   [validation] checksum
+[DEBUG]   [validation] deploy
+[DEBUG]   [validation] deploy.maven
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] upload
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] packagers
+[DEBUG]   [validation] distributions
+[DEBUG]   [validation] distribution.collector-sahab
+[DEBUG]   [validation] distribution.collector-sahab.java
+[DEBUG]   [validation] distribution.collector-sahab.appImage
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.asdf
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.brew
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.chocolatey
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.docker
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.flatpak
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.gofish
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.jbang
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.macports
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.scoop
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.sdkman
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.snap
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] distribution.collector-sahab.spec
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] files
+[DEBUG]   [validation] announce
+[DEBUG]   [validation] announce.article
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.discussions
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.discord
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.discourse
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.gitter
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.googleChat
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.http
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.mail
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.mastodon
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.mattermost
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.sdkman
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.slack
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.teams
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.telegram
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.twitter
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.webhooks
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] announce.zulip
+[DEBUG]   [validation] - disabled
+[DEBUG]   [validation] - disabled
+[DEBUG]   [postvalidation] project
+[DEBUG]   [postvalidation] assemble
+[DEBUG]   [postvalidation] assemble.jpackage
+[DEBUG]   [postvalidation] distributions
+[DEBUG]   [postvalidation] distribution.collector-sahab
+environment:
+ 
+hooks:
+    enabled: false
+    active: never
+    command:
+        enabled: false
+        active: never
+ 
+project:
+    name: collector-sahab
+    version: 0.1.0
+    versionPattern: semver
+    snapshot:
+        enabled: false
+        pattern: .*-SNAPSHOT
+        label: early-access
+        fullChangelog: false
+    description: A tool for augmenting the static diff with runtime information
+    longDescription: It gets the difference of values in the execution of two versions of a program and uses it to augment the static diff. The augmented diff is show on GitHub PRs.
+    license: The Unlicense
+    inceptionYear: 2022
+    copyright: 2022 algomaster99, khaes-kth, I-Al-Istannen
+    authors:
+        algomaster99
+        khaes-kth
+        I-Al-Istannen
+    stereotype: none
+    links:
+        homepage: https://github.com/ASSERT-KTH/collector-sahab
+        documentation: https://github.com/ASSERT-KTH/collector-sahab
+        license: https://github.com/ASSERT-KTH/collector-sahab/blob/main/LICENSE
+        bugTracker: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/issues
+        vcsBrowser: https://{{repoHost}}/{{repoOwner}}/{{repoName}}
+    extraProperties:
+        projectVersionMajor: 0
+        projectVersionMinor: 1
+        projectVersionPatch: 0
+        projectVersionNumber: 0.1.0
+        projectVersionWithUnderscores: 0_1_0
+        projectVersionWithDashes: 0-1-0
+        projectVersionNumberWithUnderscores: 0_1_0
+        projectVersionNumberWithDashes: 0-1-0
+        projectEffectiveVersionWithUnderscores: 0_1_0
+        projectEffectiveVersionWithDashes: 0-1-0
+    java:
+        enabled: true
+        version: 11
+        groupId: se.assertkth
+        artifactId: collector-sahab
+        multiProject: false
+ 
+platform:
+ 
+release:
+    github:
+        enabled: true
+        host: github.com
+        owner: ASSERT-KTH
+        name: collector-sahab
+        username: ASSERT-KTH
+        token: ************
+        artifacts: true
+        files: true
+        checksums: true
+        signatures: true
+        repoUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}
+        repoCloneUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}.git
+        commitUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/commits
+        srcUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/blob/{{repoBranch}}
+        downloadUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}
+        releaseNotesUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/tag/{{tagName}}
+        latestReleaseUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/latest
+        issueTrackerUrl: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/issues
+        tagName: v{{projectVersion}}
+        releaseName: Release {{tagName}}
+        branch: main
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        sign: false
+        skipTag: false
+        skipRelease: false
+        overwrite: false
+        update:
+            enabled: false
+        apiEndpoint: https://api.github.com
+        connectTimeout: 20
+        readTimeout: 60
+        changelog:
+            enabled: true
+            append:
+                enabled: false
+            links: false
+            skipMergeCommits: false
+            sort: DESC
+            formatted: always
+            preset: conventional-commits
+            format: - {{commitShortHash}} {{commitTitle}}
+            categoryTitleFormat: ## {{categoryTitle}}
+            contributorsTitleFormat: ## Contributors
+            content: 
+## Changelog
+
+{{changelogChanges}}
+    {{changelogContributors}}
+            hide:
+                contributors:
+                    [bot]
+                    GitHub
+            contributors:
+                enabled: true
+                format: - {{contributorName}} ({{contributorUsernameAsLink}})
+            categories:
+                category 0:
+                    key: merge
+                    title: 🔀 Merge
+                    labels:
+                        merge
+                    order: 0
+                category 1:
+                    key: features
+                    title: 🚀 Features
+                    labels:
+                        feat
+                    order: 10
+                category 2:
+                    key: fixes
+                    title: 🐛 Fixes
+                    labels:
+                        fix
+                    order: 20
+                category 3:
+                    key: changes
+                    title: 🔄️ Changes
+                    labels:
+                        revert
+                        style
+                        perf
+                        refactor
+                    order: 30
+                category 4:
+                    key: tasks
+                    title: 🧰 Tasks
+                    labels:
+                        chore
+                    order: 40
+                category 5:
+                    key: build
+                    title: 🛠  Build
+                    labels:
+                        test
+                        build
+                        ci
+                    order: 50
+                category 6:
+                    key: docs
+                    title: 📝 Documentation
+                    labels:
+                        docs
+                    order: 60
+            labelers:
+                labeler 0:
+                    label: merge
+                    title: Merge pull
+                    order: 0
+                labeler 1:
+                    label: merge
+                    title: Merge branch
+                    order: 5
+                labeler 2:
+                    label: build
+                    title: regex:^(?:build(?:\(.*\))?!?):\s.*
+                    order: 10
+                labeler 3:
+                    label: chore
+                    title: regex:^(?:chore(?:\(.*\))?!?):\s.*
+                    order: 20
+                labeler 4:
+                    label: ci
+                    title: regex:^(?:ci(?:\(.*\))?!?):\s.*
+                    order: 30
+                labeler 5:
+                    label: docs
+                    title: regex:^(?:docs(?:\(.*\))?!?):\s.*
+                    order: 40
+                labeler 6:
+                    label: feat
+                    title: regex:^(?:feat(?:\(.*\))?!?):\s.*
+                    order: 50
+                labeler 7:
+                    label: fix
+                    title: regex:^(?:fix(?:\(.*\))?!?):\s.*
+                    order: 60
+                labeler 8:
+                    label: perf
+                    title: regex:^(?:perf(?:\(.*\))?!?):\s.*
+                    order: 70
+                labeler 9:
+                    label: refactor
+                    title: regex:^(?:refactor(?:\(.*\))?!?):\s.*
+                    order: 80
+                labeler 10:
+                    label: revert
+                    title: regex:^(?:revert(?:\(.*\))?!?):\s.*
+                    order: 90
+                labeler 11:
+                    label: style
+                    title: regex:^(?:style(?:\(.*\))?!?):\s.*
+                    order: 100
+                labeler 12:
+                    label: test
+                    title: regex:^(?:test(?:\(.*\))?!?):\s.*
+                    order: 110
+        milestone:
+            name: {{tagName}}
+            close: true
+        issues:
+            enabled: false
+            comment: Released in {{tagName}} -> {{releaseNotesUrl}}
+            label:
+                name: released
+                color: #FF0000
+                description: Issue has been released
+        prerelease:
+            enabled: false
+        draft: false
+        releaseNotes:
+            enabled: false
+ 
+checksum:
+    name: checksums.txt
+    individual: false
+    algorithms:
+        SHA_256
+    files: true
+ 
+signing:
+    enabled: false
+    active: never
+    armored: false
+    artifacts: true
+    files: true
+    checksums: true
+    passphrase: **unset**
+    publicKey: **unset**
+    secretKey: **unset**
+ 
+announce:
+    enabled: false
+    active: never
+    article:
+        enabled: false
+        active: never
+        commitAuthor:
+        repository:
+            enabled: false
+            name: article
+            token: **unset**
+    discord:
+        enabled: false
+        active: never
+        webhook: **unset**
+    discourse:
+        enabled: false
+        active: never
+        apiKey: **unset**
+        username: **unset**
+    discussions:
+        enabled: false
+        active: never
+    gitter:
+        enabled: false
+        active: never
+        webhook: **unset**
+    googlechat:
+        enabled: false
+        active: never
+        webhook: **unset**
+    smtp:
+        enabled: false
+        active: never
+        auth: false
+        password: **unset**
+    mastodon:
+        enabled: false
+        active: never
+        accessToken: **unset**
+    mattermost:
+        enabled: false
+        active: never
+        webhook: **unset**
+        structuredMessage: true
+    sdkman:
+        enabled: false
+        active: never
+        consumerKey: **unset**
+        consumerToken: **unset**
+        extraProperties:
+            sdkman__MAGIC_SET__: true
+    slack:
+        enabled: false
+        active: never
+        webhook: **unset**
+        token: **unset**
+    teams:
+        enabled: false
+        active: never
+        webhook: **unset**
+    telegram:
+        enabled: false
+        active: never
+        token: **unset**
+        chatId: **unset**
+    twitter:
+        enabled: false
+        active: never
+        consumerKey: **unset**
+        consumerSecret: **unset**
+        accessToken: **unset**
+        accessTokenSecret: **unset**
+    zulip:
+        enabled: false
+        active: never
+        apiKey: **unset**
+ 
+packagers:
+    appimage:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        developerName: algomaster99, khaes-kth, I-Al-Istannen
+        requiresTerminal: false
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: appimage
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    asdf:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: asdf
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    brew:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        multiPlatform: false
+        tap:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: homebrew-tap
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+        cask:
+            enabled: false
+    chocolatey:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        apiKey: **unset**
+        remoteBuild: false
+        bucket:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: chocolatey-bucket
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    docker:
+        enabled: false
+        active: never
+        useLocalArtifact: true
+        buildx:
+            enabled: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: docker
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+            versionedSubfolders: false
+        continueOnError: false
+    flatpak:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        developerName: algomaster99, khaes-kth, I-Al-Istannen
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: flatpak
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    gofish:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: ASSERT-KTH-fish-food
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    jbang:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        catalog:
+            enabled: true
+            active: always
+            owner: ASSERT-KTH
+            name: jbang-catalog
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    macports:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: macports
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    scoop:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        bucket:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: scoop-ASSERT-KTH
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    sdkman:
+        enabled: false
+        active: never
+        continueOnError: false
+        connectTimeout: 20
+        readTimeout: 60
+        consumerKey: **unset**
+        consumerToken: **unset**
+    snap:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        base: core20
+        grade: stable
+        confinement: strict
+        remoteBuild: false
+        snap:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: snap
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+    spec:
+        enabled: false
+        active: never
+        continueOnError: false
+        commitAuthor:
+            name: jreleaserbot
+            email: jreleaser@kordamp.org
+        repository:
+            enabled: true
+            active: release
+            owner: ASSERT-KTH
+            name: ASSERT-KTH-spec
+            tagName: v{{projectVersion}}
+            branch: HEAD
+            username: ASSERT-KTH
+            token: ************
+ 
+download:
+    enabled: false
+    active: never
+ 
+assemble:
+    enabled: false
+    active: never
+ 
+deploy:
+    enabled: false
+    active: never
+    maven:
+        enabled: false
+        active: never
+ 
+upload:
+    enabled: false
+    active: never
+ 
+distributions:
+    collector-sahab:
+        enabled: true
+        active: always
+        type: SINGLE_JAR
+        executable:
+            name: collector-sahab
+            windowsExtension: bat
+        platform:
+        artifacts:
+            artifact 0:
+                path: main/target/{{distributionName}}-{{projectVersion}}-jar-with-dependencies.jar
+        stereotype: cli
+        java:
+            enabled: true
+            version: 11
+            groupId: se.assertkth
+            artifactId: collector-sahab
+            multiProject: false
+        appimage:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            requiresTerminal: false
+            repository:
+                enabled: false
+                name: appimage
+                token: **unset**
+        asdf:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            repository:
+                enabled: false
+                name: asdf
+                token: **unset**
+        brew:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            multiPlatform: false
+            tap:
+                enabled: false
+                name: homebrew-tap
+                token: **unset**
+            cask:
+                enabled: false
+        chocolatey:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            apiKey: **unset**
+            remoteBuild: false
+            bucket:
+                enabled: false
+                name: chocolatey-bucket
+                token: **unset**
+        docker:
+            enabled: false
+            active: never
+            useLocalArtifact: true
+            buildx:
+                enabled: false
+            commitAuthor:
+            repository:
+                enabled: false
+                name: docker
+                token: **unset**
+                versionedSubfolders: false
+            continueOnError: false
+        flatpak:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            repository:
+                enabled: false
+                name: flatpak
+                token: **unset**
+        gofish:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            repository:
+                enabled: false
+                name: fish-food
+                token: **unset**
+        jbang:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            catalog:
+                enabled: false
+                name: jbang-catalog
+                token: **unset**
+        macports:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            repository:
+                enabled: false
+                name: macports
+                token: **unset**
+        scoop:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            bucket:
+                enabled: false
+                name: scoop
+                token: **unset**
+        sdkman:
+            enabled: false
+            active: never
+            continueOnError: false
+            connectTimeout: 0
+            readTimeout: 0
+            consumerKey: **unset**
+            consumerToken: **unset**
+        snap:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            base: core20
+            grade: stable
+            confinement: strict
+            remoteBuild: false
+            snap:
+                enabled: false
+                name: snap
+                token: **unset**
+        spec:
+            enabled: false
+            active: never
+            continueOnError: false
+            commitAuthor:
+            repository:
+                enabled: false
+                name: spec
+                token: **unset**
+ 
+[INFO]  Project version set to 0.1.0
+[INFO]  Release is not snapshot
+[INFO]  Timestamp is 2023-04-14T15:16:32.317205Z
+[INFO]  HEAD is at 901237f
+[INFO]  Platform is linux-x86_64
+[DEBUG] loading extension default-jreleaser-mustache:jreleaser.shadow.org.jreleaser.extensions.internal.mustache.DefaultMustacheExtension
+[DEBUG] adding jreleaser.shadow.org.jreleaser.extensions.internal.mustache.DefaultMustacheExtensionPoint from default-jreleaser-mustache extension
+[INFO]  dry-run set to false
+[INFO]  Generating changelog
+[DEBUG] resolving commits
+[DEBUG] looking for tag that matches 'v0.1.0'
+[DEBUG] looking for tags that match 'v.*', excluding 'v0.1.0'
+[DEBUG] found tag v0.0.1
+[DEBUG] sorting commits DESC
+[DEBUG] looking up user for Aman Sharma <mannu.poski10@gmail.com>
+[DEBUG] looking up user for I-Al-Istannen <i-al-istannen@users.noreply.github.com>
+[DEBUG] looking up user for Khashayar Etemadi <khaes@kth.se>
+[INFO]  Storing changelog: out/jreleaser/release/CHANGELOG.md
+[DEBUG] ## Changelog
+
+## 🔀 Merge
+- 1253a0a Merge pull request #69 from algomaster99/start-maintaining-version
+
+## 🚀 Features
+- 71bc8b2 feat: add ability to run specific tests (#148)
+- 5172474 feat: integrate patch explainer to run along with Main (#147)
+- 92fcbf4 feat: parse default methods in interfaces (#118)
+- 6244924 feat: pass methods explicitly to record their return values (#76)
+
+## 🐛 Fixes
+- 8bcf830 fix: prevent generation of backup poms (#167)
+- 7ad1712 fix: add more attributes to prevent build from failing (#161)
+- 60136b3 fix(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.8.3
+- 584b910 fix(deps): update dependency org.ow2.asm:asm-util to v9.5
+- 7c8a156 fix(deps): update dependency org.ow2.asm:asm-tree to v9.5
+- 319a09f fix(deps): update dependency org.ow2.asm:asm to v9.5
+- 3b58dc0 fix(deps): update dependency org.kohsuke:github-api to v1.314
+- 8c2d5f9 fix(deps): update dependency org.jsoup:jsoup to v1.15.4
+- e499e7b fix(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.59
+- 651c87a fix(deps): update dependency org.junit.jupiter:junit-jupiter to v5.9.2
+- 2f1b0c2 fix(deps): update dependency com.googlecode.json-simple:json-simple to v1.1.1
+- cb9b470 fix: prevent failing tests if none are found (#150)
+- 4713ab8 fix: put fully qualified class names with `/` as delimiter (#146)
+- 6da313e fix(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.4
+- dba8a28 fix(deps): update dependency info.picocli:picocli to v4.7.2
+- d886b7b fix(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.3.0 (#132)
+- ed893af fix: include all line numbers that are part of multi-line expression (#121)
+- 45728df fix: ignore imports when computing mapping (#117)
+- ea1ad94 fix: add timeout so that event is not looked for forever
+- 1007c58 fix: fix serialisation of special floating value (#102)
+- e02b54d fix: serialise special floating point values (#100)
+- 145c948 fix: check for ignoring prior to performing operation on statement
+- 734a545 fix: skip lines in other file that are affected by pure insert and delete operations (#91)
+- 3eb35f1 fix: skip all statements inside inserted nodes (#89)
+- 6d5316c fix: correct computation of `diff method` when there is an `InsertOperation` (#75)
+- 3bec872 fix: optimise serialisation of output (#74)
+- 986e769 fix: put breakpoints inside case blocks (#70)
+
+## 🔄️ Changes
+- 556b6c1 refactor: use one fixed path for chromium driver (#165)
+- e87123d refactor: use our own Pair (#157)
+- 412f874 refactor: use `jackson` in `trace-diff` (#156)
+- 035b6da refactor: move common utilities to commons module (#155)
+- ad63110 refactor: integrate PatchExplainer as trace-diff (#139)
+- 87c6aee refactor: remove unnecessary nesting
+- e0037b1 refactor: modularise project (#125)
+- 4aa3d36 refactor: use instrumentation to collect trace (#123)
+- ca668bc perf: destroy debuggee after the debugger ends (#120)
+- a33c5f9 refactor: rewrite MatchedLineFinder to find breakpoints using UNIX diff instead of AST diff (#93)
+- 47a344b style: mark options as required to prevent NPE
+- 229ced3 refactor: log invalid breakpoints (#71)
+
+## 🧰 Tasks
+- 901237f chore: releasing version 0.1.0
+- e608ddf chore: fix name of artifact jar (#169)
+- 802ff45 chore: releasing version 0.1.0
+- cd23829 chore: package before release (#168)
+- be58a87 chore: releasing version 0.1.0
+- b47e5cd chore: add workflow to release collector-sahab (#166)
+- 307af29 chore(deps): update actions/checkout action to v3 (#138)
+- cb2ba05 chore(deps): update dependency org.apache.maven.plugins:maven-dependency-plugin to v3.5.0
+- 502abff chore: remove assembly of `trace-diff` (#163)
+- 830acb2 chore: distinguish local directory easily
+- 843e8b8 chore: transform all POMs in all submodules (#160)
+- 772af15 chore: bundle agent (#159)
+- b778076 chore(deps): update actions/setup-java action to v3 (#154)
+- 623bdb4 chore: remove unused dependency (#158)
+- d8cf826 chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.36.0
+- 5a85e4b chore(deps): update dependency org.jacoco:jacoco-maven-plugin to v0.8.9
+- 40085ee chore: enable automerge
+- 9a210f1 chore: add renovate configuration
+- a1cda64 chore: port script from Python to Java (#127)
+- f979de8 chore: prevent creation of dependency-reduced-pom
+- edf7375 chore: rename package (#124)
+- bddecba chore: Port gson to jackson
+- 01ed5bc chore: rename argument file
+- 8b7744a chore: use `@` to pass arguments to Java command (#111)
+- 138ce15 chore: fix clean up of generated directories
+- 5e7dbf3 chore: remove suppression of slf4j statements
+- 7dfc9ec chore: add features to run bribe-sahab on multiple commits simultaneously (#106)
+- 5d2980c chore: add config.json to gitignore
+- 645552f chore: make spotless compatible with maven 3.8.6 (#107)
+- 67ed8ab chore: wrap classpath finder inside try-catch
+- 05419f0 chore: prioritise our built classes (#99)
+- 0aa4b1f chore: run all JUnit tests in a single container (#97)
+- 49917a7 chore: update `JUnitTestRunner` to use the latest JUnit dependencies (#95)
+- b50a129 chore: sanitise bash input
+- 8888ff2 chore: remove explict setting of maven compiler version
+- e52a5c8 chore: handle multi-modular maven projects (#87)
+
+## 📝 Documentation
+- d36c004 docs: add citation information
+- ad87ef5 docs: instruction to get chromium driver
+- b9d693a docs: update prerequisite
+- e2f384f docs: add example diff
+- fc4003e docs: add integration test badge
+- 28751ba docs: update README
+- 19bfdb8 docs: fix example
+
+---
+- 0023c4c Revert "chore: releasing version 0.1.0"
+- 038303a Revert "chore: releasing version 0.1.0"
+- ae67783 tests: add infrastructure for integration tests (#162)
+- ca58725 tests: add infrastructure for integration tests (#162)
+- 243d983 doc: fix module names
+- 8d07eba doc: update README based on the sprint in the last two weeks :relieved:
+- 325bb98 doc: Give authorship to Khashayar
+- 24c50f0 refator: rename parent module (#126)
+- b7d5f7d tests: prove JUnit does not care about 'Test' prefix or suffix (#114)
+- ab964e0 tests: prove JUnit cannot discover tests in abstract classes (#113)
+- 17c910b tests: add test to check data is collected from methods that are run by nested tests
+- ee12bdd chrore: Use config file for JAR and output directory (#105)
+- fb1957c tests: load classpath from cp.txt (#98)
+- f0803bc Build classpath instead of copying dependencies (#96)
+- 5cbad7c tests: add test that shows inaccuracy between GitHub diff and AST Diff (#90)
+- b2de6b5 tests: add failing test for case when argument difference is not detected (#82)
+- 09d2702 tests: ensure methods.json is created even if there are no breakpoints (#81)
+- 501e6e0 tests: skip recording return values if fully qualified name does not match (#80)
+- 69088ca Prepare for next release
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ()
+- I-Al-Istannen ([@I-Al-Istannen](https://github.com/I-Al-Istannen))
+- Khashayar Etemadi ([@khaes-kth](https://github.com/khaes-kth))
+[INFO]  Calculating checksums
+[DEBUG]   [checksum] checksum does not exist: out/jreleaser/checksums/collector-sahab/collector-sahab-0.1.0-jar-with-dependencies.jar.sha256
+[INFO]    [checksum] main/target/collector-sahab-0.1.0-jar-with-dependencies.jar.sha256
+[DEBUG]   [checksum] reading out/jreleaser/checksums/collector-sahab/collector-sahab-0.1.0-jar-with-dependencies.jar.sha256
+[INFO]  Signing files
+[INFO]    [sign] Signing is not enabled. Skipping
+[INFO]  Deploying is not enabled. Skipping
+[INFO]  Uploading is not enabled. Skipping
+[INFO]  Releasing to https://github.com/ASSERT-KTH/collector-sahab
+[DEBUG] fetching all branches on ASSERT-KTH/collector-sahab
+[DEBUG] looking up release with tag v0.1.0 at repository ASSERT-KTH/collector-sahab
+[DEBUG] fetching release on ASSERT-KTH/collector-sahab with tag v0.1.0
+[DEBUG] release v0.1.0 does not exist
+[DEBUG] creating release v0.1.0
+[DEBUG] tagging local repository with v0.1.0
+[DEBUG] creating release on ASSERT-KTH/collector-sahab with tag v0.1.0
+[INFO]   - uploading collector-sahab-0.1.0-jar-with-dependencies.jar
+[INFO]   - uploading checksums_sha256.txt
+[DEBUG] lookup open milestone 'v0.1.0' on ASSERT-KTH/collector-sahab
+[DEBUG] lookup repository ASSERT-KTH/collector-sahab
+[INFO]  Writing output properties to out/jreleaser/output.properties
+[INFO]  JReleaser succeeded after 11.441 s
