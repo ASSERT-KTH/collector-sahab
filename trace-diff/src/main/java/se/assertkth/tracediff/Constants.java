@@ -13,6 +13,7 @@ public class Constants {
     public static final String ARG_FULL_REPORT_LINK = "--full-report-link";
     public static final String ARG_CHANGED_FILE_PATH = "--changed-file-path";
     public static final String ARG_SELECTED_TESTS = "--selected-tests";
+    public static final String ARG_EXCLUDE_RANDOM_VALUES = "--exclude-random-values";
 
     public static final String STATE_DIFF_COMMAND_NAME = "sdiff";
     public static final String ARG_LEFT_REPORT_PATH = "--left-report-path";

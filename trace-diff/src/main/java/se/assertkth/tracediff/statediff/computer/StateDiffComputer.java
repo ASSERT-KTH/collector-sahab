@@ -19,22 +19,22 @@ import se.assertkth.tracediff.models.VarValsSet;
 import se.assertkth.tracediff.statediff.models.ProgramStateDiff;
 
 public class StateDiffComputer {
-    private File leftSahabReport, rightSahabReport;
+    private File leftSahabReportDir, rightSahabReportDir;
     private Map<Integer, Integer> leftRightLineMapping, rightLeftLineMapping;
     private Map<Integer, Set<String>> leftLineToVars, rightLineToVars;
     private List<String> tests;
 
     public StateDiffComputer(
-            File leftSahabReport,
-            File rightSahabReport,
+            File leftSahabReportDir,
+            File rightSahabReportDir,
             Map<Integer, Integer> leftRightLineMapping,
             Map<Integer, Integer> rightLeftLineMapping,
             Map<Integer, Set<String>> leftLineToVars,
             Map<Integer, Set<String>> rightLineToVars,
             List<String> tests)
             throws IOException {
-        this.leftSahabReport = leftSahabReport;
-        this.rightSahabReport = rightSahabReport;
+        this.leftSahabReportDir = leftSahabReportDir;
+        this.rightSahabReportDir = rightSahabReportDir;
         this.leftLineToVars = leftLineToVars;
         this.rightLineToVars = rightLineToVars;
         this.leftRightLineMapping = leftRightLineMapping;
@@ -42,20 +42,20 @@ public class StateDiffComputer {
         this.tests = tests;
     }
 
-    public ProgramStateDiff computeProgramStateDiff(PrintWriter diffPrinter) throws IOException {
+    public ProgramStateDiff computeProgramStateDiff(PrintWriter diffPrinter, boolean excludeRandomValues) throws IOException {
         ProgramStateDiff programStateDiff = new ProgramStateDiff();
 
         programStateDiff.setFirstOriginalUniqueStateSummary(getFirstDistinctStateOnRelevantLine(
-                leftLineToVars, leftRightLineMapping, leftSahabReport, rightSahabReport, diffPrinter));
+                leftLineToVars, leftRightLineMapping, leftSahabReportDir, rightSahabReportDir, diffPrinter, excludeRandomValues));
 
         programStateDiff.setFirstPatchedUniqueStateSummary(getFirstDistinctStateOnRelevantLine(
-                rightLineToVars, rightLeftLineMapping, rightSahabReport, leftSahabReport, diffPrinter));
+                rightLineToVars, rightLeftLineMapping, rightSahabReportDir, leftSahabReportDir, diffPrinter, excludeRandomValues));
 
         programStateDiff.setOriginalUniqueReturn(
-                getFirstUniqueReturn(leftRightLineMapping, leftSahabReport, rightSahabReport, diffPrinter));
+                getFirstUniqueReturn(leftRightLineMapping, leftSahabReportDir, rightSahabReportDir, diffPrinter, excludeRandomValues));
 
         programStateDiff.setPatchedUniqueReturn(
-                getFirstUniqueReturn(rightLeftLineMapping, rightSahabReport, leftSahabReport, diffPrinter));
+                getFirstUniqueReturn(rightLeftLineMapping, rightSahabReportDir, leftSahabReportDir, diffPrinter, excludeRandomValues));
 
         return programStateDiff;
     }
@@ -70,18 +70,21 @@ public class StateDiffComputer {
 
     private ProgramStateDiff.UniqueReturnSummary getFirstUniqueReturn(
             Map<Integer, Integer> lineMapping,
-            File sahabReportFile,
-            File oppositeSahabReportFile,
-            PrintWriter diffPrinter)
+            File sahabReportDir,
+            File oppositeSahabReportDir,
+            PrintWriter diffPrinter,
+            boolean excludeRandomValues)
             throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         SahabOutput sahabOutputLeft =
-                mapper.readValue(new FileReader(sahabReportFile, StandardCharsets.UTF_8), SahabOutput.class);
+                mapper.readValue(new FileReader(sahabReportDir.toPath().resolve("0.json").toFile(),
+                        StandardCharsets.UTF_8), SahabOutput.class);
         List<RuntimeReturnedValue> jsonStates = sahabOutputLeft.getReturns();
 
         SahabOutput sahabOutputRight =
-                mapper.readValue(new FileReader(oppositeSahabReportFile, StandardCharsets.UTF_8), SahabOutput.class);
+                mapper.readValue(new FileReader(oppositeSahabReportDir.toPath().resolve("0.json").toFile(),
+                        StandardCharsets.UTF_8), SahabOutput.class);
         List<RuntimeReturnedValue> oppositeJsonStates = sahabOutputRight.getReturns();
 
         List<Pair<Integer, Integer>> hashes = getHashedReturnStates(jsonStates),
@@ -153,17 +156,18 @@ public class StateDiffComputer {
     private ProgramStateDiff.UniqueStateSummary getFirstDistinctStateOnRelevantLine(
             Map<Integer, Set<String>> lineToVars,
             Map<Integer, Integer> lineMapping,
-            File sahabReportFile,
-            File oppositeSahabReportFile,
-            PrintWriter diffPrinter)
+            File sahabReportDir,
+            File oppositeSahabReportDir,
+            PrintWriter diffPrinter,
+            boolean excludeRandomValues)
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         SahabOutput sahabOutputLeft =
-                mapper.readValue(new FileReader(sahabReportFile, StandardCharsets.UTF_8), new TypeReference<>() {});
+                mapper.readValue(new FileReader(sahabReportDir, StandardCharsets.UTF_8), new TypeReference<>() {});
         List<LineSnapshot> jsonStates = sahabOutputLeft.getBreakpoint();
 
         SahabOutput sahabOutputRight = mapper.readValue(
-                new FileReader(oppositeSahabReportFile, StandardCharsets.UTF_8), new TypeReference<>() {});
+                new FileReader(oppositeSahabReportDir, StandardCharsets.UTF_8), new TypeReference<>() {});
         List<LineSnapshot> oppositeJsonStates = sahabOutputRight.getBreakpoint();
 
         List<Pair<Integer, Integer>> hashes = getHashedBreakpointStates(jsonStates),
