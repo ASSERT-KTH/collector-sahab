@@ -74,11 +74,11 @@ jobs:
       # Now we can update the changelog
       - name: Append changelog from out/jreleaser/CHANGELOG.md to CHANGELOG.md with version as header
         run: |
-          echo "" >> CHANGELOG.md
-          echo -n "# ${{ env.NEXT_VERSION }}" >> CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          cat out/jreleaser/release/CHANGELOG.md >> CHANGELOG.md
-          echo "" >> CHANGELOG.md
+          echo "" | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
+          cat out/jreleaser/release/CHANGELOG.md | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
+          echo "" | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
+          echo -n "# ${{ env.NEXT_VERSION }}" | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
+          echo "" | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
       # Time to set the next version: The next version of any Release is a snapshot version of the next patch version
       - name : Set next version (patch of release version) with -SNAPSHOT suffix
         run: |
