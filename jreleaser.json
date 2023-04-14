@@ -44,7 +44,7 @@
     "app": {
       "artifacts": [
         {
-          "path": "main/target/{{distributionName}}-{{projectVersion}}.jar"
+          "path": "main/target/{{distributionName}}-{{projectVersion}}-jar-with-dependencies.jar"
         }
       ]
     }
