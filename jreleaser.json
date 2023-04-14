@@ -23,6 +23,7 @@
   "release": {
     "github": {
       "owner": "ASSERT-KTH",
+      "releaseName": "{{tagName}}",
       "changelog": {
         "formatted": "ALWAYS",
         "preset": "conventional-commits",
