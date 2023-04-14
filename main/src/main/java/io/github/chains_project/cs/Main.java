@@ -12,6 +12,8 @@ import io.github.chains_project.tracediff.ExecDiffMain;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -76,6 +78,11 @@ public class Main implements Callable<Integer> {
     // Runs all test by default
     private List<String> selectedTests = List.of();
 
+    @CommandLine.Option(
+            names = {Constants.ARG_EXCLUDE_RANDOM_VALUES},
+            description = "Should random values be excluded?")
+    private boolean excludeRandomValues;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Main()).execute(args);
         System.exit(exitCode);
@@ -94,39 +101,56 @@ public class Main implements Callable<Integer> {
                 MatchedLineFinder.invoke(leftClassfile.toFile(), rightClassfile.toFile());
 
         Path inputLeft = Files.writeString(left.getPath().resolve("input.txt"), matchedLines.getLeft());
-        Path outputLeft = left.getPath().resolve("output.json");
+        Path outputDirLeft = Files.createDirectories(left.getPath().resolve("output"));
         Path inputRight = Files.writeString(right.getPath().resolve("input.txt"), matchedLines.getRight());
-        Path outputRight = right.getPath().resolve("output.json");
+        Path outputDirRight = Files.createDirectories(right.getPath().resolve("output"));
         Path methods = Files.writeString(left.getPath().resolve("methods.txt"), matchedLines.getMiddle());
 
-        CollectorAgentOptions optionsLeft = new CollectorAgentOptions();
-        optionsLeft.setClassesAndBreakpoints(inputLeft.toAbsolutePath().toFile());
-        optionsLeft.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
-        optionsLeft.setExecutionDepth(executionDepth);
-        optionsLeft.setOutput(outputLeft.toAbsolutePath().toFile());
-
-        List<Path> pomFiles = Files.walk(left.getPath())
+        List<Path> pomFilesLeft = Files.walk(left.getPath())
                 .filter(path -> path.getFileName().toString().equals("pom.xml"))
                 .collect(Collectors.toList());
-        for (Path pomFile : pomFiles) {
-            new PomTransformer(new Revision(pomFile.getParent(), leftHash), optionsLeft, selectedTests);
+        // copy a backup of pom files
+        for (Path pomFile : pomFilesLeft) {
+            Files.copy(pomFile, pomFile.getParent().resolve("pom.xml.bak"));
         }
-
-        CollectorAgentOptions optionsRight = new CollectorAgentOptions();
-        optionsRight.setClassesAndBreakpoints(inputRight.toAbsolutePath().toFile());
-        optionsRight.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
-        optionsRight.setExecutionDepth(executionDepth);
-        optionsRight.setOutput(outputRight.toAbsolutePath().toFile());
 
         List<Path> pomFilesRight = Files.walk(right.getPath())
                 .filter(path -> path.getFileName().toString().equals("pom.xml"))
                 .collect(Collectors.toList());
+        // copy a backup of pom files
         for (Path pomFile : pomFilesRight) {
-            new PomTransformer(new Revision(pomFile.getParent(), rightHash), optionsRight, selectedTests);
+            Files.copy(pomFile, pomFile.getParent().resolve("pom.xml.bak"));
         }
 
-        mavenTestInvoker(left);
-        mavenTestInvoker(right);
+        int repeats = excludeRandomValues ? 3 : 1;
+        for (int i = 0; i < repeats; i++) {
+            CollectorAgentOptions optionsLeft = new CollectorAgentOptions();
+            optionsLeft.setClassesAndBreakpoints(inputLeft.toAbsolutePath().toFile());
+            optionsLeft.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
+            optionsLeft.setExecutionDepth(executionDepth);
+            optionsLeft.setOutput(outputDirLeft.resolve(i + ".json").toAbsolutePath().toFile());
+
+            for (Path pomFile : pomFilesLeft) {
+                // copy pom from backup
+                Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
+                new PomTransformer(new Revision(pomFile.getParent(), leftHash), optionsLeft, selectedTests);
+            }
+
+
+            CollectorAgentOptions optionsRight = new CollectorAgentOptions();
+            optionsRight.setClassesAndBreakpoints(inputRight.toAbsolutePath().toFile());
+            optionsRight.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
+            optionsRight.setExecutionDepth(executionDepth);
+            optionsRight.setOutput(outputDirRight.resolve(i + ".json").toAbsolutePath().toFile());
+
+            for (Path pomFile : pomFilesRight) {
+                Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
+                new PomTransformer(new Revision(pomFile.getParent(), rightHash), optionsRight, selectedTests);
+            }
+
+            mavenTestInvoker(left);
+            mavenTestInvoker(right);
+        }
 
         //        String slug,
         //        String commit,
@@ -139,16 +163,16 @@ public class Main implements Callable<Integer> {
         //        String testLink,
         //        String outputPath,
         //        String allDiffsReportPath)
-        String[] cmd = {
+        List<String> cmd = Arrays.asList(
             "sdiff",
             Constants.ARG_SLUG,
             slug,
             Constants.ARG_COMMIT,
             right.getHash(),
             Constants.ARG_LEFT_REPORT_PATH,
-            outputLeft.toAbsolutePath().toString(),
+            outputDirLeft.toAbsolutePath().toString(),
             Constants.ARG_RIGHT_REPORT_PATH,
-            outputRight.toAbsolutePath().toString(),
+            outputDirRight.toAbsolutePath().toString(),
             Constants.ARG_LEFT_SRC_PATH,
             left.resolveFilename(classfileName).toAbsolutePath().toString(),
             Constants.ARG_RIGHT_SRC_PATH,
@@ -159,9 +183,11 @@ public class Main implements Callable<Integer> {
             Constants.ARG_TEST_LINK,
             "https://github.com/ASSERT-KTH",
             Constants.ARG_OUTPUT_PATH,
-            outputPath,
-        };
-        ExecDiffMain.main(cmd);
+            outputPath);
+
+        if(excludeRandomValues) cmd.add(Constants.ARG_EXCLUDE_RANDOM_VALUES);
+
+        ExecDiffMain.main(cmd.toArray(new String[0]));
         return 0;
     }
 

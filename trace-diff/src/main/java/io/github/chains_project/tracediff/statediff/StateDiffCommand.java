@@ -66,6 +66,11 @@ public class StateDiffCommand implements Callable<Integer> {
             description = "The path to the report file for all diffs.")
     String allDiffsReportPath;
 
+    @CommandLine.Option(
+            names = {Constants.ARG_EXCLUDE_RANDOM_VALUES},
+            description = "Should random values be excluded?")
+    private boolean excludeRandomValues;
+
     @Override
     public Integer call() throws Exception {
 
@@ -81,7 +86,8 @@ public class StateDiffCommand implements Callable<Integer> {
                         testName,
                         testLink,
                         outputPath,
-                        allDiffsReportPath);
+                        allDiffsReportPath,
+                        excludeRandomValues);
         return 0;
     }
 }
