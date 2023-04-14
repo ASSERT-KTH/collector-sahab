@@ -30,9 +30,9 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: install go
+      - name: Install go
         uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4
-      - name: install semversion
+      - name: Install semversion
         run: go install github.com/ffurrer2/semver/cmd/semver@latest
       # Get current version from pom and remove snapshot if present.
       - name: Get current version from pom and remove snapshot if present.
@@ -61,6 +61,8 @@ jobs:
       # Now we can run the release
       - name: Print next version
         run: mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//'
+      - name: Build artifact for release
+        run: mvn --no-transfer-progress --batch-mode package -DskipTests
       - name: Run JReleaser
         uses: jreleaser/release-action@v2
         with:
@@ -72,7 +74,7 @@ jobs:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
 
       # Now we can update the changelog
-      - name: Append changelog from out/jreleaser/CHANGELOG.md to CHANGELOG.md with version as header
+      - name: Prepend changelog from out/jreleaser/CHANGELOG.md to CHANGELOG.md with version as header
         run: |
           echo "" | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
           cat out/jreleaser/release/CHANGELOG.md | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md

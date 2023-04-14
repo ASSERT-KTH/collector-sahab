@@ -13,24 +13,24 @@
     <dependency>
       <groupId>se.assertkth</groupId>
       <artifactId>collector-sahab-commons</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>se.assertkth</groupId>
       <artifactId>matched-line-finder</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>se.assertkth</groupId>
       <artifactId>trace-diff</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <!-- We only need this to get the JAR from resources -->
     <!-- Inspiration: https://github.com/jacoco/jacoco/tree/master/org.jacoco.agent -->
     <dependency>
       <groupId>se.assertkth</groupId>
       <artifactId>trace-collector</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>

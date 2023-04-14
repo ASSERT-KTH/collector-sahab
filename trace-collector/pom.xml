@@ -40,7 +40,7 @@
     <dependency>
       <groupId>se.assertkth</groupId>
       <artifactId>collector-sahab-commons</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
