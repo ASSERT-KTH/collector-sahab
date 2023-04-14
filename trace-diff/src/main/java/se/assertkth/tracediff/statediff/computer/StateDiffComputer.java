@@ -335,7 +335,7 @@ public class StateDiffComputer {
 
             for (int i = 0; i < nestedTypes.size(); i++) {
                 RuntimeValue nestedObj = nestedTypes.get(i);
-                String currentPrefix = prefix + "[" + i + "]";
+                String currentPrefix = prefix + "[" + i + "].";
                 varVals.addAll(extractVarVals(currentPrefix, nestedObj));
             }
         } else {
