@@ -49,7 +49,7 @@ public class StateDiffComputerTest<R> {
                 rightLineToVars,
                 List.of("test::test"));
 
-        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff(null);
+        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff(null, false);
 
         assertEquals(
                 "{return-object}.UTC.iID=UTC",
@@ -96,7 +96,7 @@ public class StateDiffComputerTest<R> {
                 rightLineToVars,
                 List.of("test::test"));
 
-        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff(null);
+        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff(null, false);
 
         assertEquals(
                 "tailZone.iID=TestDTZ1",
@@ -140,7 +140,7 @@ public class StateDiffComputerTest<R> {
                 rightLineToVars,
                 List.of("test::test"));
 
-        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff(null);
+        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff(null, false);
 
         assertEquals(
                 "id=TestDTZ1", stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarVal());
