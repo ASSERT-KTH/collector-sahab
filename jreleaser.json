@@ -1,0 +1,38 @@
+{
+  "project": {
+    "name": "collector-sahab",
+    "description": "A tool for augmenting the static diff with runtime information",
+    "longDescription": "It gets the difference of values in the execution of two versions of a program and uses it to augment the static diff. The augmented diff is show on GitHub PRs.",
+
+    "authors": [
+      "algomaster99",
+      "khaes-kth",
+      "I-Al-Istannen"
+    ],
+    "license": "The Unlicense",
+    "links": {
+      "homepage": "https://github.com/ASSERT-KTH/collector-sahab"
+    },
+    "java": {
+      "groupId": "se.assertkth",
+      "version": "11"
+    },
+    "inceptionYear": "2022"
+  },
+
+  "release": {
+    "github": {
+      "owner": "ASSERT-KTH"
+    }
+  },
+
+  "distributions": {
+    "app": {
+      "artifacts": [
+        {
+          "path": "main/target/collector-sahab-0.0.1-SNAPSHOT-jar-with-dependencies.jar"
+        }
+      ]
+    }
+  }
+}
