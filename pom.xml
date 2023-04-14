@@ -4,7 +4,7 @@
 
   <groupId>se.assertkth</groupId>
   <artifactId>collector-sahab-parent-pom</artifactId>
-  <version>0.1.0</version>
+  <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Collector Sahab Parent POM</name>
   <modules>
