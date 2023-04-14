@@ -163,11 +163,13 @@ public class StateDiffComputer {
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         SahabOutput sahabOutputLeft =
-                mapper.readValue(new FileReader(sahabReportDir, StandardCharsets.UTF_8), new TypeReference<>() {});
+                mapper.readValue(new FileReader(sahabReportDir.toPath().resolve("0.json").toFile(),
+                        StandardCharsets.UTF_8), new TypeReference<>() {});
         List<LineSnapshot> jsonStates = sahabOutputLeft.getBreakpoint();
 
         SahabOutput sahabOutputRight = mapper.readValue(
-                new FileReader(oppositeSahabReportDir, StandardCharsets.UTF_8), new TypeReference<>() {});
+                new FileReader(oppositeSahabReportDir.toPath().resolve("0.json").toFile(),
+                        StandardCharsets.UTF_8), new TypeReference<>() {});
         List<LineSnapshot> oppositeJsonStates = sahabOutputRight.getBreakpoint();
 
         List<Pair<Integer, Integer>> hashes = getHashedBreakpointStates(jsonStates),

@@ -26,4 +26,5 @@ public class Constants {
     public static final String TEST_SEPARATOR = ";";
     public static final String TEST_METHOD_NAME_SEPARATOR = "::";
     public static final String UNKNOWN_TEST = "unknown::unknown";
+    public static final int REPEATS_FOR_RANDOM_EXCLUSION = 3;
 }
