@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.fail;
-import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
+import static se.assertkth.cs.preprocess.JavaAgentPath.getAgentPath;
 
 import java.io.FileWriter;
 import java.io.IOException;

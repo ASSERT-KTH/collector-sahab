@@ -1,6 +1,6 @@
 package se.assertkth.cs.preprocess;
 
-import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
+import static se.assertkth.cs.preprocess.JavaAgentPath.getAgentPath;
 
 import java.io.FileReader;
 import java.io.FileWriter;

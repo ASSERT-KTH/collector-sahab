@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -803,7 +802,7 @@ class NewCollectorTest {
         request.setPomFile(pomFile);
         request.setGoals(List.of("clean", "test"));
         request.addArg(testArg);
-        request.addArg("-DargLine=-javaagent:" + getAgentPath() + "=" + String.join(",", agentOptions));
+        request.addArg("-DargLine=-javaagent:" + TestUtil.getAgentPath() + "=" + String.join(",", agentOptions));
 
         // act
         Invoker invoker = new DefaultInvoker();

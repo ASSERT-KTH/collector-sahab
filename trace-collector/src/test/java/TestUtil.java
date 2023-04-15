@@ -1,5 +1,3 @@
-package se.assertkth.collector.util;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -7,13 +5,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import se.assertkth.collector.CollectorAgent;
 
-public class JavaAgentPath {
-    private JavaAgentPath() {}
+public class TestUtil {
+    private TestUtil() {}
 
     /**
-     * Returns the path of the trace-collector.jar file in target/classes directory of `trace-collector` module.
+     * Returns the path of the trace-collector.jar file.
+     *
+     * Fetches from target/classes in test environment.
      */
-    public static String getAgentPath() throws IOException {
+    static String getAgentPath() throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         Path traceCollector = Path.of(tempDir, "trace-collector.jar");
 

@@ -115,6 +115,8 @@
           </filters>
         </configuration>
         <executions>
+          <!--     For creating the agent JAR that will be eventually copied by dependency plugin inside collector-sahab-{version}-jar-with-dependencies.jar. -->
+          <!--          See execution `dep-plug` in main module. -->
           <execution>
             <id>shade</id>
             <goals>
@@ -122,6 +124,7 @@
             </goals>
             <phase>package</phase>
           </execution>
+          <!--          For copying the agent jar into target/classes so that tests can run. -->
           <execution>
             <id>shade-for-test</id>
             <goals>
