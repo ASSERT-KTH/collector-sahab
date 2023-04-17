@@ -49,8 +49,7 @@ public class StateDiffUIManipulator {
             String testsStr,
             String testLink,
             String outputPath,
-            String allDiffsReportPath,
-            boolean excludeRandomValues)
+            String allDiffsReportPath)
             throws Exception {
         long processStartTime = new Date().getTime();
         boolean isHitDataIncluded = ghFullDiff != null;
@@ -89,7 +88,7 @@ public class StateDiffUIManipulator {
 
         PrintWriter diffPrinter = allDiffsReportPath == null ? null : new PrintWriter(new File(allDiffsReportPath));
 
-        ProgramStateDiff psd = sdc.computeProgramStateDiff(diffPrinter, excludeRandomValues);
+        ProgramStateDiff psd = sdc.computeProgramStateDiff();
 
         if (diffPrinter != null) diffPrinter.close();
 
@@ -239,6 +238,6 @@ public class StateDiffUIManipulator {
                         "org.apache.commons.lang3.time.FastDateParserTest::testLang1380",
                         "http://example.com",
                         "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/4816441885916f66a16d8d2e21acc0e4fbd207cd.html",
-                        null, false);
+                        null);
     }
 }
