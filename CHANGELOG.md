@@ -1,4 +1,25 @@
 
+# 0.1.2
+## Changelog
+
+## 🐛 Fixes
+- 27f5dfa fix: set source and target version as `1.6` if they are `5` or `1.5` (#177)
+- b6dc916 fix(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-2
+
+## 🧰 Tasks
+- 6cabc11 chore: releasing version 0.1.2
+- 4aaff37 chore: specify the version of SNAPSHOT
+- 266cc57 chore: use tag name for name of the release
+- ea98d3c chore: setting SNAPSHOT version 0.1.1
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ([@betterqualityassuranceuser](https://github.com/betterqualityassuranceuser))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.1.1
 ## Changelog
 

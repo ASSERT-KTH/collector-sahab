@@ -4,7 +4,7 @@
   <parent>
     <groupId>se.assertkth</groupId>
     <artifactId>collector-sahab-parent-pom</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3-SNAPSHOT</version>
   </parent>
   <artifactId>collector-sahab-commons</artifactId>
   <name>Common Utilities</name>
