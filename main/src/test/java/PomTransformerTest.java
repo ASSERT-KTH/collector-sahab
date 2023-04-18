@@ -320,5 +320,27 @@ class PomTransformerTest {
             Xpp3Dom parameters = compilerArgs.getChild(1);
             assertThat(parameters.getValue(), is(equalTo("-parameters")));
         }
+
+        @Test
+        void modifyCompilerPlugin_shouldSet_source_target_to_6_if_5(@TempDir Path tempDir)
+                throws XmlPullParserException, IOException {
+            // arrange;
+            PomTransformer transformer =
+                    new PomTransformer(Paths.get("src/test/resources/compiler/modify-source-target.xml"));
+
+            Plugin compilerPlugin =
+                    transformer.getModel().getBuild().getPlugins().get(0);
+            Xpp3Dom source = ((Xpp3Dom) compilerPlugin.getConfiguration()).getChild("source");
+            assertThat(source.getValue(), is(equalTo("1.5")));
+            Xpp3Dom target = ((Xpp3Dom) compilerPlugin.getConfiguration()).getChild("target");
+            assertThat(target.getValue(), is(equalTo("5")));
+
+            // act
+            transformer.modifyCompilerPlugin();
+
+            // assert
+            assertThat(source.getValue(), is(equalTo("1.6")));
+            assertThat(target.getValue(), is(equalTo("1.6")));
+        }
     }
 }
