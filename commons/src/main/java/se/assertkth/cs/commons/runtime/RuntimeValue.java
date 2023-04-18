@@ -123,7 +123,7 @@ public class RuntimeValue {
             serializers.defaultSerializeField("name", value.name, gen);
             serializers.defaultSerializeField("type", value.type, gen);
             serializers.defaultSerializeField("fields", value.fields, gen);
-            serializers.defaultSerializeField("value", value.value, gen);
+            serializers.defaultSerializeField("value", Classes.simplifyValue(value.value), gen);
             serializers.defaultSerializeField("arrayElements", value.arrayElements, gen);
             gen.writeEndObject();
         }
