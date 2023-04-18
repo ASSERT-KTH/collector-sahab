@@ -1,4 +1,21 @@
 
+# 0.1.3
+## Changelog
+
+## 🐛 Fixes
+- fd657ff fix: remove debugging configuration from compiler plugin (#178)
+
+## 🧰 Tasks
+- 0f4d403 chore: releasing version 0.1.3
+- 98c5e5f chore: setting SNAPSHOT version 0.1.3-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ([@betterqualityassuranceuser](https://github.com/betterqualityassuranceuser))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
 # 0.1.2
 ## Changelog
 
