@@ -212,15 +212,25 @@ public class PomTransformer {
             if (!found) {
                 compilerArgs.addChild(arg);
             }
+        }
+        // By default, the compiler plugin compiles debug information.
+        Xpp3Dom debug = configuration.getChild("debug");
+        if (debug != null) {
+            configuration.removeChild(debug);
+        }
 
-            Xpp3Dom source = configuration.getChild("source");
-            if (source != null && ("5".equals(source.getValue()) || "1.5".equals(source.getValue()))) {
-                source.setValue("1.6");
-            }
-            Xpp3Dom target = configuration.getChild("target");
-            if (target != null && ("5".equals(target.getValue()) || "1.5".equals(target.getValue()))) {
-                target.setValue("1.6");
-            }
+        Xpp3Dom debugLevel = configuration.getChild("debuglevel");
+        if (debugLevel != null) {
+            configuration.removeChild(debugLevel);
+        }
+
+        Xpp3Dom source = configuration.getChild("source");
+        if (source != null && ("5".equals(source.getValue()) || "1.5".equals(source.getValue()))) {
+            source.setValue("1.6");
+        }
+        Xpp3Dom target = configuration.getChild("target");
+        if (target != null && ("5".equals(target.getValue()) || "1.5".equals(target.getValue()))) {
+            target.setValue("1.6");
         }
         return configuration;
     }
