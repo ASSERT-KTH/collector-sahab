@@ -212,6 +212,15 @@ public class PomTransformer {
             if (!found) {
                 compilerArgs.addChild(arg);
             }
+
+            Xpp3Dom source = configuration.getChild("source");
+            if (source != null && ("5".equals(source.getValue()) || "1.5".equals(source.getValue()))) {
+                source.setValue("1.6");
+            }
+            Xpp3Dom target = configuration.getChild("target");
+            if (target != null && ("5".equals(target.getValue()) || "1.5".equals(target.getValue()))) {
+                target.setValue("1.6");
+            }
         }
         return configuration;
     }
