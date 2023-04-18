@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
 
@@ -341,6 +342,30 @@ class PomTransformerTest {
             // assert
             assertThat(source.getValue(), is(equalTo("1.6")));
             assertThat(target.getValue(), is(equalTo("1.6")));
+        }
+
+        @Test
+        void modifyCompilerPlugin_shouldRemoveDebugConfiguration(@TempDir Path tempDir)
+                throws XmlPullParserException, IOException {
+            // arrange;
+            PomTransformer transformer = new PomTransformer(Paths.get("src/test/resources/compiler/remove-debug.xml"));
+
+            Plugin compilerPlugin =
+                    transformer.getModel().getBuild().getPlugins().get(0);
+            Xpp3Dom debug = ((Xpp3Dom) compilerPlugin.getConfiguration()).getChild("debug");
+            assertThat(debug.getValue(), is(equalTo("true")));
+            Xpp3Dom debugLevel = ((Xpp3Dom) compilerPlugin.getConfiguration()).getChild("debuglevel");
+            assertThat(debugLevel.getValue(), is(equalTo("lines,source")));
+
+            // act
+            transformer.modifyCompilerPlugin();
+
+            // assert
+            Xpp3Dom configuration = (Xpp3Dom) compilerPlugin.getConfiguration();
+            debug = configuration.getChild("debug");
+            debugLevel = configuration.getChild("debuglevel");
+            assertThat(debug, is(nullValue()));
+            assertThat(debugLevel, is(nullValue()));
         }
     }
 }
