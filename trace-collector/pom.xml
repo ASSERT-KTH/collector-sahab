@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>se.assertkth</groupId>
+    <groupId>io.github.chains-project</groupId>
     <artifactId>collector-sahab-parent-pom</artifactId>
     <version>0.1.5-SNAPSHOT</version>
   </parent>
@@ -38,7 +38,7 @@
     </dependency>
 
     <dependency>
-      <groupId>se.assertkth</groupId>
+      <groupId>io.github.chains-project</groupId>
       <artifactId>collector-sahab-commons</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
@@ -79,7 +79,7 @@
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
               <manifestEntries>
-                <Premain-Class>se.assertkth.collector.CollectorAgent</Premain-Class>
+                <Premain-Class>io.github.chains-project.collector.CollectorAgent</Premain-Class>
                 <Can-Retransform-Classes>true</Can-Retransform-Classes>
                 <Multi-Release>true</Multi-Release>
               </manifestEntries>

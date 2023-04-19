@@ -21,9 +21,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import se.assertkth.cs.commons.FileAndBreakpoint;
-import se.assertkth.cs.commons.MethodForExitEvent;
-import se.assertkth.mlf.MatchedLineFinder;
+import io.github.chains_project.cs.commons.FileAndBreakpoint;
+import io.github.chains_project.cs.commons.MethodForExitEvent;
+import io.github.chains_project.mlf.MatchedLineFinder;
 
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");

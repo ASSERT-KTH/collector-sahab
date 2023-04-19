@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
+import static io.github.chains_project.collector.util.JavaAgentPath.getAgentPath;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,8 +25,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import se.assertkth.cs.commons.Pair;
-import se.assertkth.cs.preprocess.PomTransformer;
+import io.github.chains_project.cs.commons.Pair;
+import io.github.chains_project.cs.preprocess.PomTransformer;
 
 class PomTransformerTest {
 
