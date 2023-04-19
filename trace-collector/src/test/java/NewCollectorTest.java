@@ -836,8 +836,7 @@ class NewCollectorTest {
         request.setPomFile(pomFile);
         request.setGoals(List.of("clean", "test"));
         request.addArg(testArg);
-        request.addArg("-DargLine=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 -javaagent:"
-                + getAgentPath() + "=" + String.join(",", agentOptions));
+        request.addArg("-DargLine=-javaagent:" + getAgentPath() + "=" + String.join(",", agentOptions));
 
         // act
         Invoker invoker = new DefaultInvoker();
