@@ -809,7 +809,7 @@ class NewCollectorTest {
                     List.of(
                             "classesAndBreakpoints=src/test/resources/non-primitive.txt",
                             "output=target/output.json",
-                            "executionDepth=1"),
+                            "executionDepth=0"),
                     "-Dtest=CopyArrayTest#nonPrimitive");
 
             // assert
@@ -839,7 +839,7 @@ class NewCollectorTest {
                     List.of(
                             "classesAndBreakpoints=src/test/resources/primitive.txt",
                             "output=target/output.json",
-                            "executionDepth=1"),
+                            "executionDepth=0"),
                     "-Dtest=CopyArrayTest#primitive");
 
             // assert
