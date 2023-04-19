@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "foo/NonPrimitive",
+        "breakpoints": [11]
+    }
+]
