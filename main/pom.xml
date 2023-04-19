@@ -87,7 +87,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>io.github.chains_project.cs.Main</mainClass>
+              <mainClass>io.github.chains-project.cs.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
