@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Objects;
 import se.assertkth.cs.commons.runtime.RuntimeValue.RuntimeValueSerializer;
@@ -68,7 +69,8 @@ public class RuntimeValue {
             List<RuntimeValue> fields,
             List<RuntimeValue> arrayElements) {
         if (Classes.isArrayBasicallyPrimitive(value)) {
-            return new RuntimeValue(kind, name, type, value, fields, List.of());
+            Object clonedArray = Array.newInstance(value.getClass().getComponentType(), Array.getLength(value));
+            return new RuntimeValue(kind, name, type, clonedArray, fields, List.of());
         } else {
             return new RuntimeValue(kind, name, type, Classes.simplifyValue(value), fields, arrayElements);
         }
