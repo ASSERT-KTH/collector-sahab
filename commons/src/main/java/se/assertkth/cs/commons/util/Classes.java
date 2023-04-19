@@ -99,4 +99,13 @@ public class Classes {
         }
         return getCanonicalClassName(value.getClass());
     }
+
+    public static Object cloneArray(Object array) {
+        int length = Array.getLength(array);
+        Object clonedArray = Array.newInstance(array.getClass().getComponentType(), length);
+        for (int i = 0; i < length; i++) {
+            Array.set(clonedArray, i, Array.get(array, i));
+        }
+        return clonedArray;
+    }
 }

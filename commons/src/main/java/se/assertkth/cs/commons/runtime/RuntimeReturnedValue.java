@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.List;
 import se.assertkth.cs.commons.util.Classes;
 
@@ -60,7 +59,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
         if (Classes.isArrayBasicallyPrimitive(value)) {
             // I am not sure why this is necessary, but just to be safe...
             // you cannot mutate the array after it has been returned.
-            Object clonedArray = Array.newInstance(value.getClass().getComponentType(), Array.getLength(value));
+            Object clonedArray = Classes.cloneArray(value);
             return new RuntimeReturnedValue(
                     kind, name, type, clonedArray, fields, List.of(), parameters, stackTrace, location);
         } else {
