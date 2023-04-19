@@ -852,12 +852,15 @@ class NewCollectorTest {
             assertThat(output.getBreakpoint().size(), equalTo(1));
             assertThat(output.getReturns().size(), equalTo(0));
 
+            LineSnapshot lineSnapshot = output.getBreakpoint().get(0);
+            assertThat(lineSnapshot.getLineNumber(), equalTo(6));
+
             StackFrameContext stackFrameContext =
-                    output.getBreakpoint().get(0).getStackFrameContext().get(0);
+                    lineSnapshot.getStackFrameContext().get(0);
             RuntimeValue localVariable =
                     stackFrameContext.getRuntimeValueCollection().get(0);
             assertThat(localVariable.getName(), equalTo("array"));
-            assertThat(localVariable.getValue(), equalTo(new ArrayList<>(Collections.nCopies(4, null))));
+            assertThat(localVariable.getValue(), equalTo(List.of(0, 0, 0, 0)));
         }
     }
 
