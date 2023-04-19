@@ -1,4 +1,23 @@
 
+# 0.1.4
+## Changelog
+
+## 🐛 Fixes
+- e766785 fix: clone array before storing it as runtime value (#179)
+- a2326b1 fix(deps): update dependency info.picocli:picocli to v4.7.3 (#180)
+
+## 🧰 Tasks
+- 5a5ab86 chore: releasing version 0.1.4
+- e336fce chore: setting SNAPSHOT version 0.1.4-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ([@betterqualityassuranceuser](https://github.com/betterqualityassuranceuser))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.1.3
 ## Changelog
 
