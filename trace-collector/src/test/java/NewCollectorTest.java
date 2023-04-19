@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -796,6 +798,37 @@ class NewCollectorTest {
         }
     }
 
+    @Test
+    void isArrayBasicallyPrimitive_convertNonPrimitiveArrayOfNullsToObjectArray()
+            throws MavenInvocationException, IOException {
+        // act
+        File pomFile = new File("src/test/resources/joda-time/pom.xml");
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "classesAndBreakpoints=src/test/resources/input.txt",
+                        "output=target/output.json",
+                        "executionDepth=1"),
+                "-Dtest=OutsmartJacksonTest#test");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/joda-time/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(1));
+        assertThat(output.getReturns().size(), equalTo(0));
+
+        StackFrameContext stackFrameContext =
+                output.getBreakpoint().get(0).getStackFrameContext().get(0);
+        RuntimeValue localVariable =
+                stackFrameContext.getRuntimeValueCollection().get(0);
+        assertThat(localVariable.getName(), equalTo("chronologies"));
+        assertThat(localVariable.getValue(), equalTo(new ArrayList<>(Collections.nCopies(4, null))));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException, IOException {
         // arrange
@@ -803,7 +836,8 @@ class NewCollectorTest {
         request.setPomFile(pomFile);
         request.setGoals(List.of("clean", "test"));
         request.addArg(testArg);
-        request.addArg("-DargLine=-javaagent:" + getAgentPath() + "=" + String.join(",", agentOptions));
+        request.addArg("-DargLine=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 -javaagent:"
+                + getAgentPath() + "=" + String.join(",", agentOptions));
 
         // act
         Invoker invoker = new DefaultInvoker();

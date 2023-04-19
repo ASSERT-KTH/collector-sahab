@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "foo/OutsmartJackson",
+        "breakpoints": [7]
+    }
+]
