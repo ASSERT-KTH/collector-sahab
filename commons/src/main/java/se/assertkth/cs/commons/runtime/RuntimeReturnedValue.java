@@ -83,7 +83,7 @@ public class RuntimeReturnedValue extends RuntimeValue {
             serializers.defaultSerializeField("methodName", value.getName(), gen);
             serializers.defaultSerializeField("stackTrace", value.getStackTrace(), gen);
             serializers.defaultSerializeField("type", value.getType(), gen);
-            serializers.defaultSerializeField("value", Classes.simplifyValue(value.getValue()), gen);
+            serializers.defaultSerializeField("value", value.getValue(), gen);
             serializers.defaultSerializeField("arrayElements", value.getArrayElements(), gen);
             serializers.defaultSerializeField("fields", value.getFields(), gen);
             serializers.defaultSerializeField("location", value.getLocation(), gen);
