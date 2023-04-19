@@ -1,10 +1,10 @@
 package io.github.chains_project.cs.preprocess;
 
+import io.github.chains_project.cs.commons.Pair;
+import io.github.chains_project.cs.commons.Revision;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import io.github.chains_project.cs.commons.Pair;
-import io.github.chains_project.cs.commons.Revision;
 
 public class GitToLocal {
     public static Pair<Revision, Revision> getRevisions(Path project, String leftHash, String rightHash)

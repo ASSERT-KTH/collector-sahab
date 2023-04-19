@@ -1,10 +1,10 @@
 package io.github.chains_project.tracediff.statediff;
 
+import io.github.chains_project.tracediff.Constants;
+import io.github.chains_project.tracediff.statediff.ui.StateDiffUIManipulator;
 import java.io.File;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
-import io.github.chains_project.tracediff.Constants;
-import io.github.chains_project.tracediff.statediff.ui.StateDiffUIManipulator;
 
 @CommandLine.Command(
         name = Constants.STATE_DIFF_COMMAND_NAME,

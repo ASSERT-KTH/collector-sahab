@@ -5,11 +5,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.github.chains_project.cs.commons.runtime.RuntimeValue.RuntimeValueSerializer;
+import io.github.chains_project.cs.commons.util.Classes;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import io.github.chains_project.cs.commons.runtime.RuntimeValue.RuntimeValueSerializer;
-import io.github.chains_project.cs.commons.util.Classes;
 
 @JsonSerialize(using = RuntimeValueSerializer.class)
 public class RuntimeValue {

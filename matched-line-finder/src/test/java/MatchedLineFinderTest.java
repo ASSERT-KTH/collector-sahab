@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.chains_project.cs.commons.FileAndBreakpoint;
+import io.github.chains_project.cs.commons.MethodForExitEvent;
+import io.github.chains_project.mlf.MatchedLineFinder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,9 +24,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import io.github.chains_project.cs.commons.FileAndBreakpoint;
-import io.github.chains_project.cs.commons.MethodForExitEvent;
-import io.github.chains_project.mlf.MatchedLineFinder;
 
 class MatchedLineFinderTest {
     static final Path BASE_DIR = Paths.get("src/test/resources/matched-line-finder");

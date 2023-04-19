@@ -1,8 +1,8 @@
 package io.github.chains_project.tracediff;
 
-import picocli.CommandLine;
 import io.github.chains_project.tracediff.statediff.StateDiffCommand;
 import io.github.chains_project.tracediff.trace.ExecFreqDiffCommand;
+import picocli.CommandLine;
 
 @CommandLine.Command(
         name = Constants.EXEC_DIFF_COMMAND_NAME,

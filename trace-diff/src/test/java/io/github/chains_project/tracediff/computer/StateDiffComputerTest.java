@@ -2,6 +2,8 @@ package io.github.chains_project.tracediff.computer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.github.chains_project.tracediff.statediff.computer.StateDiffComputer;
+import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,8 +12,6 @@ import java.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
-import io.github.chains_project.tracediff.statediff.computer.StateDiffComputer;
-import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
 
 public class StateDiffComputerTest<R> {
 

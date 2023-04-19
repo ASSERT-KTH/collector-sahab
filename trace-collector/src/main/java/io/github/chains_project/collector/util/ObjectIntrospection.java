@@ -1,16 +1,16 @@
 package io.github.chains_project.collector.util;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
 import io.github.chains_project.collector.CollectorAgent;
 import io.github.chains_project.collector.module.ModuleCracker;
 import io.github.chains_project.cs.commons.runtime.LocalVariable;
 import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
 import io.github.chains_project.cs.commons.runtime.RuntimeValue;
 import io.github.chains_project.cs.commons.util.Classes;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObjectIntrospection {
 

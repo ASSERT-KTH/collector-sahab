@@ -4,12 +4,12 @@ import com.github.gumtreediff.matchers.Mapping;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
 import gumtree.spoon.diff.operations.*;
+import io.github.chains_project.tracediff.trace.models.LineMapping;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
-import io.github.chains_project.tracediff.trace.models.LineMapping;
 import spoon.reflect.declaration.CtElement;
 
 public class SpoonHelper {

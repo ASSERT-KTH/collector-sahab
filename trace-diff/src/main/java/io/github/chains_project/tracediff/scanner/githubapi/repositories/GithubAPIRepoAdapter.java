@@ -1,5 +1,6 @@
 package io.github.chains_project.tracediff.scanner.githubapi.repositories;
 
+import io.github.chains_project.tracediff.scanner.githubapi.GAA;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,7 +10,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHRepositorySearchBuilder;
-import io.github.chains_project.tracediff.scanner.githubapi.GAA;
 
 public class GithubAPIRepoAdapter {
     public static final int MAX_STARS = 200000;

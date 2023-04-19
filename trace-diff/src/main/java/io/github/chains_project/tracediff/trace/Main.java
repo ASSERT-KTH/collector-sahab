@@ -1,8 +1,8 @@
 package io.github.chains_project.tracediff.trace;
 
+import io.github.chains_project.tracediff.sharedutils.GHHelper;
 import java.io.File;
 import java.util.Arrays;
-import io.github.chains_project.tracediff.sharedutils.GHHelper;
 
 public class Main {
     public static void main(String args[]) throws Exception {

@@ -1,11 +1,11 @@
 package io.github.chains_project.tracediff.trace;
 
+import io.github.chains_project.tracediff.Constants;
+import io.github.chains_project.tracediff.sharedutils.GHHelper;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
-import io.github.chains_project.tracediff.Constants;
-import io.github.chains_project.tracediff.sharedutils.GHHelper;
 
 @CommandLine.Command(
         name = Constants.EXEC_FREQ_DIFF_COMMAND_NAME,

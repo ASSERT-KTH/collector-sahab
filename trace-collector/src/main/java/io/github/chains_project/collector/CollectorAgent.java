@@ -7,6 +7,14 @@ import static org.objectweb.asm.Opcodes.RETURN;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.chains_project.collector.module.ModuleCracker;
+import io.github.chains_project.collector.util.ByteBuddyHelper;
+import io.github.chains_project.collector.util.ContextCollector;
+import io.github.chains_project.cs.commons.CollectorAgentOptions;
+import io.github.chains_project.cs.commons.FileAndBreakpoint;
+import io.github.chains_project.cs.commons.MethodForExitEvent;
+import io.github.chains_project.cs.commons.runtime.LocalVariable;
+import io.github.chains_project.cs.commons.util.Classes;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
@@ -44,14 +52,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.ParameterNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
-import io.github.chains_project.collector.module.ModuleCracker;
-import io.github.chains_project.collector.util.ByteBuddyHelper;
-import io.github.chains_project.collector.util.ContextCollector;
-import io.github.chains_project.cs.commons.CollectorAgentOptions;
-import io.github.chains_project.cs.commons.FileAndBreakpoint;
-import io.github.chains_project.cs.commons.MethodForExitEvent;
-import io.github.chains_project.cs.commons.runtime.LocalVariable;
-import io.github.chains_project.cs.commons.util.Classes;
 
 public class CollectorAgent {
 

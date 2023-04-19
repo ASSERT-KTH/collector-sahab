@@ -1,5 +1,12 @@
 package io.github.chains_project.tracediff.trace;
 
+import io.github.chains_project.tracediff.sharedutils.GHHelper;
+import io.github.chains_project.tracediff.trace.models.GHReports;
+import io.github.chains_project.tracediff.trace.models.LineMapping;
+import io.github.chains_project.tracediff.trace.models.ReportConfig;
+import io.github.chains_project.tracediff.trace.models.TraceInfo;
+import io.github.chains_project.tracediff.trace.utils.CloverHelper;
+import io.github.chains_project.tracediff.trace.utils.SpoonHelper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -9,13 +16,6 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import io.github.chains_project.tracediff.sharedutils.GHHelper;
-import io.github.chains_project.tracediff.trace.models.GHReports;
-import io.github.chains_project.tracediff.trace.models.LineMapping;
-import io.github.chains_project.tracediff.trace.models.ReportConfig;
-import io.github.chains_project.tracediff.trace.models.TraceInfo;
-import io.github.chains_project.tracediff.trace.utils.CloverHelper;
-import io.github.chains_project.tracediff.trace.utils.SpoonHelper;
 
 /**
  * Given the original and patched mvn projects, a {@link TraceAnalyzer} generates the execution trace diff.

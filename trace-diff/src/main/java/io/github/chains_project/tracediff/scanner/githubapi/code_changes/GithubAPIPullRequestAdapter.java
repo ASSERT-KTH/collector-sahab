@@ -1,13 +1,13 @@
 package io.github.chains_project.tracediff.scanner.githubapi.code_changes;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.kohsuke.github.*;
 import io.github.chains_project.tracediff.scanner.githubapi.GAA;
 import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.FetchMode;
 import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.SelectedPullRequest;
 import io.github.chains_project.tracediff.scanner.githubapi.repositories.GithubAPIRepoAdapter;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.kohsuke.github.*;
 
 public class GithubAPIPullRequestAdapter {
 

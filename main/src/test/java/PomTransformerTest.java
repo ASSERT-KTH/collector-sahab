@@ -1,3 +1,4 @@
+import static io.github.chains_project.collector.util.JavaAgentPath.getAgentPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -7,8 +8,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static io.github.chains_project.collector.util.JavaAgentPath.getAgentPath;
 
+import io.github.chains_project.cs.commons.Pair;
+import io.github.chains_project.cs.preprocess.PomTransformer;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,8 +27,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import io.github.chains_project.cs.commons.Pair;
-import io.github.chains_project.cs.preprocess.PomTransformer;
 
 class PomTransformerTest {
 

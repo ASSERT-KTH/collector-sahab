@@ -1,11 +1,11 @@
 package io.github.chains_project.tracediff.scanner;
 
+import io.github.chains_project.tracediff.scanner.githubapi.code_changes.GithubAPIPullRequestAdapter;
+import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.SelectedPullRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
-import io.github.chains_project.tracediff.scanner.githubapi.code_changes.GithubAPIPullRequestAdapter;
-import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.SelectedPullRequest;
 
 public class PRScannerMain {
     public static void main(String[] args) throws IOException {

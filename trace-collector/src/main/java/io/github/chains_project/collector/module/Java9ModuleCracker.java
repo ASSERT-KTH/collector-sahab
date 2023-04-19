@@ -1,12 +1,12 @@
 package io.github.chains_project.collector.module;
 
+import io.github.chains_project.collector.CollectorAgent;
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import io.github.chains_project.collector.CollectorAgent;
 
 public class Java9ModuleCracker implements ModuleCracker {
 

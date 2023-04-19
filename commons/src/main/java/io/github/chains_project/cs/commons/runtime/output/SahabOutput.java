@@ -1,11 +1,11 @@
 package io.github.chains_project.cs.commons.runtime.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.chains_project.cs.commons.runtime.LineSnapshot;
+import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import io.github.chains_project.cs.commons.runtime.LineSnapshot;
-import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
 
 public class SahabOutput {
 

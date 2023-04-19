@@ -1,5 +1,9 @@
 package io.github.chains_project.tracediff.sharedutils;
 
+import io.github.chains_project.tracediff.models.CodeInterval;
+import io.github.chains_project.tracediff.models.SourceInfo;
+import io.github.chains_project.tracediff.trace.models.GHReports;
+import io.github.chains_project.tracediff.trace.utils.PH;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,10 +20,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import io.github.chains_project.tracediff.models.CodeInterval;
-import io.github.chains_project.tracediff.models.SourceInfo;
-import io.github.chains_project.tracediff.trace.models.GHReports;
-import io.github.chains_project.tracediff.trace.utils.PH;
 
 public class GHHelper {
     private static final String GH_COMMIT_KEYWORD = "{commit}";

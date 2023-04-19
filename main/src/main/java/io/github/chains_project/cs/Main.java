@@ -2,6 +2,13 @@ package io.github.chains_project.cs;
 
 import static io.github.chains_project.cs.preprocess.GitToLocal.getRevisions;
 
+import io.github.chains_project.cs.commons.CollectorAgentOptions;
+import io.github.chains_project.cs.commons.Pair;
+import io.github.chains_project.cs.commons.Revision;
+import io.github.chains_project.cs.preprocess.PomTransformer;
+import io.github.chains_project.mlf.MatchedLineFinder;
+import io.github.chains_project.tracediff.Constants;
+import io.github.chains_project.tracediff.ExecDiffMain;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,13 +23,6 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import picocli.CommandLine;
-import io.github.chains_project.cs.commons.CollectorAgentOptions;
-import io.github.chains_project.cs.commons.Pair;
-import io.github.chains_project.cs.commons.Revision;
-import io.github.chains_project.cs.preprocess.PomTransformer;
-import io.github.chains_project.mlf.MatchedLineFinder;
-import io.github.chains_project.tracediff.Constants;
-import io.github.chains_project.tracediff.ExecDiffMain;
 
 @CommandLine.Command(name = "collector-sahab", mixinStandardHelpOptions = true)
 public class Main implements Callable<Integer> {

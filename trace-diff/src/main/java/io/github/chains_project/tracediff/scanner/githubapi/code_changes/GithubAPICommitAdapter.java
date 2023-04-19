@@ -1,14 +1,14 @@
 package io.github.chains_project.tracediff.scanner.githubapi.code_changes;
 
+import io.github.chains_project.tracediff.scanner.githubapi.GAA;
+import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.FetchMode;
+import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.SelectedCommit;
+import io.github.chains_project.tracediff.scanner.githubapi.repositories.GithubAPIRepoAdapter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.kohsuke.github.*;
 import org.kohsuke.github.GHCheckRun.Conclusion;
-import io.github.chains_project.tracediff.scanner.githubapi.GAA;
-import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.FetchMode;
-import io.github.chains_project.tracediff.scanner.githubapi.code_changes.models.SelectedCommit;
-import io.github.chains_project.tracediff.scanner.githubapi.repositories.GithubAPIRepoAdapter;
 
 public class GithubAPICommitAdapter {
     private static GithubAPICommitAdapter _instance;

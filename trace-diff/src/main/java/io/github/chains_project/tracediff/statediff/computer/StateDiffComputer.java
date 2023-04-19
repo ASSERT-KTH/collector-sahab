@@ -2,12 +2,6 @@ package io.github.chains_project.tracediff.statediff.computer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 import io.github.chains_project.cs.commons.Pair;
 import io.github.chains_project.cs.commons.runtime.LineSnapshot;
 import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
@@ -17,6 +11,12 @@ import io.github.chains_project.cs.commons.runtime.output.SahabOutput;
 import io.github.chains_project.tracediff.Constants;
 import io.github.chains_project.tracediff.models.VarValsSet;
 import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class StateDiffComputer {
     private File leftSahabReport, rightSahabReport;

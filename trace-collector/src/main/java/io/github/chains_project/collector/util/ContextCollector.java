@@ -1,14 +1,14 @@
 package io.github.chains_project.collector.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import io.github.chains_project.cs.commons.runtime.LineSnapshot;
 import io.github.chains_project.cs.commons.runtime.LocalVariable;
 import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
 import io.github.chains_project.cs.commons.runtime.RuntimeValue;
 import io.github.chains_project.cs.commons.runtime.StackFrameContext;
 import io.github.chains_project.cs.commons.runtime.output.SahabOutput;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ContextCollector {
 

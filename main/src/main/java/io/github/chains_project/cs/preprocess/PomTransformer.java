@@ -2,6 +2,8 @@ package io.github.chains_project.cs.preprocess;
 
 import static io.github.chains_project.collector.util.JavaAgentPath.getAgentPath;
 
+import io.github.chains_project.cs.commons.CollectorAgentOptions;
+import io.github.chains_project.cs.commons.Revision;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,8 +20,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import io.github.chains_project.cs.commons.CollectorAgentOptions;
-import io.github.chains_project.cs.commons.Revision;
 
 public class PomTransformer {
 

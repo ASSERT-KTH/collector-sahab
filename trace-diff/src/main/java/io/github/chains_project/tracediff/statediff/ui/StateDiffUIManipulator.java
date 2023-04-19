@@ -3,6 +3,12 @@ package io.github.chains_project.tracediff.statediff.ui;
 import com.github.gumtreediff.matchers.Mapping;
 import gumtree.spoon.AstComparator;
 import gumtree.spoon.diff.Diff;
+import io.github.chains_project.tracediff.Constants;
+import io.github.chains_project.tracediff.models.SourceInfo;
+import io.github.chains_project.tracediff.sharedutils.GHHelper;
+import io.github.chains_project.tracediff.statediff.computer.StateDiffComputer;
+import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
+import io.github.chains_project.tracediff.statediff.utils.ExecDiffHelper;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,12 +17,6 @@ import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import io.github.chains_project.tracediff.Constants;
-import io.github.chains_project.tracediff.models.SourceInfo;
-import io.github.chains_project.tracediff.sharedutils.GHHelper;
-import io.github.chains_project.tracediff.statediff.computer.StateDiffComputer;
-import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
-import io.github.chains_project.tracediff.statediff.utils.ExecDiffHelper;
 import spoon.reflect.code.CtReturn;
 
 public class StateDiffUIManipulator {
