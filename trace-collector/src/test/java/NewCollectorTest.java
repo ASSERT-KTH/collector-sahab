@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -793,6 +795,72 @@ class NewCollectorTest {
             assertThat(a2Fields.get(0).getValue(), equalTo(1));
             assertThat(a2Fields.get(1).getName(), equalTo("denominator"));
             assertThat(a2Fields.get(1).getValue(), equalTo(4));
+        }
+    }
+
+    @Nested
+    class DeepCopyArray_ItMayMutateLater {
+        @Test
+        void nonPrimitive() throws MavenInvocationException, IOException {
+            // act
+            File pomFile = new File("src/test/resources/copy-array/pom.xml");
+            InvocationResult result = getInvocationResult(
+                    pomFile,
+                    List.of(
+                            "classesAndBreakpoints=src/test/resources/non-primitive.txt",
+                            "output=target/output.json",
+                            "executionDepth=0"),
+                    "-Dtest=CopyArrayTest#nonPrimitive");
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/copy-array/target/output.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint().size(), equalTo(1));
+            assertThat(output.getReturns().size(), equalTo(0));
+
+            StackFrameContext stackFrameContext =
+                    output.getBreakpoint().get(0).getStackFrameContext().get(0);
+            RuntimeValue localVariable =
+                    stackFrameContext.getRuntimeValueCollection().get(0);
+            assertThat(localVariable.getName(), equalTo("chronologies"));
+            assertThat(localVariable.getValue(), equalTo(new ArrayList<>(Collections.nCopies(4, null))));
+        }
+
+        @Test
+        void primitive() throws MavenInvocationException, IOException {
+            // act
+            File pomFile = new File("src/test/resources/copy-array/pom.xml");
+            InvocationResult result = getInvocationResult(
+                    pomFile,
+                    List.of(
+                            "classesAndBreakpoints=src/test/resources/primitive.txt",
+                            "output=target/output.json",
+                            "executionDepth=0"),
+                    "-Dtest=CopyArrayTest#primitive");
+
+            // assert
+            assertThat(result.getExitCode(), equalTo(0));
+            File actualOutput = new File("src/test/resources/copy-array/target/output.json");
+            assertThat(actualOutput.exists(), equalTo(true));
+
+            ObjectMapper mapper = new ObjectMapper();
+            SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+            assertThat(output.getBreakpoint().size(), equalTo(1));
+            assertThat(output.getReturns().size(), equalTo(0));
+
+            LineSnapshot lineSnapshot = output.getBreakpoint().get(0);
+            assertThat(lineSnapshot.getLineNumber(), equalTo(6));
+
+            StackFrameContext stackFrameContext =
+                    lineSnapshot.getStackFrameContext().get(0);
+            RuntimeValue localVariable =
+                    stackFrameContext.getRuntimeValueCollection().get(0);
+            assertThat(localVariable.getName(), equalTo("array"));
+            assertThat(localVariable.getValue(), equalTo(List.of(0, 0, 0, 0)));
         }
     }
 

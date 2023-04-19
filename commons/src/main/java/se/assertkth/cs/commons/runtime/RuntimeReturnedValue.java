@@ -57,8 +57,11 @@ public class RuntimeReturnedValue extends RuntimeValue {
             @JsonProperty("stackTrace") List<String> stackTrace,
             @JsonProperty("location") String location) {
         if (Classes.isArrayBasicallyPrimitive(value)) {
+            // I am not sure why this is necessary, but just to be safe...
+            // you cannot mutate the array after it has been returned.
+            Object clonedArray = Classes.cloneArray(value);
             return new RuntimeReturnedValue(
-                    kind, name, type, value, fields, List.of(), parameters, stackTrace, location);
+                    kind, name, type, clonedArray, fields, List.of(), parameters, stackTrace, location);
         } else {
             return new RuntimeReturnedValue(
                     kind,

@@ -68,7 +68,8 @@ public class RuntimeValue {
             List<RuntimeValue> fields,
             List<RuntimeValue> arrayElements) {
         if (Classes.isArrayBasicallyPrimitive(value)) {
-            return new RuntimeValue(kind, name, type, value, fields, List.of());
+            Object clonedArray = Classes.cloneArray(value);
+            return new RuntimeValue(kind, name, type, clonedArray, fields, List.of());
         } else {
             return new RuntimeValue(kind, name, type, Classes.simplifyValue(value), fields, arrayElements);
         }
