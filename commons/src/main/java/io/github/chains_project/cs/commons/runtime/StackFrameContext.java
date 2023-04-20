@@ -69,7 +69,7 @@ public class StackFrameContext {
     }
 
     private static boolean isOurCode(StackFrame frame) {
-        String julianCode = "se.assertteam";
+        String julianCode = "io.github.chains_project";
         if (frame.getClassName().startsWith(julianCode)) {
             return true;
         }
