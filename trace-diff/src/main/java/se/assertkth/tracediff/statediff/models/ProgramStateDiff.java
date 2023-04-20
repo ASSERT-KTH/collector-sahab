@@ -96,8 +96,8 @@ public class ProgramStateDiff {
         @Override
         public String toString() {
             return "UniqueStateSummary{" + "differencingTest="
-                    + differencingTest + ", firstUniqueStateLine="
-                    + firstUniqueVarValLine + ", firstUniqueStateHash="
+                    + differencingTest + ", firstUniqueVarValLine="
+                    + firstUniqueVarValLine + ", firstUniqueVarVal="
                     + firstUniqueVarVal + '\'' + '}';
         }
 

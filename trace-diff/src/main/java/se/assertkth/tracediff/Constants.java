@@ -9,7 +9,6 @@ public class Constants {
     public static final String ARG_ORIGINAL_PATH = "--original-path";
     public static final String ARG_PATCHED_PATH = "--patched-path";
     public static final String ARG_OUTPUT_PATH = "--output-path";
-    public static final String ARG_ALL_DIFFS_REPORT_PATH = "--all-diffs-report-path";
     public static final String ARG_FULL_REPORT_LINK = "--full-report-link";
     public static final String ARG_CHANGED_FILE_PATH = "--changed-file-path";
     public static final String ARG_SELECTED_TESTS = "--selected-tests";
