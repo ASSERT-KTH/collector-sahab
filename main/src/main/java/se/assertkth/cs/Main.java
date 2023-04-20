@@ -125,18 +125,18 @@ public class Main implements Callable<Integer> {
         }
 
         int repeats = excludeRandomValues ? Constants.REPEATS_FOR_RANDOM_EXCLUSION : 1;
-        for (int i = 0; i < repeats; i++) {
+        for (int i = repeats - 1; i >= 0; i--) {
             CollectorAgentOptions optionsLeft = new CollectorAgentOptions();
             optionsLeft.setClassesAndBreakpoints(inputLeft.toAbsolutePath().toFile());
             optionsLeft.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
             optionsLeft.setExecutionDepth(executionDepth);
             optionsLeft.setOutput(outputDirLeft.resolve(i + ".json").toAbsolutePath().toFile());
 
-//            for (Path pomFile : pomFilesLeft) {
-//                // copy pom from backup
-//                Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
-//                new PomTransformer(new Revision(pomFile.getParent(), leftHash), optionsLeft, selectedTests);
-//            }
+            for (Path pomFile : pomFilesLeft) {
+                // copy pom from backup
+                Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
+                new PomTransformer(new Revision(pomFile.getParent(), leftHash), optionsLeft, selectedTests);
+            }
 
 
             CollectorAgentOptions optionsRight = new CollectorAgentOptions();
@@ -145,13 +145,13 @@ public class Main implements Callable<Integer> {
             optionsRight.setExecutionDepth(executionDepth);
             optionsRight.setOutput(outputDirRight.resolve(i + ".json").toAbsolutePath().toFile());
 
-//            for (Path pomFile : pomFilesRight) {
-//                Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
-//                new PomTransformer(new Revision(pomFile.getParent(), rightHash), optionsRight, selectedTests);
-//            }
+            for (Path pomFile : pomFilesRight) {
+                Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
+                new PomTransformer(new Revision(pomFile.getParent(), rightHash), optionsRight, selectedTests);
+            }
 
-//            mavenTestInvoker(left);
-//            mavenTestInvoker(right);
+            mavenTestInvoker(left);
+            mavenTestInvoker(right);
         }
 
         //        String slug,
@@ -186,8 +186,6 @@ public class Main implements Callable<Integer> {
             "https://github.com/ASSERT-KTH",
             Constants.ARG_OUTPUT_PATH,
             outputPath));
-
-        if(excludeRandomValues) cmd.add(Constants.ARG_EXCLUDE_RANDOM_VALUES);
 
         ExecDiffMain.main(cmd.toArray(new String[0]));
         return 0;
