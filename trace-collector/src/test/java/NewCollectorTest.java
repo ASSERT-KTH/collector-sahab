@@ -864,6 +864,33 @@ class NewCollectorTest {
         }
     }
 
+    @Test
+    void ourOwnCode_stackTraceShouldHaveFramesOfOurCode() throws MavenInvocationException, IOException {
+        // arrange
+        File pomFile = new File("src/test/resources/our-own-code/pom.xml");
+
+        // act
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of("classesAndBreakpoints=src/test/resources/input.txt", "output=target/output.json"),
+                "-Dtest=JustTest#test");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/our-own-code/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(1));
+        assertThat(output.getReturns().size(), equalTo(0));
+
+        StackFrameContext stackFrameContext =
+                output.getBreakpoint().get(0).getStackFrameContext().get(0);
+        List<String> expectedStackTrace = List.of("test:7, JustTest");
+        assertThat(expectedStackTrace, equalTo(stackFrameContext.getStackTrace()));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException, IOException {
         // arrange
