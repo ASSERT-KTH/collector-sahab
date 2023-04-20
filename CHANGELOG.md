@@ -1,4 +1,24 @@
 
+# 0.1.5
+## Changelog
+
+## 🔄️ Changes
+- 01c6469 perf: exclude our own code (#185)
+
+## 🧰 Tasks
+- a23b7e4 chore: releasing version 0.1.5
+- 2f0725a chore: set a real group ID (#184)
+- 8c08fde chore: remove redundant version
+- b090b08 chore: change commit message of renovate PRs
+- 7d697b6 chore: setting SNAPSHOT version 0.1.5-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ([@betterqualityassuranceuser](https://github.com/betterqualityassuranceuser))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
 # 0.1.4
 ## Changelog
 
