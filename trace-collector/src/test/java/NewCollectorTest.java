@@ -1,13 +1,19 @@
+import static io.github.chains_project.collector.util.JavaAgentPath.getAgentPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static se.assertkth.collector.util.JavaAgentPath.getAgentPath;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.chains_project.cs.commons.runtime.LineSnapshot;
+import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
+import io.github.chains_project.cs.commons.runtime.RuntimeValue;
+import io.github.chains_project.cs.commons.runtime.RuntimeValue.Kind;
+import io.github.chains_project.cs.commons.runtime.StackFrameContext;
+import io.github.chains_project.cs.commons.runtime.output.SahabOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,12 +30,6 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.assertkth.cs.commons.runtime.LineSnapshot;
-import se.assertkth.cs.commons.runtime.RuntimeReturnedValue;
-import se.assertkth.cs.commons.runtime.RuntimeValue;
-import se.assertkth.cs.commons.runtime.RuntimeValue.Kind;
-import se.assertkth.cs.commons.runtime.StackFrameContext;
-import se.assertkth.cs.commons.runtime.output.SahabOutput;
 
 class NewCollectorTest {
     @Test

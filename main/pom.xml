@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>se.assertkth</groupId>
+    <groupId>io.github.chains-project</groupId>
     <artifactId>collector-sahab-parent-pom</artifactId>
     <version>0.1.5-SNAPSHOT</version>
   </parent>
@@ -11,24 +11,24 @@
 
   <dependencies>
     <dependency>
-      <groupId>se.assertkth</groupId>
+      <groupId>io.github.chains-project</groupId>
       <artifactId>collector-sahab-commons</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>se.assertkth</groupId>
+      <groupId>io.github.chains-project</groupId>
       <artifactId>matched-line-finder</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>se.assertkth</groupId>
+      <groupId>io.github.chains-project</groupId>
       <artifactId>trace-diff</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <!-- We only need this to get the JAR from resources -->
     <!-- Inspiration: https://github.com/jacoco/jacoco/tree/master/org.jacoco.agent -->
     <dependency>
-      <groupId>se.assertkth</groupId>
+      <groupId>io.github.chains-project</groupId>
       <artifactId>trace-collector</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
@@ -87,7 +87,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>se.assertkth.cs.Main</mainClass>
+              <mainClass>io.github.chains_project.cs.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
