@@ -14,7 +14,7 @@ You may run the following commands to verify the signature of a release.
 gpg --recv-keys 1429025e3eda19a5
 gpg --verify collector-sahab-<VERSION>-jar-with-dependencies.jar.asc
 ```
-> This signature is a type of [detaached signature](https://en.wikipedia.org/wiki/Detached_signature),
+> This signature is a type of [detached signature](https://en.wikipedia.org/wiki/Detached_signature),
 > so you need to have the JAR file as well to verify the signature.
 
 ## Structure of the project
