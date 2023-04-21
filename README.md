@@ -5,6 +5,18 @@
 
 CLI to collect runtime context of a Java class.
 
+## Releases
+
+Our releases are signed using `travis-gumtree-spoon`'s GPG key. The key is hosted
+[here](https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x1429025e3eda19a5).
+You may run the following commands to verify the signature of a release.
+```shell
+gpg --recv-keys 1429025e3eda19a5
+gpg --verify collector-sahab-<VERSION>-jar-with-dependencies.jar.asc
+```
+> This signature is a type of [detaached signature](https://en.wikipedia.org/wiki/Detached_signature),
+> so you need to have the JAR file as well to verify the signature.
+
 ## Structure of the project
 
 The project is divided into multiple submodules.
