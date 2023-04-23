@@ -1,5 +1,8 @@
 package io.github.chains_project.tracediff;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
     public static final String EXEC_DIFF_COMMAND_NAME = "EXEC-DIFF";
 
@@ -26,4 +29,6 @@ public class Constants {
     public static final String TEST_METHOD_NAME_SEPARATOR = "::";
     public static final String UNKNOWN_TEST = "unknown::unknown";
     public static final int REPEATS_FOR_RANDOM_EXCLUSION = 3;
+    public static final List<String> FILE_RELATED_CLASSES = Arrays.asList("java.io.File", "java.nio.file.Path", "sun.nio.fs.UnixPath",
+            "sun.nio.fs.WindowsPath");
 }
