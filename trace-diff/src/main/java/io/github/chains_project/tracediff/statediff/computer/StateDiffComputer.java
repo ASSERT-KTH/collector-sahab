@@ -139,7 +139,7 @@ public class StateDiffComputer {
         for (int i = 0; i < jsonStates.size(); i++) {
             RuntimeReturnedValue jo = jsonStates.get(i);
             int linenumber = Integer.parseInt(jo.getLocation().split(":")[1]);
-            extractVarVals("{return-value}", jo).forEach(varVal -> ret.add(new Pair<Integer, String>(linenumber, varVal)));
+            extractVarVals("{return-object}", jo).forEach(varVal -> ret.add(new Pair<Integer, String>(linenumber, varVal)));
         }
 
         return ret;
@@ -325,7 +325,7 @@ public class StateDiffComputer {
     private Set<String> extractVarVals(String prefix, RuntimeValue valueJo) {
         Set<String> varVals = new HashSet<>();
 
-        if(valueJo.getType().contains("java.io.File") || valueJo.getType().contains("java.nio.file.Path")) {
+        if(Constants.FILE_RELATED_CLASSES.stream().anyMatch(valueJo.getType()::contains)) {
             return varVals;
         }
 

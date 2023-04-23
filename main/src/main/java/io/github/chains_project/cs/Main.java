@@ -9,6 +9,9 @@ import io.github.chains_project.cs.preprocess.PomTransformer;
 import io.github.chains_project.mlf.MatchedLineFinder;
 import io.github.chains_project.tracediff.Constants;
 import io.github.chains_project.tracediff.ExecDiffMain;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -108,7 +112,8 @@ public class Main implements Callable<Integer> {
         Path methods = Files.writeString(left.getPath().resolve("methods.txt"), matchedLines.getMiddle());
 
         List<Path> pomFilesLeft = Files.walk(left.getPath())
-                .filter(path -> path.getFileName().toString().equals("pom.xml"))
+                .filter(path -> path.getFileName().toString().equals("pom.xml")
+                        && !path.toString().contains("/resources/"))
                 .collect(Collectors.toList());
         // copy a backup of pom files
         for (Path pomFile : pomFilesLeft) {
@@ -116,7 +121,8 @@ public class Main implements Callable<Integer> {
         }
 
         List<Path> pomFilesRight = Files.walk(right.getPath())
-                .filter(path -> path.getFileName().toString().equals("pom.xml"))
+                .filter(path -> path.getFileName().toString().equals("pom.xml")
+                        && !path.toString().contains("/resources/"))
                 .collect(Collectors.toList());
         // copy a backup of pom files
         for (Path pomFile : pomFilesRight) {
@@ -165,26 +171,26 @@ public class Main implements Callable<Integer> {
         //        String outputPath,
         //        String allDiffsReportPath)
         List<String> cmd = new ArrayList<>(Arrays.asList(
-            "sdiff",
-            Constants.ARG_SLUG,
-            slug,
-            Constants.ARG_COMMIT,
-            right.getHash(),
-            Constants.ARG_LEFT_REPORT_PATH,
-            outputDirLeft.toAbsolutePath().toString(),
-            Constants.ARG_RIGHT_REPORT_PATH,
-            outputDirRight.toAbsolutePath().toString(),
-            Constants.ARG_LEFT_SRC_PATH,
-            left.resolveFilename(classfileName).toAbsolutePath().toString(),
-            Constants.ARG_RIGHT_SRC_PATH,
-            right.resolveFilename(classfileName).toAbsolutePath().toString(),
-            // ghFullDiff is null
-            Constants.ARG_SELECTED_TESTS,
-            String.join(",", selectedTests),
-            Constants.ARG_TEST_LINK,
-            "https://github.com/ASSERT-KTH",
-            Constants.ARG_OUTPUT_PATH,
-            outputPath));
+                "sdiff",
+                Constants.ARG_SLUG,
+                slug,
+                Constants.ARG_COMMIT,
+                right.getHash(),
+                Constants.ARG_LEFT_REPORT_PATH,
+                outputDirLeft.toAbsolutePath().toString(),
+                Constants.ARG_RIGHT_REPORT_PATH,
+                outputDirRight.toAbsolutePath().toString(),
+                Constants.ARG_LEFT_SRC_PATH,
+                left.resolveFilename(classfileName).toAbsolutePath().toString(),
+                Constants.ARG_RIGHT_SRC_PATH,
+                right.resolveFilename(classfileName).toAbsolutePath().toString(),
+                // ghFullDiff is null
+                Constants.ARG_SELECTED_TESTS,
+                String.join(",", selectedTests),
+                Constants.ARG_TEST_LINK,
+                "https://github.com/ASSERT-KTH",
+                Constants.ARG_OUTPUT_PATH,
+                outputPath));
 
         ExecDiffMain.main(cmd.toArray(new String[0]));
         return 0;
@@ -193,10 +199,17 @@ public class Main implements Callable<Integer> {
     private static InvocationResult mavenTestInvoker(Revision project) throws IOException, MavenInvocationException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(project.resolveFilename("pom.xml").toFile());
+        try {
+            project.resolveFilename(".mvn/maven.config").toFile().delete();
+        } catch (FileNotFoundException e) {
+            // ignore
+        }
         request.setGoals(List.of("test"));
         request.setBatchMode(true);
 
         Invoker invoker = new DefaultInvoker();
+        if (System.getenv().containsKey("MAVEN_HOME"))
+            invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
         return invoker.execute(request);
     }
 }
