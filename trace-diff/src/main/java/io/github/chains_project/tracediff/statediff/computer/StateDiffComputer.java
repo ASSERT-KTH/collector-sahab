@@ -11,6 +11,7 @@ import io.github.chains_project.cs.commons.runtime.output.SahabOutput;
 import io.github.chains_project.tracediff.Constants;
 import io.github.chains_project.tracediff.models.VarValsSet;
 import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -122,7 +123,8 @@ public class StateDiffComputer {
         for (int i = 0; i < lastVarVals.size(); i++) {
             Pair<Integer, String> p = lastVarVals.get(i);
             if (hashes.contains(getVarValHash(p.getLeft(), p.getRight()))) {
-                String executedTest = getMatchingTest(jsonStates.get(i).getStackTrace());
+                // FIXME: this is not correct, we should get the test that executed the line
+                String executedTest = getMatchingTest(jsonStates.get(0).getStackTrace());
                 firstUniqueReturnSummary.setDifferencingTest(executedTest);
                 firstUniqueReturnSummary.setFirstUniqueVarValLine(p.getLeft());
                 firstUniqueReturnSummary.setFirstUniqueVarVal(p.getRight());
@@ -139,7 +141,18 @@ public class StateDiffComputer {
         for (int i = 0; i < jsonStates.size(); i++) {
             RuntimeReturnedValue jo = jsonStates.get(i);
             int linenumber = Integer.parseInt(jo.getLocation().split(":")[1]);
-            extractVarVals("{return-object}", jo).forEach(varVal -> ret.add(new Pair<Integer, String>(linenumber, varVal)));
+            List<String> returnVarVals = new ArrayList<>(extractVarVals("{return-object}", jo));
+            Collections.sort(returnVarVals, new Comparator<String>() {
+                @Override
+                public int compare(String s1, String s2) {
+                    if (StringUtils.countMatches(s1, '.') < StringUtils.countMatches(s2, '.')) return -1;
+                    if (StringUtils.countMatches(s1, '.') > StringUtils.countMatches(s2, '.')) return 1;
+                    if (s1.length() < s2.length()) return -1;
+                    if (s1.length() > s2.length()) return 1;
+                    return 0;
+                }
+            });
+            returnVarVals.forEach(varVal -> ret.add(new Pair<Integer, String>(linenumber, varVal)));
         }
 
         return ret;
@@ -247,7 +260,13 @@ public class StateDiffComputer {
         for (int i = 0; i < lineSnapshots.size(); i++) {
             LineSnapshot lineSnapshot = lineSnapshots.get(i);
 
-            if (isOpposite && !reverseLineMapping.containsKey(lineSnapshot.getLineNumber())) continue;
+            if (isOpposite) {
+                if (!reverseLineMapping.containsKey(lineSnapshot.getLineNumber()))
+                    continue;
+            } else {
+                if (!reverseLineMapping.containsValue(lineSnapshot.getLineNumber()))
+                    continue;
+            }
 
             int originalLineNumber = !isOpposite ? lineSnapshot.getLineNumber() :
                     reverseLineMapping.get(lineSnapshot.getLineNumber());
@@ -325,7 +344,7 @@ public class StateDiffComputer {
     private Set<String> extractVarVals(String prefix, RuntimeValue valueJo) {
         Set<String> varVals = new HashSet<>();
 
-        if(Constants.FILE_RELATED_CLASSES.stream().anyMatch(valueJo.getType()::contains)) {
+        if (Constants.FILE_RELATED_CLASSES.stream().anyMatch(valueJo.getType()::contains)) {
             return varVals;
         }
 
@@ -373,8 +392,13 @@ public class StateDiffComputer {
                     boolean isOpposite
             ) {
         int lineNumber = Integer.parseInt(stateJO.getLocation().split(":")[1]);
-        if (isOpposite && !reverseLineMapping.containsKey(lineNumber))
-            return new HashSet<>();
+        if (isOpposite) {
+            if (!reverseLineMapping.containsKey(lineNumber))
+                return new HashSet<>();
+        } else {
+            if (!reverseLineMapping.containsValue(lineNumber))
+                return new HashSet<>();
+        }
 
         final int finalLineNumber = !isOpposite ? lineNumber :
                 reverseLineMapping.get(lineNumber);
