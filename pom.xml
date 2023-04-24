@@ -7,6 +7,34 @@
   <version>0.1.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Collector Sahab Parent POM</name>
+  <description>A tool for augmenting the static diff with runtime information</description>
+  <url>https://github.com/ASSERT-KTH/collector-sahab/</url>
+
+  <licenses>
+    <license>
+      <name>The Unlicense</name>
+      <url>https://unlicense.org/</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>algomaster99</id>
+      <name>Aman Sharma</name>
+      <email>amansha@kth.se</email>
+      <url>https://algomaster99.github.io/</url>
+      <organization>KTH Royal Institute of Technology</organization>
+      <organizationUrl>https://www.kth.se/</organizationUrl>
+    </developer>
+    <developer>
+      <id>khaes-kth</id>
+      <name>Khashayar Etemadi</name>
+      <email>khaes@kth.se</email>
+      <organization>KTH Royal Institute of Technology</organization>
+      <organizationUrl>https://www.kth.se</organizationUrl>
+    </developer>
+  </developers>
+
   <modules>
     <module>trace-collector</module>
     <module>matched-line-finder</module>
@@ -14,6 +42,10 @@
     <module>main</module>
     <module>trace-diff</module>
   </modules>
+  <scm>
+    <connection>scm:git:https://github.com/ASSERT-KTH/collector-sahab/</connection>
+    <url>https://github.com/ASSERT-KTH/collector-sahab.git</url>
+  </scm>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
