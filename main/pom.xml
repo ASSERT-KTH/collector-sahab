@@ -6,10 +6,10 @@
     <artifactId>collector-sahab-parent-pom</artifactId>
     <version>0.1.6-SNAPSHOT</version>
   </parent>
-  <description>Aggregator of Collector Sahab</description>
-  <url>https://github.com/ASSERT-KTH/collector-sahab/tree/main/main</url>
   <artifactId>collector-sahab</artifactId>
   <name>Collector Sahab</name>
+  <description>Aggregator of Collector Sahab</description>
+  <url>https://github.com/ASSERT-KTH/collector-sahab/tree/main/main</url>
 
   <dependencies>
     <dependency>
