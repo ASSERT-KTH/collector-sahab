@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import spoon.Launcher;
@@ -21,15 +20,13 @@ import spoon.reflect.visitor.CtScanner;
 
 public class MatchedLineFinder {
 
-    private static final Logger LOGGER = Logger.getLogger("MLF");
-
     /**
      * Find the matched line between two Java source files.
      *
      * @param left previous version of source file
      * @param right revision of source file
      * @return matched line for left and matched line for right
-     * @throws Exception raised from gumtree-spoon
+     * @throws IOException raised when there is a problem with reading the files
      */
     public static Triple<String, String, String> invoke(File left, File right) throws IOException {
         Pair<Set<Integer>, Set<Integer>> diffLines = getDiffLines(left, right);
