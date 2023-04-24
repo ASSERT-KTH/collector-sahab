@@ -6,9 +6,10 @@
     <artifactId>collector-sahab-parent-pom</artifactId>
     <version>0.1.6-SNAPSHOT</version>
   </parent>
-
   <artifactId>trace-diff</artifactId>
   <name>State Differencing</name>
+  <description>Diff tool for trace collected by Collector Sahab</description>
+  <url>https://github.com/ASSERT-KTH/collector-sahab/tree/main/trace-diff</url>
 
   <developers>
     <developer>

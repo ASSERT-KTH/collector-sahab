@@ -8,6 +8,8 @@
   </parent>
   <artifactId>trace-collector</artifactId>
   <name>Trace Collector</name>
+  <description>Trace collector agent for Collector Sahab</description>
+  <url>https://github.com/ASSERT-KTH/collector-sahab/tree/main/trace-collector</url>
 
   <dependencies>
     <dependency>
