@@ -1,4 +1,46 @@
 
+# 0.1.6
+## Changelog
+
+## 🐛 Fixes
+- e900ed1 fix: clone the first `20` elements of array (#191)
+
+## 🔄️ Changes
+- 96eeffa style: please spotless
+- 12f2ff0 revert: Revert "chore: releasing version 0.1.6"
+- 48f18e5 revert: Revert "chore: releasing version 0.1.6"
+- 1ffe9ee revert: Revert "chore: releasing version 0.1.6"
+- 80d89f3 revert: Revert "chore: releasing version 0.1.6"
+
+## 🧰 Tasks
+- f877f8c chore: releasing version 0.1.6
+- 2a95b17 chore: releasing version 0.1.6
+- a914931 chore: releasing version 0.1.6
+- bbb1504 chore: update jreleaser version
+- ff21763 chore: releasing version 0.1.6
+- 9531db9 chore: releasing version 0.1.6
+- b7d18c3 chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.15.0
+- a05227c chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.9.0
+- 16ad213 chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.5.0
+- cfef8f8 chore: configure maven central deployment (#186)
+- 54af9b0 chore: setting SNAPSHOT version 0.1.6-SNAPSHOT
+
+## 🛠  Build
+- 5057670 ci: comply with pomchecker run by jreleaser
+- c0e3970 ci: fix POM to comply with maven central requirements
+- aeb3003 ci: be consistent
+
+## 📝 Documentation
+- ffdbc72 docs: fix @throw docstring of MatchedLineFinder (#192)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.1.5
 ## Changelog
 
