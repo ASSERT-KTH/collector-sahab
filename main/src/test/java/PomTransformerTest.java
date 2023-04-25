@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -366,6 +367,26 @@ class PomTransformerTest {
             debugLevel = configuration.getChild("debuglevel");
             assertThat(debug, is(nullValue()));
             assertThat(debugLevel, is(nullValue()));
+        }
+
+        @Test
+        void modifyCompilerPlugin_shouldModifyProperties() throws XmlPullParserException, IOException {
+            // arrange;
+            PomTransformer transformer = new PomTransformer(Paths.get("src/test/resources/compiler/properties.xml"));
+
+            Properties properties = transformer.getModel().getProperties();
+            assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("5")));
+            assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.5")));
+            assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("5")));
+
+            // act
+            transformer.modifyProperties();
+
+            // assert
+            properties = transformer.getModel().getProperties();
+            assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("1.6")));
+            assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.6")));
+            assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("1.6")));
         }
     }
 }
