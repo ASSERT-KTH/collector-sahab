@@ -1,4 +1,23 @@
 
+# 0.3.3
+## Changelog
+
+## 🐛 Fixes
+- 1fa9773 fix: do not load classes for verification (#207)
+
+## 🧰 Tasks
+- 878026a chore: releasing version 0.3.3
+- 9f9425e chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-3 (#196)
+- f477bc6 chore: setting SNAPSHOT version 0.3.3-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.3.2
 ## Changelog
 
