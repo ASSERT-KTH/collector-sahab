@@ -4,7 +4,7 @@
 
   <groupId>io.github.chains-project</groupId>
   <artifactId>collector-sahab-parent-pom</artifactId>
-  <version>0.3.2-SNAPSHOT</version>
+  <version>0.3.2</version>
   <packaging>pom</packaging>
   <name>Collector Sahab Parent POM</name>
   <description>A tool for augmenting the static diff with runtime information</description>
