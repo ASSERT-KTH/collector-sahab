@@ -19,9 +19,9 @@ public class StateDiffComputerTest<R> {
     @Test
     void computeStateDiff_simple_diffIsGenerated() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple");
-        File leftSahabReport = simpleSahabDirectory.resolve("report/left.json").toFile(),
+        File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
                 rightSahabReport =
-                        simpleSahabDirectory.resolve("report/right.json").toFile(),
+                        simpleSahabDirectory.resolve("report/right").toFile(),
                 lineMapping =
                         simpleSahabDirectory
                                 .resolve("project_data/line_mapping.csv")
@@ -52,7 +52,7 @@ public class StateDiffComputerTest<R> {
         ProgramStateDiff stateDiff = sdc.computeProgramStateDiff();
 
         assertEquals(
-                "{return-object}.UTC.iID=UTC",
+                "{return-object}.iID=TestDTZ1",
                 stateDiff.getOriginalUniqueReturn().getFirstUniqueVarVal());
         assertEquals("{return-object}=null", stateDiff.getPatchedUniqueReturn().getFirstUniqueVarVal());
 
@@ -62,13 +62,13 @@ public class StateDiffComputerTest<R> {
     }
 
     // breakpoint from: https://github.com/khaes-kth/drr-execdiff/commit/1c04679173a46faa59e73f68def33f60843f8beb
-    // only a part of breakpoint data is stored in right.json
+    // only a part of breakpoint data is stored in 0.json
     @Test
     void computeStateDiff_complex_diffIsGenerated() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/complex");
-        File leftSahabReport = simpleSahabDirectory.resolve("report/left.json").toFile(),
+        File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
                 rightSahabReport =
-                        simpleSahabDirectory.resolve("report/right.json").toFile(),
+                        simpleSahabDirectory.resolve("report/right").toFile(),
                 lineMapping =
                         simpleSahabDirectory
                                 .resolve("project_data/line_mapping.csv")
@@ -106,13 +106,13 @@ public class StateDiffComputerTest<R> {
 
     // breakpoint from: https://github.com/khaes-kth/drr-execdiff/commit/8b5b580751d1c08eb848e389ec3e7e235eea62d8,
     // depth=1
-    // only a part of breakpoint data is stored in right.json
+    // only a part of breakpoint data is stored in 0.json
     @Test
     void computeStateDiff_simple_diffIsGenerated_two() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple_two");
-        File leftSahabReport = simpleSahabDirectory.resolve("report/left.json").toFile(),
+        File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
                 rightSahabReport =
-                        simpleSahabDirectory.resolve("report/right.json").toFile(),
+                        simpleSahabDirectory.resolve("report/right").toFile(),
                 lineMapping =
                         simpleSahabDirectory
                                 .resolve("project_data/line_mapping.csv")
