@@ -1,0 +1,6 @@
+[
+  {
+    "fileName": "synthetic/SyntheticField$InnerClass",
+    "breakpoints": [15]
+  }
+]

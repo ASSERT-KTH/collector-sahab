@@ -155,9 +155,9 @@ public class ObjectIntrospection {
             if (onlyCollectStaticFields && !Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            if (field.isSynthetic()) {
-                continue;
-            }
+//            if (field.isSynthetic()) {
+//                continue;
+//            }
             if (field.getName().startsWith("CGLIB$")) {
                 continue;
             }

@@ -1,0 +1,6 @@
+[
+  {
+    "fileName": "synthetic/SyntheticMethod",
+    "breakpoints": [9]
+  }
+]
