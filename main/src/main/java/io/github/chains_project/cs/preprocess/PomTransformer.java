@@ -66,13 +66,25 @@ public class PomTransformer {
         if (mavenCompilerCompilerVersion != null && OLD_COMPILER_VERSIONS.contains(mavenCompilerCompilerVersion)) {
             properties.setProperty("maven.compiler.compilerVersion", "1.6");
         }
+        String mavenCompileCompilerVersion = properties.getProperty("maven.compile.compilerVersion");
+        if (mavenCompileCompilerVersion != null && OLD_COMPILER_VERSIONS.contains(mavenCompileCompilerVersion)) {
+            properties.setProperty("maven.compile.compilerVersion", "1.6");
+        }
         String mavenCompilerSource = properties.getProperty("maven.compiler.source");
         if (mavenCompilerSource != null && OLD_COMPILER_VERSIONS.contains(mavenCompilerSource)) {
             properties.setProperty("maven.compiler.source", "1.6");
         }
+        String mavenCompileSource = properties.getProperty("maven.compile.source");
+        if (mavenCompileSource != null && OLD_COMPILER_VERSIONS.contains(mavenCompileSource)) {
+            properties.setProperty("maven.compile.source", "1.6");
+        }
         String mavenCompilerTarget = properties.getProperty("maven.compiler.target");
         if (mavenCompilerTarget != null && OLD_COMPILER_VERSIONS.contains(mavenCompilerTarget)) {
             properties.setProperty("maven.compiler.target", "1.6");
+        }
+        String mavenCompileTarget = properties.getProperty("maven.compile.target");
+        if (mavenCompileTarget != null && OLD_COMPILER_VERSIONS.contains(mavenCompileTarget)) {
+            properties.setProperty("maven.compile.target", "1.6");
         }
     }
 
