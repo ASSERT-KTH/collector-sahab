@@ -1,4 +1,21 @@
 
+# 0.3.2
+## Changelog
+
+## 🐛 Fixes
+- d834103 fix: update versions for maven.compile(r) (#204)
+
+## 🧰 Tasks
+- 59bbbaf chore: releasing version 0.3.2
+- 12c1fca chore: setting SNAPSHOT version 0.3.2-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
 # 0.3.1
 ## Changelog
 
