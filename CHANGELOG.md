@@ -1,4 +1,24 @@
 
+# 0.3.1
+## Changelog
+
+## 🐛 Fixes
+- e8eaf3c fix: remove instrumentation of throw instruction (#203)
+
+## 🔄️ Changes
+- db1ce2b refactor: create another methods.txt file for right version (#202)
+
+## 🧰 Tasks
+- bc28c84 chore: releasing version 0.3.1
+- 863364c chore: setting SNAPSHOT version 0.3.1-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
 # 0.3.0
 ## Changelog
 
