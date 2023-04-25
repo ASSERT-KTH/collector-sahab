@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -366,6 +367,53 @@ class PomTransformerTest {
             debugLevel = configuration.getChild("debuglevel");
             assertThat(debug, is(nullValue()));
             assertThat(debugLevel, is(nullValue()));
+        }
+
+        @Nested
+        class ModifyProperties {
+
+            // https://github.com/ASSERT-KTH/collector-sahab-experiments/blob/master/Time-4/pom.xml#L698
+            @Test
+            void modifyCompilerPlugin_shouldModifyAllProperties() throws XmlPullParserException, IOException {
+                // arrange;
+                PomTransformer transformer =
+                        new PomTransformer(Paths.get("src/test/resources/compiler/properties.xml"));
+
+                Properties properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("5")));
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.5")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("5")));
+
+                // act
+                transformer.modifyProperties();
+
+                // assert
+                properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("1.6")));
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.6")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("1.6")));
+            }
+
+            // https://github.com/ASSERT-KTH/collector-sahab-experiments/blob/master/Math-2/pom.xml#L345
+            @Test
+            void modifyCompilerPlugin_shouldModifyFewProperties() throws XmlPullParserException, IOException {
+                // arrange;
+                PomTransformer transformer =
+                        new PomTransformer(Paths.get("src/test/resources/compiler/subset-of-properties.xml"));
+
+                Properties properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(nullValue()));
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.5")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("5")));
+
+                // act
+                transformer.modifyProperties();
+
+                // assert
+                properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.6")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("1.6")));
+            }
         }
     }
 }
