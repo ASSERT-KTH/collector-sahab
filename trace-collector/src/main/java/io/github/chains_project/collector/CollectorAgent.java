@@ -15,7 +15,6 @@ import io.github.chains_project.cs.commons.MethodForExitEvent;
 import io.github.chains_project.cs.commons.runtime.LocalVariable;
 import io.github.chains_project.cs.commons.util.Classes;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Modifier;
@@ -49,7 +48,6 @@ import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.ParameterNode;
-import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 public class CollectorAgent {
@@ -174,8 +172,6 @@ public class CollectorAgent {
         }
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classNode.accept(new TraceClassVisitor(writer, null));
-
-        CheckClassAdapter.verify(new ClassReader(writer.toByteArray()), false, new PrintWriter(System.err));
 
         return writer.toByteArray();
     }
