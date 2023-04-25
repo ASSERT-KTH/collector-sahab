@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
 import org.apache.commons.lang3.StringUtils;
 import se.assertkth.cs.commons.Pair;
 import se.assertkth.cs.commons.runtime.LineSnapshot;
@@ -23,6 +24,16 @@ import se.assertkth.cs.commons.runtime.output.SahabOutput;
 import se.assertkth.tracediff.Constants;
 import se.assertkth.tracediff.models.VarValsSet;
 import se.assertkth.tracediff.statediff.models.ProgramStateDiff;
+=======
+import io.github.chains_project.cs.commons.Pair;
+import io.github.chains_project.cs.commons.runtime.LineSnapshot;
+import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
+import io.github.chains_project.cs.commons.runtime.RuntimeValue;
+import io.github.chains_project.cs.commons.runtime.output.SahabOutput;
+import io.github.chains_project.tracediff.Constants;
+import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
+import org.apache.commons.lang3.StringUtils;
+>>>>>>> e507140d39d2c41566ddd9d041ba47a2f4c534c9
 
 public class StateDiffComputer {
     private File leftSahabReportDir, rightSahabReportDir;
