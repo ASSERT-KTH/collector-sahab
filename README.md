@@ -76,7 +76,7 @@ And finally, a maven project hosted on GitHub. :smile:
 
    Following parameters have not been added to `main`, but planned to be added in the future if needed.
    
-   1.  `numberOfArrayElements`: The number of array elements to be collected. Default is `10`.
+   1.  `numberOfArrayElements`: The number of array elements to be collected. Default is `20`.
 
    2. `extractParameters`: Whether to extract parameters of the method. Default is `false`. 
 
