@@ -4,10 +4,12 @@
   <parent>
     <groupId>io.github.chains-project</groupId>
     <artifactId>collector-sahab-parent-pom</artifactId>
-    <version>0.1.6-SNAPSHOT</version>
+    <version>0.3.3-SNAPSHOT</version>
   </parent>
   <artifactId>matched-line-finder</artifactId>
   <name>Matched Line Finder</name>
+  <description>Module for computing matched lines between two projects</description>
+  <url>https://github.com/ASSERT-KTH/collector-sahab/tree/main/matched-line-finder</url>
 
   <dependencies>
     <dependency>

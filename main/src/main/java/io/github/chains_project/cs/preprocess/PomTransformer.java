@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -30,6 +31,8 @@ public class PomTransformer {
 
     public static String AGENT_JAR;
 
+    private static final List<String> OLD_COMPILER_VERSIONS = List.of("1.5", "5");
+
     static {
         try {
             AGENT_JAR = getAgentPath();
@@ -47,10 +50,42 @@ public class PomTransformer {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         this.model = reader.read(new FileReader(pomFile.toFile(), StandardCharsets.UTF_8));
         preprocessPom();
+        modifyProperties();
         modifySurefirePlugin(tests);
         modifyCompilerPlugin();
         MavenXpp3Writer writer = new MavenXpp3Writer();
         writer.write(new FileWriter(pomFile.toFile(), StandardCharsets.UTF_8), model);
+    }
+
+    public void modifyProperties() {
+        Properties properties = model.getProperties();
+        if (properties == null) {
+            return;
+        }
+        String mavenCompilerCompilerVersion = properties.getProperty("maven.compiler.compilerVersion");
+        if (mavenCompilerCompilerVersion != null && OLD_COMPILER_VERSIONS.contains(mavenCompilerCompilerVersion)) {
+            properties.setProperty("maven.compiler.compilerVersion", "1.6");
+        }
+        String mavenCompileCompilerVersion = properties.getProperty("maven.compile.compilerVersion");
+        if (mavenCompileCompilerVersion != null && OLD_COMPILER_VERSIONS.contains(mavenCompileCompilerVersion)) {
+            properties.setProperty("maven.compile.compilerVersion", "1.6");
+        }
+        String mavenCompilerSource = properties.getProperty("maven.compiler.source");
+        if (mavenCompilerSource != null && OLD_COMPILER_VERSIONS.contains(mavenCompilerSource)) {
+            properties.setProperty("maven.compiler.source", "1.6");
+        }
+        String mavenCompileSource = properties.getProperty("maven.compile.source");
+        if (mavenCompileSource != null && OLD_COMPILER_VERSIONS.contains(mavenCompileSource)) {
+            properties.setProperty("maven.compile.source", "1.6");
+        }
+        String mavenCompilerTarget = properties.getProperty("maven.compiler.target");
+        if (mavenCompilerTarget != null && OLD_COMPILER_VERSIONS.contains(mavenCompilerTarget)) {
+            properties.setProperty("maven.compiler.target", "1.6");
+        }
+        String mavenCompileTarget = properties.getProperty("maven.compile.target");
+        if (mavenCompileTarget != null && OLD_COMPILER_VERSIONS.contains(mavenCompileTarget)) {
+            properties.setProperty("maven.compile.target", "1.6");
+        }
     }
 
     private void preprocessPom() {

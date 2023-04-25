@@ -1,4 +1,126 @@
 
+# 0.3.2
+## Changelog
+
+## 🐛 Fixes
+- d834103 fix: update versions for maven.compile(r) (#204)
+
+## 🧰 Tasks
+- 59bbbaf chore: releasing version 0.3.2
+- 12c1fca chore: setting SNAPSHOT version 0.3.2-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
+# 0.3.1
+## Changelog
+
+## 🐛 Fixes
+- e8eaf3c fix: remove instrumentation of throw instruction (#203)
+
+## 🔄️ Changes
+- db1ce2b refactor: create another methods.txt file for right version (#202)
+
+## 🧰 Tasks
+- bc28c84 chore: releasing version 0.3.1
+- 863364c chore: setting SNAPSHOT version 0.3.1-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
+# 0.3.0
+## Changelog
+
+## 🚀 Features
+- 029f638 feat: update properties to `1.6` if it is `5` or `1.5` (#199)
+
+## 🧰 Tasks
+- be45366 chore: releasing version 0.3.0
+- e0487dc chore: setting SNAPSHOT version 0.2.1-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
+# 0.2.0
+## Changelog
+
+## 🚀 Features
+- 64cc8c7 feat: add option to clean up generated directories after JVM exit (#197)
+
+## 🔄️ Changes
+- 385cd4c refactor: make hardcode consistent with actual behaviour (#193)
+
+## 🧰 Tasks
+- dc6034e chore: releasing version 0.2.0
+- a7be54a chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.60 (#194)
+- 63d627a chore: setting SNAPSHOT version 0.1.7-SNAPSHOT
+
+## 📝 Documentation
+- 65b48cc docs: fix default value of `numberOfArrayElements`
+- 3ed5dd7 docs: add artifact verification protocol (#189)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
+# 0.1.6
+## Changelog
+
+## 🐛 Fixes
+- e900ed1 fix: clone the first `20` elements of array (#191)
+
+## 🔄️ Changes
+- 96eeffa style: please spotless
+- 12f2ff0 revert: Revert "chore: releasing version 0.1.6"
+- 48f18e5 revert: Revert "chore: releasing version 0.1.6"
+- 1ffe9ee revert: Revert "chore: releasing version 0.1.6"
+- 80d89f3 revert: Revert "chore: releasing version 0.1.6"
+
+## 🧰 Tasks
+- f877f8c chore: releasing version 0.1.6
+- 2a95b17 chore: releasing version 0.1.6
+- a914931 chore: releasing version 0.1.6
+- bbb1504 chore: update jreleaser version
+- ff21763 chore: releasing version 0.1.6
+- 9531db9 chore: releasing version 0.1.6
+- b7d18c3 chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.15.0
+- a05227c chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.9.0
+- 16ad213 chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.5.0
+- cfef8f8 chore: configure maven central deployment (#186)
+- 54af9b0 chore: setting SNAPSHOT version 0.1.6-SNAPSHOT
+
+## 🛠  Build
+- 5057670 ci: comply with pomchecker run by jreleaser
+- c0e3970 ci: fix POM to comply with maven central requirements
+- aeb3003 ci: be consistent
+
+## 📝 Documentation
+- ffdbc72 docs: fix @throw docstring of MatchedLineFinder (#192)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.1.5
 ## Changelog
 

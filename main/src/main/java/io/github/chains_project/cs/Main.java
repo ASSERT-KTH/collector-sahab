@@ -13,9 +13,8 @@ import io.github.chains_project.tracediff.ExecDiffMain;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,6 +87,12 @@ public class Main implements Callable<Integer> {
             description = "Should random values be excluded?")
     private boolean excludeRandomValues;
 
+    @CommandLine.Option(
+            names = {"--cleanup"},
+            description = "The selected methods",
+            required = false)
+    private boolean cleanup = false;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Main()).execute(args);
         System.exit(exitCode);
@@ -98,6 +103,11 @@ public class Main implements Callable<Integer> {
         Pair<Revision, Revision> revisions = getRevisions(projectDirectory, leftHash, rightHash);
         Revision left = revisions.getLeft();
         Revision right = revisions.getRight();
+
+        // register shutdown hook to delete the temporary directory
+        if (cleanup) {
+            recursiveDeleteOnShutdownHook(left.getPath().getParent());
+        }
 
         Path leftClassfile = left.resolveFilename(classfileName);
         Path rightClassfile = right.resolveFilename(classfileName);
@@ -194,6 +204,33 @@ public class Main implements Callable<Integer> {
 
         ExecDiffMain.main(cmd.toArray(new String[0]));
         return 0;
+    }
+
+    private static void recursiveDeleteOnShutdownHook(final Path path) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                Files.walkFileTree(path, new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, @SuppressWarnings("unused") BasicFileAttributes attrs)
+                            throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                        if (e == null) {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        }
+                        // directory iteration failed
+                        throw e;
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to delete " + path, e);
+            }
+        }));
     }
 
     private static InvocationResult mavenTestInvoker(Revision project) throws IOException, MavenInvocationException {

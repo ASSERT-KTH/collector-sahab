@@ -35,7 +35,7 @@ jobs:
       - name: Install semversion
         run: go install github.com/ffurrer2/semver/cmd/semver@latest
       # Get current version from pom and remove snapshot if present.
-      - name: Get current version from pom and remove snapshot if present.
+      - name: Get current version from pom and remove snapshot if present
         run: echo "CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> $GITHUB_ENV
       - name: Get version with snapshot
         run: echo "CURRENT_VERSION_WITH_SNAPSHOT=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
@@ -67,7 +67,7 @@ jobs:
         uses: jreleaser/release-action@v2
         with:
           setup-java: false
-          version: 1.4.0
+          version: 1.5.1
           arguments: release
         env:
           JRELEASER_PROJECT_VERSION: ${{ env.NEXT_VERSION }}

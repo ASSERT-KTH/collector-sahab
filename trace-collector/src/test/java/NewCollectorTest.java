@@ -891,6 +891,36 @@ class NewCollectorTest {
         assertThat(expectedStackTrace, equalTo(stackFrameContext.getStackTrace()));
     }
 
+    @Test
+    void cloneArray_shouldOnlyCloneTheSpecifiedNumberOfElements() throws MavenInvocationException, IOException {
+        // arrange
+        File pomFile = new File("src/test/resources/array-value/pom.xml");
+
+        // act
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of("classesAndBreakpoints=src/test/resources/input.txt", "output=target/output.json"),
+                "-Dtest=ArrayValueTest#test");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/array-value/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(1));
+        assertThat(output.getBreakpoint().get(0).getLineNumber(), equalTo(10));
+
+        StackFrameContext stackFrameContext =
+                output.getBreakpoint().get(0).getStackFrameContext().get(0);
+        RuntimeValue localVariable =
+                stackFrameContext.getRuntimeValueCollection().get(0);
+        assertThat(localVariable.getName(), equalTo("array"));
+        List<?> arrayElementsAsValue = (List<?>) localVariable.getValue();
+        assertThat(arrayElementsAsValue.size(), equalTo(20));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException, IOException {
         // arrange

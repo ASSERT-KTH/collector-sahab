@@ -101,8 +101,10 @@ public class Classes {
     }
 
     public static Object cloneArray(Object array) {
-        int length = Array.getLength(array);
+        // We only clone the first 20 elements, because we don't want to clone huge arrays.
+        int length = Math.min(Array.getLength(array), 20);
         Object clonedArray = Array.newInstance(array.getClass().getComponentType(), length);
+        // ToDo: get this from `numberOfArrayElements` parameter
         for (int i = 0; i < length; i++) {
             Array.set(clonedArray, i, Array.get(array, i));
         }

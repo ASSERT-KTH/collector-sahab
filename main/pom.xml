@@ -4,10 +4,12 @@
   <parent>
     <groupId>io.github.chains-project</groupId>
     <artifactId>collector-sahab-parent-pom</artifactId>
-    <version>0.1.6-SNAPSHOT</version>
+    <version>0.3.3-SNAPSHOT</version>
   </parent>
   <artifactId>collector-sahab</artifactId>
   <name>Collector Sahab</name>
+  <description>Aggregator of Collector Sahab</description>
+  <url>https://github.com/ASSERT-KTH/collector-sahab/tree/main/main</url>
 
   <dependencies>
     <dependency>

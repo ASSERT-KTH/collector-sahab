@@ -5,6 +5,18 @@
 
 CLI to collect runtime context of a Java class.
 
+## Releases
+
+Our releases are signed using `travis-gumtree-spoon`'s GPG key. The key is hosted
+[here](https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x1429025e3eda19a5).
+You may run the following commands to verify the signature of a release.
+```shell
+gpg --recv-keys 1429025e3eda19a5
+gpg --verify collector-sahab-<VERSION>-jar-with-dependencies.jar.asc
+```
+> This signature is a type of [detached signature](https://en.wikipedia.org/wiki/Detached_signature),
+> so you need to have the JAR file as well to verify the signature.
+
 ## Structure of the project
 
 The project is divided into multiple submodules.
@@ -60,10 +72,11 @@ And finally, a maven project hosted on GitHub. :smile:
    1. `--selected-test` (list of tests separated by comma): The tests to be executed. Default is `[]` which
       runs every test in the target project.
    2. `--output-path` (string): The path where the output will be stored. Default is `output.html`.
+   3. `--cleanup` (boolean): Whether to clean up the temporary files created during execution. Default is `false`.
 
    Following parameters have not been added to `main`, but planned to be added in the future if needed.
    
-   1.  `numberOfArrayElements`: The number of array elements to be collected. Default is `10`.
+   1.  `numberOfArrayElements`: The number of array elements to be collected. Default is `20`.
 
    2. `extractParameters`: Whether to extract parameters of the method. Default is `false`. 
 
