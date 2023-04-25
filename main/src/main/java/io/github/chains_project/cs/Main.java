@@ -111,11 +111,12 @@ public class Main implements Callable<Integer> {
         Path outputLeft = left.getPath().resolve("output.json");
         Path inputRight = Files.writeString(right.getPath().resolve("input.txt"), matchedLines.getRight());
         Path outputRight = right.getPath().resolve("output.json");
-        Path methods = Files.writeString(left.getPath().resolve("methods.txt"), matchedLines.getMiddle());
+        Path methodsLeft = Files.writeString(left.getPath().resolve("methods.txt"), matchedLines.getMiddle());
+        Path methodsRight = Files.writeString(right.getPath().resolve("methods.txt"), matchedLines.getMiddle());
 
         CollectorAgentOptions optionsLeft = new CollectorAgentOptions();
         optionsLeft.setClassesAndBreakpoints(inputLeft.toAbsolutePath().toFile());
-        optionsLeft.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
+        optionsLeft.setMethodsForExitEvent(methodsLeft.toAbsolutePath().toFile());
         optionsLeft.setExecutionDepth(executionDepth);
         optionsLeft.setOutput(outputLeft.toAbsolutePath().toFile());
 
@@ -128,7 +129,7 @@ public class Main implements Callable<Integer> {
 
         CollectorAgentOptions optionsRight = new CollectorAgentOptions();
         optionsRight.setClassesAndBreakpoints(inputRight.toAbsolutePath().toFile());
-        optionsRight.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
+        optionsRight.setMethodsForExitEvent(methodsRight.toAbsolutePath().toFile());
         optionsRight.setExecutionDepth(executionDepth);
         optionsRight.setOutput(outputRight.toAbsolutePath().toFile());
 
