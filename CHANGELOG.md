@@ -1,4 +1,30 @@
 
+# 0.2.0
+## Changelog
+
+## 🚀 Features
+- 64cc8c7 feat: add option to clean up generated directories after JVM exit (#197)
+
+## 🔄️ Changes
+- 385cd4c refactor: make hardcode consistent with actual behaviour (#193)
+
+## 🧰 Tasks
+- dc6034e chore: releasing version 0.2.0
+- a7be54a chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.60 (#194)
+- 63d627a chore: setting SNAPSHOT version 0.1.7-SNAPSHOT
+
+## 📝 Documentation
+- 65b48cc docs: fix default value of `numberOfArrayElements`
+- 3ed5dd7 docs: add artifact verification protocol (#189)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.1.6
 ## Changelog
 
