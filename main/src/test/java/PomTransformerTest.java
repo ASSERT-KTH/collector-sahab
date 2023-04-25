@@ -369,24 +369,51 @@ class PomTransformerTest {
             assertThat(debugLevel, is(nullValue()));
         }
 
-        @Test
-        void modifyCompilerPlugin_shouldModifyProperties() throws XmlPullParserException, IOException {
-            // arrange;
-            PomTransformer transformer = new PomTransformer(Paths.get("src/test/resources/compiler/properties.xml"));
+        @Nested
+        class ModifyProperties {
 
-            Properties properties = transformer.getModel().getProperties();
-            assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("5")));
-            assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.5")));
-            assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("5")));
+            // https://github.com/ASSERT-KTH/collector-sahab-experiments/blob/master/Time-4/pom.xml#L698
+            @Test
+            void modifyCompilerPlugin_shouldModifyAllProperties() throws XmlPullParserException, IOException {
+                // arrange;
+                PomTransformer transformer =
+                        new PomTransformer(Paths.get("src/test/resources/compiler/properties.xml"));
 
-            // act
-            transformer.modifyProperties();
+                Properties properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("5")));
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.5")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("5")));
 
-            // assert
-            properties = transformer.getModel().getProperties();
-            assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("1.6")));
-            assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.6")));
-            assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("1.6")));
+                // act
+                transformer.modifyProperties();
+
+                // assert
+                properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(equalTo("1.6")));
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.6")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("1.6")));
+            }
+
+            // https://github.com/ASSERT-KTH/collector-sahab-experiments/blob/master/Math-2/pom.xml#L345
+            @Test
+            void modifyCompilerPlugin_shouldModifyFewProperties() throws XmlPullParserException, IOException {
+                // arrange;
+                PomTransformer transformer =
+                        new PomTransformer(Paths.get("src/test/resources/compiler/subset-of-properties.xml"));
+
+                Properties properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.compilerVersion"), is(nullValue()));
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.5")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("5")));
+
+                // act
+                transformer.modifyProperties();
+
+                // assert
+                properties = transformer.getModel().getProperties();
+                assertThat(properties.getProperty("maven.compiler.source"), is(equalTo("1.6")));
+                assertThat(properties.getProperty("maven.compiler.target"), is(equalTo("1.6")));
+            }
         }
     }
 }
