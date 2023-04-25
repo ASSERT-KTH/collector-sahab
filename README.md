@@ -72,6 +72,7 @@ And finally, a maven project hosted on GitHub. :smile:
    1. `--selected-test` (list of tests separated by comma): The tests to be executed. Default is `[]` which
       runs every test in the target project.
    2. `--output-path` (string): The path where the output will be stored. Default is `output.html`.
+   3. `--cleanup` (boolean): Whether to clean up the temporary files created during execution. Default is `false`.
 
    Following parameters have not been added to `main`, but planned to be added in the future if needed.
    
