@@ -1,4 +1,21 @@
 
+# 0.3.0
+## Changelog
+
+## 🚀 Features
+- 029f638 feat: update properties to `1.6` if it is `5` or `1.5` (#199)
+
+## 🧰 Tasks
+- be45366 chore: releasing version 0.3.0
+- e0487dc chore: setting SNAPSHOT version 0.2.1-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+
 # 0.2.0
 ## Changelog
 
