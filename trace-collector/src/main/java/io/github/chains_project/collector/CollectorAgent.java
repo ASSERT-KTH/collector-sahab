@@ -1,6 +1,5 @@
 package io.github.chains_project.collector;
 
-import static org.objectweb.asm.Opcodes.ATHROW;
 import static org.objectweb.asm.Opcodes.IRETURN;
 import static org.objectweb.asm.Opcodes.RETURN;
 
@@ -186,7 +185,7 @@ public class CollectorAgent {
     }
 
     private static boolean isItExitInstruction(int opCode) {
-        return (opCode >= IRETURN && opCode <= RETURN) || opCode == ATHROW;
+        return (opCode >= IRETURN && opCode <= RETURN);
     }
 
     private static StackManipulation.Compound getCallToEntryLogMethod(MethodNode method) throws NoSuchMethodException {
