@@ -9,7 +9,6 @@ import io.github.chains_project.cs.preprocess.PomTransformer;
 import io.github.chains_project.mlf.MatchedLineFinder;
 import io.github.chains_project.tracediff.Constants;
 import io.github.chains_project.tracediff.ExecDiffMain;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -145,7 +143,8 @@ public class Main implements Callable<Integer> {
             optionsLeft.setClassesAndBreakpoints(inputLeft.toAbsolutePath().toFile());
             optionsLeft.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
             optionsLeft.setExecutionDepth(executionDepth);
-            optionsLeft.setOutput(outputDirLeft.resolve(i + ".json").toAbsolutePath().toFile());
+            optionsLeft.setOutput(
+                    outputDirLeft.resolve(i + ".json").toAbsolutePath().toFile());
 
             for (Path pomFile : pomFilesLeft) {
                 // copy pom from backup
@@ -153,12 +152,12 @@ public class Main implements Callable<Integer> {
                 new PomTransformer(new Revision(pomFile.getParent(), leftHash), optionsLeft, selectedTests);
             }
 
-
             CollectorAgentOptions optionsRight = new CollectorAgentOptions();
             optionsRight.setClassesAndBreakpoints(inputRight.toAbsolutePath().toFile());
             optionsRight.setMethodsForExitEvent(methods.toAbsolutePath().toFile());
             optionsRight.setExecutionDepth(executionDepth);
-            optionsRight.setOutput(outputDirRight.resolve(i + ".json").toAbsolutePath().toFile());
+            optionsRight.setOutput(
+                    outputDirRight.resolve(i + ".json").toAbsolutePath().toFile());
 
             for (Path pomFile : pomFilesRight) {
                 Files.copy(pomFile.getParent().resolve("pom.xml.bak"), pomFile, StandardCopyOption.REPLACE_EXISTING);
@@ -245,8 +244,7 @@ public class Main implements Callable<Integer> {
         request.setBatchMode(true);
 
         Invoker invoker = new DefaultInvoker();
-        if (System.getenv().containsKey("MAVEN_HOME"))
-            invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+        if (System.getenv().containsKey("MAVEN_HOME")) invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
         return invoker.execute(request);
     }
 }

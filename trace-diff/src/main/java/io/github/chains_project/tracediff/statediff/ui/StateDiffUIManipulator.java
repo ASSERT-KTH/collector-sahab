@@ -11,7 +11,6 @@ import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
 import io.github.chains_project.tracediff.statediff.utils.ExecDiffHelper;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;

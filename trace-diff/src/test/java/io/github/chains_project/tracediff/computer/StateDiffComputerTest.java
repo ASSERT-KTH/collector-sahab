@@ -20,8 +20,7 @@ public class StateDiffComputerTest<R> {
     void computeStateDiff_simple_diffIsGenerated() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple");
         File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
-                rightSahabReport =
-                        simpleSahabDirectory.resolve("report/right").toFile(),
+                rightSahabReport = simpleSahabDirectory.resolve("report/right").toFile(),
                 lineMapping =
                         simpleSahabDirectory
                                 .resolve("project_data/line_mapping.csv")
@@ -67,8 +66,7 @@ public class StateDiffComputerTest<R> {
     void computeStateDiff_complex_diffIsGenerated() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/complex");
         File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
-                rightSahabReport =
-                        simpleSahabDirectory.resolve("report/right").toFile(),
+                rightSahabReport = simpleSahabDirectory.resolve("report/right").toFile(),
                 lineMapping =
                         simpleSahabDirectory
                                 .resolve("project_data/line_mapping.csv")
@@ -111,8 +109,7 @@ public class StateDiffComputerTest<R> {
     void computeStateDiff_simple_diffIsGenerated_two() throws IOException {
         Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple_two");
         File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
-                rightSahabReport =
-                        simpleSahabDirectory.resolve("report/right").toFile(),
+                rightSahabReport = simpleSahabDirectory.resolve("report/right").toFile(),
                 lineMapping =
                         simpleSahabDirectory
                                 .resolve("project_data/line_mapping.csv")
