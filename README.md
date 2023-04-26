@@ -2,6 +2,7 @@
 
 [![test](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml/badge.svg)](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml)
 [![integration-test](https://github.com/ASSERT-KTH/collector-sahab/actions/workflows/it.yml/badge.svg)](https://github.com/ASSERT-KTH/collector-sahab/actions/workflows/it.yml)
+[![maven central](https://maven-badges.herokuapp.com/maven-central/io.github.chains-project/collector-sahab/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.chains-project/collector-sahab)
 
 Collector Sahab is a tool to augment code diffs with runtime information. It works by instrumenting and running the versions before and after a commit, and then report the differences found in the runtime values.
 For more information, see our paper [Augmenting Diffs With Runtime Information](http://arxiv.org/pdf/2212.11077).
