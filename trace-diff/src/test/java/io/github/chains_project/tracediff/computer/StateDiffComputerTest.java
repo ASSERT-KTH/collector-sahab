@@ -60,6 +60,51 @@ public class StateDiffComputerTest<R> {
         assertNull(stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarVal());
     }
 
+    // data from https://github.com/khaes-kth/drr-execdiff/commit/649e9234549d2c74f1279499011da87638c2d718, depth=3
+    @Test
+    void computeStateDiff_simple_diffIsDifferentWhenRandomExcluded() throws IOException {
+        Path simpleSahabDirectory = Paths.get("src/test/resources/sahab_reports/simple_repeat");
+        File leftSahabReport = simpleSahabDirectory.resolve("report/left").toFile(),
+                rightSahabReport = simpleSahabDirectory.resolve("report/right").toFile(),
+                lineMapping =
+                        simpleSahabDirectory
+                                .resolve("project_data/line_mapping.csv")
+                                .toFile(),
+                leftLineToVarFile =
+                        simpleSahabDirectory
+                                .resolve("project_data/left_line_to_var.csv")
+                                .toFile(),
+                rightLineToVarFile =
+                        simpleSahabDirectory
+                                .resolve("project_data/right_line_to_var.csv")
+                                .toFile();
+
+        Map<Integer, Set<String>> leftLineToVars = readLineVarsFromFile(leftLineToVarFile),
+                rightLineToVars = readLineVarsFromFile(rightLineToVarFile);
+
+        Pair<Map<Integer, Integer>, Map<Integer, Integer>> mappings = readMappingsFromFile(lineMapping);
+
+        StateDiffComputer sdc = new StateDiffComputer(
+                leftSahabReport,
+                rightSahabReport,
+                mappings.getLeft(),
+                mappings.getRight(),
+                leftLineToVars,
+                rightLineToVars,
+                List.of("test::test"));
+
+        ProgramStateDiff stateDiff = sdc.computeProgramStateDiff();
+
+        assertEquals(
+                "{return-object}.iID=TestDTZ1",
+                stateDiff.getOriginalUniqueReturn().getFirstUniqueVarVal());
+        assertEquals("{return-object}=null", stateDiff.getPatchedUniqueReturn().getFirstUniqueVarVal());
+
+        assertNotEquals(
+                "iRules.size=2", stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarVal());
+        assertNull(stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarVal());
+    }
+
     // breakpoint from: https://github.com/khaes-kth/drr-execdiff/commit/1c04679173a46faa59e73f68def33f60843f8beb
     // only a part of breakpoint data is stored in 0.json
     @Test
