@@ -3,7 +3,8 @@
 [![test](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml/badge.svg)](https://github.com/algomaster99/collector-sahab/actions/workflows/tests.yml)
 [![integration-test](https://github.com/ASSERT-KTH/collector-sahab/actions/workflows/it.yml/badge.svg)](https://github.com/ASSERT-KTH/collector-sahab/actions/workflows/it.yml)
 
-CLI to collect runtime context of a Java class.
+Collector Sahab is a tool to augment code diffs with runtime information. It works by instrumenting and running the versions before and after a commit, and then report the differences found in the runtime values.
+For more information, see our paper [Augmenting Diffs With Runtime Information](http://arxiv.org/pdf/2212.11077).
 
 ## Releases
 
