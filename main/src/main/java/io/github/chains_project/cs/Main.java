@@ -80,8 +80,9 @@ public class Main implements Callable<Integer> {
 
     @CommandLine.Option(
             names = {Constants.ARG_EXCLUDE_RANDOM_VALUES},
-            description = "Should random values be excluded?")
-    private boolean excludeRandomValues;
+            description = "Whether to exclude random values",
+            required = false)
+    private boolean excludeRandomValues = false;
 
     @CommandLine.Option(
             names = {"--cleanup"},
