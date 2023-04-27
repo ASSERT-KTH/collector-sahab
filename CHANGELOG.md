@@ -1,4 +1,30 @@
 
+# 0.4.0
+## Changelog
+
+## 🚀 Features
+- 89fdf98 feat: exclude random values (#205)
+
+## 🧰 Tasks
+- 4ba3a0c chore: releasing version 0.4.0
+- f4a8c34 chore(deps): update dependency org.junit.jupiter:junit-jupiter to v5.9.3
+- cb92601 chore(deps): update dependency org.jacoco:jacoco-maven-plugin to v0.8.10
+- ae11acb chore: setting SNAPSHOT version 0.3.4-SNAPSHOT
+
+## 📝 Documentation
+- bba4f00 docs: add maven central badge
+- 43ec451 docs: update description of tool (#209)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- Khashayar Etemadi ([@khaes-kth](https://github.com/khaes-kth))
+- Martin Monperrus ([@monperrus](https://github.com/monperrus))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.3.3
 ## Changelog
 
