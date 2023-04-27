@@ -14,8 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -179,29 +177,30 @@ public class Main implements Callable<Integer> {
         //        String testLink,
         //        String outputPath,
         //        String allDiffsReportPath)
-        List<String> cmd = new ArrayList<>(Arrays.asList(
-                "sdiff",
-                Constants.ARG_SLUG,
-                slug,
-                Constants.ARG_COMMIT,
-                right.getHash(),
-                Constants.ARG_LEFT_REPORT_PATH,
-                outputDirLeft.toAbsolutePath().toString(),
-                Constants.ARG_RIGHT_REPORT_PATH,
-                outputDirRight.toAbsolutePath().toString(),
-                Constants.ARG_LEFT_SRC_PATH,
-                left.resolveFilename(classfileName).toAbsolutePath().toString(),
-                Constants.ARG_RIGHT_SRC_PATH,
-                right.resolveFilename(classfileName).toAbsolutePath().toString(),
-                // ghFullDiff is null
-                Constants.ARG_SELECTED_TESTS,
-                String.join(",", selectedTests),
-                Constants.ARG_TEST_LINK,
-                "https://github.com/ASSERT-KTH",
-                Constants.ARG_OUTPUT_PATH,
-                outputPath));
+        String[] cmd = {
+            "sdiff",
+            Constants.ARG_SLUG,
+            slug,
+            Constants.ARG_COMMIT,
+            right.getHash(),
+            Constants.ARG_LEFT_REPORT_PATH,
+            outputDirLeft.toAbsolutePath().toString(),
+            Constants.ARG_RIGHT_REPORT_PATH,
+            outputDirRight.toAbsolutePath().toString(),
+            Constants.ARG_LEFT_SRC_PATH,
+            left.resolveFilename(classfileName).toAbsolutePath().toString(),
+            Constants.ARG_RIGHT_SRC_PATH,
+            right.resolveFilename(classfileName).toAbsolutePath().toString(),
+            // ghFullDiff is null
+            Constants.ARG_SELECTED_TESTS,
+            String.join(",", selectedTests),
+            Constants.ARG_TEST_LINK,
+            "https://github.com/ASSERT-KTH",
+            Constants.ARG_OUTPUT_PATH,
+            outputPath
+        };
 
-        ExecDiffMain.main(cmd.toArray(new String[0]));
+        ExecDiffMain.main(cmd);
         return 0;
     }
 
