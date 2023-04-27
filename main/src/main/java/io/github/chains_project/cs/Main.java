@@ -244,7 +244,6 @@ public class Main implements Callable<Integer> {
         request.setBatchMode(true);
 
         Invoker invoker = new DefaultInvoker();
-        if (System.getenv().containsKey("MAVEN_HOME")) invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
         return invoker.execute(request);
     }
 }
