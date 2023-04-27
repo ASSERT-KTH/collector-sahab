@@ -6,35 +6,35 @@ import io.github.chains_project.cs.commons.Pair;
 import io.github.chains_project.cs.commons.runtime.LineSnapshot;
 import io.github.chains_project.cs.commons.runtime.RuntimeReturnedValue;
 import io.github.chains_project.cs.commons.runtime.RuntimeValue;
-import io.github.chains_project.cs.commons.runtime.StackFrameContext;
 import io.github.chains_project.cs.commons.runtime.output.SahabOutput;
 import io.github.chains_project.tracediff.Constants;
-import io.github.chains_project.tracediff.models.VarValsSet;
 import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 public class StateDiffComputer {
-    private File leftSahabReport, rightSahabReport;
+    private File leftSahabReportDir, rightSahabReportDir;
     private Map<Integer, Integer> leftRightLineMapping, rightLeftLineMapping;
     private Map<Integer, Set<String>> leftLineToVars, rightLineToVars;
     private List<String> tests;
 
     public StateDiffComputer(
-            File leftSahabReport,
-            File rightSahabReport,
+            File leftSahabReportDir,
+            File rightSahabReportDir,
             Map<Integer, Integer> leftRightLineMapping,
             Map<Integer, Integer> rightLeftLineMapping,
             Map<Integer, Set<String>> leftLineToVars,
             Map<Integer, Set<String>> rightLineToVars,
             List<String> tests)
             throws IOException {
-        this.leftSahabReport = leftSahabReport;
-        this.rightSahabReport = rightSahabReport;
+        this.leftSahabReportDir = leftSahabReportDir;
+        this.rightSahabReportDir = rightSahabReportDir;
         this.leftLineToVars = leftLineToVars;
         this.rightLineToVars = rightLineToVars;
         this.leftRightLineMapping = leftRightLineMapping;
@@ -42,108 +42,115 @@ public class StateDiffComputer {
         this.tests = tests;
     }
 
-    public ProgramStateDiff computeProgramStateDiff(PrintWriter diffPrinter) throws IOException {
+    public ProgramStateDiff computeProgramStateDiff() throws IOException {
         ProgramStateDiff programStateDiff = new ProgramStateDiff();
 
         programStateDiff.setFirstOriginalUniqueStateSummary(getFirstDistinctStateOnRelevantLine(
-                leftLineToVars, leftRightLineMapping, leftSahabReport, rightSahabReport, diffPrinter));
+                leftLineToVars, leftRightLineMapping, leftSahabReportDir, rightSahabReportDir));
 
         programStateDiff.setFirstPatchedUniqueStateSummary(getFirstDistinctStateOnRelevantLine(
-                rightLineToVars, rightLeftLineMapping, rightSahabReport, leftSahabReport, diffPrinter));
+                rightLineToVars, rightLeftLineMapping, rightSahabReportDir, leftSahabReportDir));
 
         programStateDiff.setOriginalUniqueReturn(
-                getFirstUniqueReturn(leftRightLineMapping, leftSahabReport, rightSahabReport, diffPrinter));
+                getFirstUniqueReturn(leftRightLineMapping, leftSahabReportDir, rightSahabReportDir));
 
         programStateDiff.setPatchedUniqueReturn(
-                getFirstUniqueReturn(rightLeftLineMapping, rightSahabReport, leftSahabReport, diffPrinter));
+                getFirstUniqueReturn(rightLeftLineMapping, rightSahabReportDir, leftSahabReportDir));
 
         return programStateDiff;
     }
 
-    private void printIfNeeded(String title, String line, PrintWriter printer) {
-        if (printer != null) {
-            printer.println(title);
-            printer.println(line);
-            printer.flush();
-        }
-    }
-
     private ProgramStateDiff.UniqueReturnSummary getFirstUniqueReturn(
-            Map<Integer, Integer> lineMapping,
-            File sahabReportFile,
-            File oppositeSahabReportFile,
-            PrintWriter diffPrinter)
-            throws IOException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        SahabOutput sahabOutputLeft =
-                mapper.readValue(new FileReader(sahabReportFile, StandardCharsets.UTF_8), SahabOutput.class);
-        List<RuntimeReturnedValue> jsonStates = sahabOutputLeft.getReturns();
-
-        SahabOutput sahabOutputRight =
-                mapper.readValue(new FileReader(oppositeSahabReportFile, StandardCharsets.UTF_8), SahabOutput.class);
-        List<RuntimeReturnedValue> oppositeJsonStates = sahabOutputRight.getReturns();
-
-        List<Pair<Integer, Integer>> hashes = getHashedReturnStates(jsonStates),
-                oppositeHashes = getHashedReturnStates(oppositeJsonStates);
-
-        Map<Integer, List<Integer>> oppositeLineToStateIndices = getLineToStateIndices(oppositeHashes);
-
-        Map<Integer, Set<Integer>> oppositeLineToStates = getLineToStates(oppositeHashes);
+            Map<Integer, Integer> lineMapping, File sahabReportDir, File oppositeSahabReportDir) throws IOException {
 
         ProgramStateDiff.UniqueReturnSummary firstUniqueReturnSummary = new ProgramStateDiff.UniqueReturnSummary();
+        ObjectMapper mapper = new ObjectMapper();
 
-        for (int i = 0; i < hashes.size(); i++) {
-            Pair<Integer, Integer> p = hashes.get(i);
-            int lineNumber = p.getLeft(), stateHash = p.getRight();
+        Map<Integer, Integer> reverseLineMapping =
+                lineMapping.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        Set<Integer> oppositeHashes = new HashSet<>();
 
-            if (!lineMapping.containsKey(lineNumber)) continue;
+        int cnt = 0;
+        Path reportPath = oppositeSahabReportDir.toPath().resolve(cnt + ".json");
+        while (reportPath.toFile().exists()) {
+            SahabOutput sahabOutputRight = mapper.readValue(
+                    new FileReader(reportPath.toFile(), StandardCharsets.UTF_8), new TypeReference<>() {});
+            List<RuntimeReturnedValue> jsonStates = sahabOutputRight.getReturns();
+            oppositeHashes.addAll(getHashedReturnStates(jsonStates, reverseLineMapping, true));
 
-            int oppositeLineNumber = lineMapping.get(lineNumber);
+            reportPath = oppositeSahabReportDir.toPath().resolve(++cnt + ".json");
+        }
 
-            if (!oppositeLineToStates.containsKey(oppositeLineNumber)
-                    || !oppositeLineToStates.get(oppositeLineNumber).contains(stateHash)) {
-                // this stateHash is not covered in the opposite version
+        reportPath = sahabReportDir.toPath().resolve("0.json");
+        SahabOutput sahabOutputLeft =
+                mapper.readValue(new FileReader(reportPath.toFile(), StandardCharsets.UTF_8), new TypeReference<>() {});
+        List<RuntimeReturnedValue> jsonStates = sahabOutputLeft.getReturns();
 
-                printIfNeeded(
-                        "Unique return state at line " + lineNumber,
-                        jsonStates.get(i).toString(),
-                        diffPrinter);
+        Set<Integer> hashes = getHashedReturnStates(jsonStates, reverseLineMapping, false);
+        hashes.removeAll(oppositeHashes);
 
-                if (firstUniqueReturnSummary.getFirstUniqueReturnHash() == null) {
-                    firstUniqueReturnSummary.setFirstUniqueReturnHash(stateHash);
-                    firstUniqueReturnSummary.setFirstUniqueReturnLine(lineNumber);
-                }
+        List<Pair<Integer, String>> lastVarVals = null;
+        if (cnt == 1) {
+            lastVarVals = getReturnStateVals(jsonStates);
+        }
 
-                VarValsSet distinctVarVals = identifyDistinctReturnVarVal(
-                        jsonStates.get(i), oppositeJsonStates, oppositeLineToStateIndices.get(oppositeLineNumber));
+        for (int i = 1; i < cnt; i++) {
+            reportPath = sahabReportDir.toPath().resolve(i + ".json");
+            sahabOutputLeft = mapper.readValue(
+                    new FileReader(reportPath.toFile(), StandardCharsets.UTF_8), new TypeReference<>() {});
+            jsonStates = sahabOutputLeft.getReturns();
+            hashes.retainAll(getHashedReturnStates(jsonStates, reverseLineMapping, false));
 
-                for (String varVal : distinctVarVals.getAllVals()) {
-                    printIfNeeded("Unique return var-val at line " + lineNumber, varVal, diffPrinter);
-                }
+            if (i == cnt - 1) {
+                lastVarVals = getReturnStateVals(jsonStates);
+            }
+        }
 
-                String selectedVarVal = distinctVarVals.getSelectedVal();
-
-                if (selectedVarVal != null && firstUniqueReturnSummary.getFirstUniqueVarVal() == null) {
-                    String executedTest = getMatchingTest(jsonStates.get(i).getStackTrace());
-                    firstUniqueReturnSummary.setDifferencingTest(executedTest);
-                    firstUniqueReturnSummary.setFirstUniqueVarValLine(lineNumber);
-                    firstUniqueReturnSummary.setFirstUniqueVarVal(selectedVarVal);
-
-                    if (diffPrinter == null) break;
-                }
+        for (int i = 0; i < lastVarVals.size(); i++) {
+            Pair<Integer, String> p = lastVarVals.get(i);
+            if (hashes.contains(getVarValHash(p.getLeft(), p.getRight()))) {
+                // FIXME: this is not correct, we should get the test that executed the line
+                String executedTest = getMatchingTest(jsonStates.get(0).getStackTrace());
+                firstUniqueReturnSummary.setDifferencingTest(executedTest);
+                firstUniqueReturnSummary.setFirstUniqueVarValLine(p.getLeft());
+                firstUniqueReturnSummary.setFirstUniqueVarVal(p.getRight());
+                break;
             }
         }
 
         return firstUniqueReturnSummary;
     }
 
-    private List<Pair<Integer, Integer>> getHashedReturnStates(List<RuntimeReturnedValue> ja) {
-        List<Pair<Integer, Integer>> hashes = new ArrayList<>();
+    private List<Pair<Integer, String>> getReturnStateVals(List<RuntimeReturnedValue> jsonStates) {
+        List<Pair<Integer, String>> ret = new ArrayList<>();
+
+        for (int i = 0; i < jsonStates.size(); i++) {
+            RuntimeReturnedValue jo = jsonStates.get(i);
+            int linenumber = Integer.parseInt(jo.getLocation().split(":")[1]);
+            List<String> returnVarVals = new ArrayList<>(extractVarVals("{return-object}", jo));
+            Collections.sort(returnVarVals, new Comparator<String>() {
+                @Override
+                public int compare(String s1, String s2) {
+                    if (StringUtils.countMatches(s1, '.') < StringUtils.countMatches(s2, '.')) return -1;
+                    if (StringUtils.countMatches(s1, '.') > StringUtils.countMatches(s2, '.')) return 1;
+                    if (s1.length() < s2.length()) return -1;
+                    if (s1.length() > s2.length()) return 1;
+                    return 0;
+                }
+            });
+            returnVarVals.forEach(varVal -> ret.add(new Pair<Integer, String>(linenumber, varVal)));
+        }
+
+        return ret;
+    }
+
+    private Set<Integer> getHashedReturnStates(
+            List<RuntimeReturnedValue> ja, Map<Integer, Integer> reverseLineMapping, boolean isOpposite) {
+        Set<Integer> hashes = new HashSet<>();
 
         for (int i = 0; i < ja.size(); i++) {
             RuntimeReturnedValue jo = ja.get(i);
-            hashes.add(returnStateJsonToHash(jo));
+            hashes.addAll(returnStateJsonToHash(jo, reverseLineMapping, isOpposite));
         }
 
         return hashes;
@@ -153,71 +160,131 @@ public class StateDiffComputer {
     private ProgramStateDiff.UniqueStateSummary getFirstDistinctStateOnRelevantLine(
             Map<Integer, Set<String>> lineToVars,
             Map<Integer, Integer> lineMapping,
-            File sahabReportFile,
-            File oppositeSahabReportFile,
-            PrintWriter diffPrinter)
+            File sahabReportDir,
+            File oppositeSahabReportDir)
             throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        SahabOutput sahabOutputLeft =
-                mapper.readValue(new FileReader(sahabReportFile, StandardCharsets.UTF_8), new TypeReference<>() {});
-        List<LineSnapshot> jsonStates = sahabOutputLeft.getBreakpoint();
-
-        SahabOutput sahabOutputRight = mapper.readValue(
-                new FileReader(oppositeSahabReportFile, StandardCharsets.UTF_8), new TypeReference<>() {});
-        List<LineSnapshot> oppositeJsonStates = sahabOutputRight.getBreakpoint();
-
-        List<Pair<Integer, Integer>> hashes = getHashedBreakpointStates(jsonStates),
-                oppositeHashes = getHashedBreakpointStates(oppositeJsonStates);
-
-        Map<Integer, List<Integer>> oppositeLineToStateIndices = getLineToStateIndices(oppositeHashes);
-
-        Map<Integer, Set<Integer>> oppositeLineToStates = getLineToStates(oppositeHashes);
-
         ProgramStateDiff.UniqueStateSummary firstUniqueStateSummary = new ProgramStateDiff.UniqueStateSummary();
-        for (int i = 0; i < hashes.size(); i++) {
-            Pair<Integer, Integer> p = hashes.get(i);
-            int lineNumber = p.getLeft(), stateHash = p.getRight();
+        ObjectMapper mapper = new ObjectMapper();
 
-            if (!lineMapping.containsKey(lineNumber)) continue;
+        Map<Integer, Integer> reverseLineMapping =
+                lineMapping.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        Set<Integer> oppositeHashes = new HashSet<>();
 
-            int oppositeLineNumber = lineMapping.get(lineNumber);
+        int cnt = 0;
+        Path reportPath = oppositeSahabReportDir.toPath().resolve(cnt + ".json");
+        while (reportPath.toFile().exists()) {
+            SahabOutput sahabOutputRight = mapper.readValue(
+                    new FileReader(reportPath.toFile(), StandardCharsets.UTF_8), new TypeReference<>() {});
+            List<LineSnapshot> oppositeLineSnapshots = sahabOutputRight.getBreakpoint();
+            oppositeHashes.addAll(getVarValHashes(oppositeLineSnapshots, lineToVars, reverseLineMapping, true));
 
-            if (!oppositeLineToStates.containsKey(oppositeLineNumber)
-                    || !oppositeLineToStates.get(oppositeLineNumber).contains(stateHash)) {
-                // this stateHash is not covered in the opposite version
+            reportPath = oppositeSahabReportDir.toPath().resolve(++cnt + ".json");
+        }
 
-                printIfNeeded(
-                        "Unique state at line " + lineNumber, jsonStates.get(i).toString(), diffPrinter);
+        reportPath = sahabReportDir.toPath().resolve("0.json");
+        SahabOutput sahabOutputLeft =
+                mapper.readValue(new FileReader(reportPath.toFile(), StandardCharsets.UTF_8), new TypeReference<>() {});
+        List<LineSnapshot> lineSnapshots = sahabOutputLeft.getBreakpoint();
 
-                if (firstUniqueStateSummary.getFirstUniqueStateHash() == null) {
-                    firstUniqueStateSummary.setFirstUniqueStateHash(stateHash);
-                    firstUniqueStateSummary.setFirstUniqueStateLine(lineNumber);
-                }
+        Set<Integer> hashes = getVarValHashes(lineSnapshots, lineToVars, reverseLineMapping, false);
+        hashes.removeAll(oppositeHashes);
 
-                VarValsSet distinctVarVals = identifyDistinctBreakpointVarVal(
-                        jsonStates.get(i),
-                        lineToVars.get(lineNumber),
-                        oppositeJsonStates,
-                        oppositeLineToStateIndices.get(oppositeLineNumber));
+        List<Pair<Integer, String>> lastVarVals = null;
+        if (cnt == 1) {
+            lastVarVals = getLineStateVals(lineSnapshots, lineToVars);
+        }
 
-                for (String varVal : distinctVarVals.getAllVals()) {
-                    printIfNeeded("Unique state var-val at line " + lineNumber, varVal, diffPrinter);
-                }
+        for (int i = 1; i < cnt; i++) {
+            reportPath = sahabReportDir.toPath().resolve(i + ".json");
+            sahabOutputLeft = mapper.readValue(
+                    new FileReader(reportPath.toFile(), StandardCharsets.UTF_8), new TypeReference<>() {});
+            lineSnapshots = sahabOutputLeft.getBreakpoint();
+            hashes.retainAll(getVarValHashes(lineSnapshots, lineToVars, reverseLineMapping, false));
 
-                String selectedVarVal = distinctVarVals.getSelectedVal();
+            if (i == cnt - 1) {
+                lastVarVals = getLineStateVals(lineSnapshots, lineToVars);
+            }
+        }
 
-                if (selectedVarVal != null && firstUniqueStateSummary.getFirstUniqueVarVal() == null) {
-                    String executedTest = getMatchingTest(
-                            jsonStates.get(i).getStackFrameContext().get(0).getStackTrace());
-                    firstUniqueStateSummary.setDifferencingTest(executedTest);
-                    firstUniqueStateSummary.setFirstUniqueVarValLine(lineNumber);
-                    firstUniqueStateSummary.setFirstUniqueVarVal(selectedVarVal);
-                    if (diffPrinter == null) break;
-                }
+        for (int i = 0; i < lastVarVals.size(); i++) {
+            Pair<Integer, String> p = lastVarVals.get(i);
+            if (hashes.contains(getVarValHash(p.getLeft(), p.getRight()))) {
+                // FIXME: this is not correct, we should get the test that executed the line
+                String executedTest = getMatchingTest(
+                        lineSnapshots.get(0).getStackFrameContext().get(0).getStackTrace());
+                firstUniqueStateSummary.setDifferencingTest(executedTest);
+                firstUniqueStateSummary.setFirstUniqueVarValLine(p.getLeft());
+                firstUniqueStateSummary.setFirstUniqueVarVal(p.getRight());
+                break;
             }
         }
 
         return firstUniqueStateSummary;
+    }
+
+    private int getVarValHash(int line, String varVal) {
+        return (line + ":" + varVal).hashCode();
+    }
+
+    private Set<Integer> getVarValHashes(
+            List<LineSnapshot> lineSnapshots,
+            Map<Integer, Set<String>> lineToVars,
+            Map<Integer, Integer> reverseLineMapping,
+            boolean isOpposite) {
+        Set<Integer> varValHashes = new HashSet<>();
+
+        for (int i = 0; i < lineSnapshots.size(); i++) {
+            LineSnapshot lineSnapshot = lineSnapshots.get(i);
+
+            if (isOpposite) {
+                if (!reverseLineMapping.containsKey(lineSnapshot.getLineNumber())) continue;
+            } else {
+                if (!reverseLineMapping.containsValue(lineSnapshot.getLineNumber())) continue;
+            }
+
+            int originalLineNumber =
+                    !isOpposite ? lineSnapshot.getLineNumber() : reverseLineMapping.get(lineSnapshot.getLineNumber());
+
+            if (!lineToVars.containsKey(originalLineNumber)) continue;
+
+            extractVarVals(
+                            lineSnapshot.getStackFrameContext().get(0).getRuntimeValueCollection(),
+                            lineToVars.get(originalLineNumber),
+                            true)
+                    .forEach(s -> varValHashes.add(getVarValHash(originalLineNumber, s)));
+        }
+
+        return varValHashes;
+    }
+
+    private List<Pair<Integer, String>> getLineStateVals(
+            List<LineSnapshot> lineSnapshots, Map<Integer, Set<String>> lineToVars) {
+        List<Pair<Integer, String>> lineStateVals = new ArrayList<>();
+
+        for (int i = 0; i < lineSnapshots.size(); i++) {
+            LineSnapshot lineSnapshot = lineSnapshots.get(i);
+
+            if (!lineToVars.containsKey(lineSnapshot.getLineNumber())) continue;
+
+            List<String> varVals = new ArrayList<>(extractVarVals(
+                    lineSnapshot.getStackFrameContext().get(0).getRuntimeValueCollection(),
+                    lineToVars.get(lineSnapshot.getLineNumber()),
+                    true));
+            Collections.sort(varVals, new Comparator<String>() {
+                @Override
+                public int compare(String s1, String s2) {
+                    if (StringUtils.countMatches(s1, '.') < StringUtils.countMatches(s2, '.')) return -1;
+                    if (StringUtils.countMatches(s1, '.') > StringUtils.countMatches(s2, '.')) return 1;
+                    if (s1.length() < s2.length()) return -1;
+                    if (s1.length() > s2.length()) return 1;
+                    return 0;
+                }
+            });
+
+            varVals.forEach(s -> lineStateVals.add(new Pair(lineSnapshot.getLineNumber(), s)));
+        }
+
+        return lineStateVals;
     }
 
     private String getMatchingTest(List<String> stackTraceJa) {
@@ -235,72 +302,6 @@ public class StateDiffComputer {
         return Constants.UNKNOWN_TEST;
     }
 
-    private VarValsSet identifyDistinctReturnVarVal(
-            RuntimeReturnedValue jsonState,
-            List<RuntimeReturnedValue> oppositeJsonStates,
-            List<Integer> oppositeTargetStateIndices)
-            throws IOException {
-        Set<String> distinctVarVals = extractVarVals("{return-object}", jsonState);
-
-        if (oppositeTargetStateIndices != null)
-            for (int ind : oppositeTargetStateIndices) {
-                RuntimeReturnedValue oppositeState = oppositeJsonStates.get(ind);
-                distinctVarVals.removeAll(extractVarVals("{return-object}", oppositeState));
-            }
-
-        String shortestDistinctVarVal = null;
-
-        for (String varVal : distinctVarVals) {
-            if (shortestDistinctVarVal == null) shortestDistinctVarVal = varVal;
-            else {
-                int shortestLen = shortestDistinctVarVal.length(),
-                        shortestParts = shortestDistinctVarVal.split("=")[0].split(".").length,
-                        curParts = varVal.split("=")[0].split(".").length,
-                        curLen = varVal.length();
-
-                if (shortestParts > curParts || (shortestParts == curParts && shortestLen > curLen))
-                    shortestDistinctVarVal = varVal;
-            }
-        }
-
-        return new VarValsSet(distinctVarVals, shortestDistinctVarVal);
-    }
-
-    private VarValsSet identifyDistinctBreakpointVarVal(
-            LineSnapshot jsonState,
-            Set<String> lineVars,
-            List<LineSnapshot> oppositeJsonStates,
-            List<Integer> oppositeTargetStateIndices)
-            throws IOException {
-        List<RuntimeValue> valueCollection = breakpointStateToValueCollection(jsonState);
-
-        Set<String> distinctVarVals = extractVarVals(valueCollection, lineVars, true);
-
-        if (oppositeTargetStateIndices != null)
-            for (int ind : oppositeTargetStateIndices) {
-                List<RuntimeValue> oppositeValueCollection =
-                        breakpointStateToValueCollection(oppositeJsonStates.get(ind));
-                distinctVarVals.removeAll(extractVarVals(oppositeValueCollection, lineVars, true));
-            }
-
-        String shortestDistinctVarVal = null;
-
-        for (String varVal : distinctVarVals) {
-            if (shortestDistinctVarVal == null) shortestDistinctVarVal = varVal;
-            else {
-                int shortestLen = shortestDistinctVarVal.length(),
-                        shortestParts = shortestDistinctVarVal.split(".").length,
-                        curParts = varVal.split(".").length,
-                        curLen = varVal.length();
-
-                if (shortestParts > curParts || (shortestParts == curParts && shortestLen > curLen))
-                    shortestDistinctVarVal = varVal;
-            }
-        }
-
-        return new VarValsSet(distinctVarVals, shortestDistinctVarVal);
-    }
-
     private Set<String> extractVarVals(
             List<RuntimeValue> valueCollection, Set<String> lineVarsLst, boolean checkLineVars) {
         Set<String> varVals = new HashSet<>();
@@ -316,6 +317,11 @@ public class StateDiffComputer {
 
     private Set<String> extractVarVals(String prefix, RuntimeValue valueJo) {
         Set<String> varVals = new HashSet<>();
+
+        if (Constants.FILE_RELATED_CLASSES.stream().anyMatch(valueJo.getType()::contains)) {
+            return varVals;
+        }
+
         if (valueJo.getFields() != null && !valueJo.getFields().isEmpty()) {
             if (valueJo.getKind() == RuntimeValue.Kind.RETURN) {
                 prefix += ".";
@@ -353,58 +359,18 @@ public class StateDiffComputer {
         return varVals;
     }
 
-    private List<RuntimeValue> breakpointStateToValueCollection(LineSnapshot state) {
-        return state.getStackFrameContext().get(0).getRuntimeValueCollection();
-    }
-
-    // Gives Json indices that correspond to states of a line
-    private Map<Integer, List<Integer>> getLineToStateIndices(List<Pair<Integer, Integer>> lineToHashes) {
-        Map<Integer, List<Integer>> ret = new HashMap<>();
-
-        for (int i = 0; i < lineToHashes.size(); i++) {
-            int lineNumber = lineToHashes.get(i).getLeft();
-            if (!ret.containsKey(lineNumber)) ret.put(lineNumber, new ArrayList<>());
-            ret.get(lineNumber).add(i);
-        }
-
-        return ret;
-    }
-
-    private Map<Integer, Set<Integer>> getLineToStates(List<Pair<Integer, Integer>> lineToHashes) {
-        Map<Integer, Set<Integer>> ret = new HashMap<>();
-
-        for (Pair<Integer, Integer> p : lineToHashes) {
-            int lineNumber = p.getLeft(), state = p.getRight();
-            if (!ret.containsKey(lineNumber)) ret.put(lineNumber, new HashSet<>());
-            ret.get(lineNumber).add(state);
-        }
-
-        return ret;
-    }
-
-    // returns pair of (lineNumber, stateHash)
-    private List<Pair<Integer, Integer>> getHashedBreakpointStates(List<LineSnapshot> ja) {
-        List<Pair<Integer, Integer>> hashedStates = new ArrayList<>();
-
-        for (LineSnapshot jo : ja) {
-            hashedStates.add(breakpointStateJsonToHashedStatePair(jo));
-        }
-
-        return hashedStates;
-    }
-
-    // Left of return is the lineNumber and right is the state hashhash
-    private Pair<Integer, Integer> breakpointStateJsonToHashedStatePair(LineSnapshot stateJO) {
-        int lineNumber = stateJO.getLineNumber();
-        StackFrameContext stackFrameContextJO = stateJO.getStackFrameContext().get(0);
-        return new Pair<>(
-                lineNumber,
-                stackFrameContextJO.getRuntimeValueCollection().toString().hashCode());
-    }
-
-    private Pair<Integer, Integer> returnStateJsonToHash(RuntimeReturnedValue stateJO) {
+    private Set<Integer> returnStateJsonToHash(
+            RuntimeReturnedValue stateJO, Map<Integer, Integer> reverseLineMapping, boolean isOpposite) {
         int lineNumber = Integer.parseInt(stateJO.getLocation().split(":")[1]);
-        return new Pair<>(
-                lineNumber, ("" + stateJO.getFields() + stateJO.getValue() + stateJO.getArrayElements()).hashCode());
+        if (isOpposite) {
+            if (!reverseLineMapping.containsKey(lineNumber)) return new HashSet<>();
+        } else {
+            if (!reverseLineMapping.containsValue(lineNumber)) return new HashSet<>();
+        }
+
+        final int finalLineNumber = !isOpposite ? lineNumber : reverseLineMapping.get(lineNumber);
+        return extractVarVals("{return-object}", stateJO).stream()
+                .map(s -> getVarValHash(finalLineNumber, s))
+                .collect(Collectors.toSet());
     }
 }

@@ -75,6 +75,7 @@ And finally, a maven project hosted on GitHub. :smile:
       runs every test in the target project.
    2. `--output-path` (string): The path where the output will be stored. Default is `output.html`.
    3. `--cleanup` (boolean): Whether to clean up the temporary files created during execution. Default is `false`.
+   4. `--exclude-random-values` (boolean): Whether to exclude random values in trace. Example: path to temporary files. Default is `false`.
 
    Following parameters have not been added to `main`, but planned to be added in the future if needed.
    

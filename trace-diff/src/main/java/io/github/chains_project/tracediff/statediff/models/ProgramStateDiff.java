@@ -37,7 +37,7 @@ public class ProgramStateDiff {
     }
 
     public static class UniqueReturnSummary {
-        private Integer firstUniqueVarValLine, firstUniqueReturnLine, firstUniqueReturnHash;
+        private Integer firstUniqueVarValLine;
         private String firstUniqueVarVal, differencingTest;
 
         public Integer getFirstUniqueVarValLine() {
@@ -56,29 +56,11 @@ public class ProgramStateDiff {
             this.firstUniqueVarVal = firstUniqueVarVal;
         }
 
-        public Integer getFirstUniqueReturnHash() {
-            return firstUniqueReturnHash;
-        }
-
-        public void setFirstUniqueReturnHash(Integer firstUniqueReturnHash) {
-            this.firstUniqueReturnHash = firstUniqueReturnHash;
-        }
-
-        public Integer getFirstUniqueReturnLine() {
-            return firstUniqueReturnLine;
-        }
-
-        public void setFirstUniqueReturnLine(Integer firstUniqueReturnLine) {
-            this.firstUniqueReturnLine = firstUniqueReturnLine;
-        }
-
         @Override
         public String toString() {
             return "UniqueReturnSummary{" + "differencingTest="
                     + differencingTest + ", firstUniqueVarValLine="
-                    + firstUniqueVarValLine + ", firstUniqueReturnLine="
-                    + firstUniqueReturnLine + ", firstUniqueReturnHash="
-                    + firstUniqueReturnHash + ", firstUniqueVarVal='"
+                    + firstUniqueVarValLine + ", firstUniqueVarVal='"
                     + firstUniqueVarVal + '\'' + '}';
         }
 
@@ -92,16 +74,8 @@ public class ProgramStateDiff {
     }
 
     public static class UniqueStateSummary {
-        private Integer firstUniqueStateLine, firstUniqueVarValLine, firstUniqueStateHash;
+        private Integer firstUniqueVarValLine;
         private String firstUniqueVarVal, differencingTest;
-
-        public Integer getFirstUniqueStateLine() {
-            return firstUniqueStateLine;
-        }
-
-        public void setFirstUniqueStateLine(Integer firstUniqueStateLine) {
-            this.firstUniqueStateLine = firstUniqueStateLine;
-        }
 
         public Integer getFirstUniqueVarValLine() {
             return firstUniqueVarValLine;
@@ -109,14 +83,6 @@ public class ProgramStateDiff {
 
         public void setFirstUniqueVarValLine(Integer firstUniqueVarValLine) {
             this.firstUniqueVarValLine = firstUniqueVarValLine;
-        }
-
-        public Integer getFirstUniqueStateHash() {
-            return firstUniqueStateHash;
-        }
-
-        public void setFirstUniqueStateHash(Integer firstUniqueStateHash) {
-            this.firstUniqueStateHash = firstUniqueStateHash;
         }
 
         public String getFirstUniqueVarVal() {
@@ -130,10 +96,8 @@ public class ProgramStateDiff {
         @Override
         public String toString() {
             return "UniqueStateSummary{" + "differencingTest="
-                    + differencingTest + ", firstUniqueStateLine="
-                    + firstUniqueStateLine + ", firstUniqueVarValLine="
-                    + firstUniqueVarValLine + ", firstUniqueStateHash="
-                    + firstUniqueStateHash + ", firstUniqueVarVal='"
+                    + differencingTest + ", firstUniqueVarValLine="
+                    + firstUniqueVarValLine + ", firstUniqueVarVal="
                     + firstUniqueVarVal + '\'' + '}';
         }
 

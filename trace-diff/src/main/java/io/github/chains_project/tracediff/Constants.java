@@ -1,5 +1,7 @@
 package io.github.chains_project.tracediff;
 
+import java.util.List;
+
 public class Constants {
     public static final String EXEC_DIFF_COMMAND_NAME = "EXEC-DIFF";
 
@@ -9,10 +11,10 @@ public class Constants {
     public static final String ARG_ORIGINAL_PATH = "--original-path";
     public static final String ARG_PATCHED_PATH = "--patched-path";
     public static final String ARG_OUTPUT_PATH = "--output-path";
-    public static final String ARG_ALL_DIFFS_REPORT_PATH = "--all-diffs-report-path";
     public static final String ARG_FULL_REPORT_LINK = "--full-report-link";
     public static final String ARG_CHANGED_FILE_PATH = "--changed-file-path";
     public static final String ARG_SELECTED_TESTS = "--selected-tests";
+    public static final String ARG_EXCLUDE_RANDOM_VALUES = "--exclude-random-values";
 
     public static final String STATE_DIFF_COMMAND_NAME = "sdiff";
     public static final String ARG_LEFT_REPORT_PATH = "--left-report-path";
@@ -25,4 +27,7 @@ public class Constants {
     public static final String TEST_SEPARATOR = ";";
     public static final String TEST_METHOD_NAME_SEPARATOR = "::";
     public static final String UNKNOWN_TEST = "unknown::unknown";
+    public static final int REPEATS_FOR_RANDOM_EXCLUSION = 3;
+    public static final List<String> FILE_RELATED_CLASSES =
+            List.of("java.io.File", "java.nio.file.Path", "sun.nio.fs.UnixPath", "sun.nio.fs.WindowsPath");
 }

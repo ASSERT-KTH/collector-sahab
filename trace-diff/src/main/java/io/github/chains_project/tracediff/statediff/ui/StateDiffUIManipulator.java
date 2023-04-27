@@ -11,7 +11,6 @@ import io.github.chains_project.tracediff.statediff.models.ProgramStateDiff;
 import io.github.chains_project.tracediff.statediff.utils.ExecDiffHelper;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;
@@ -48,8 +47,7 @@ public class StateDiffUIManipulator {
             File ghFullDiff,
             String testsStr,
             String testLink,
-            String outputPath,
-            String allDiffsReportPath)
+            String outputPath)
             throws Exception {
         long processStartTime = new Date().getTime();
         boolean isHitDataIncluded = ghFullDiff != null;
@@ -86,11 +84,7 @@ public class StateDiffUIManipulator {
                 dstInfo.getLineVars(),
                 Arrays.asList(testsStr.split(Constants.TEST_SEPARATOR)));
 
-        PrintWriter diffPrinter = allDiffsReportPath == null ? null : new PrintWriter(new File(allDiffsReportPath));
-
-        ProgramStateDiff psd = sdc.computeProgramStateDiff(diffPrinter);
-
-        if (diffPrinter != null) diffPrinter.close();
+        ProgramStateDiff psd = sdc.computeProgramStateDiff();
 
         logger.info(psd.toString());
 
@@ -207,37 +201,5 @@ public class StateDiffUIManipulator {
                 .replace("{{unique-state}}", diffStr)
                 .replace("{{unique-state-version}}", occursInOriginal ? "original" : "patched");
         ExecDiffHelper.addLineInfoAfter(diffLine, stateDiffHtml, ghFullDiff, occursInOriginal, isHitDataIncluded);
-    }
-
-    public static void main(String[] args) throws Exception {
-        //        String leftReportPath = args[0], rightReportPath = args[1], leftSrcPath = args[2], rightSrcPath =
-        // args[3],
-        //                diffHtmlPath = args[4], testName = args[5], testLink = args[6];
-        //        new StateDiffUIManipulator().addStateDiffToExecDiffUI(
-        //                new File(leftReportPath),
-        //                new File(rightReportPath),
-        //                new File(leftSrcPath),
-        //                new File(rightSrcPath),
-        //                new File(diffHtmlPath),
-        //                testName,
-        //                testLink);
-
-        new StateDiffUIManipulator()
-                .addStateDiffToExecDiffUI(
-                        "khaes-kth/commons-io",
-                        "db23cdbcf787165df0aec971107f0136d830fcc3",
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/output/sahab-reports/4816441885916f66a16d8d2e21acc0e4fbd207cd/left.json"),
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/output/sahab-reports/4816441885916f66a16d8d2e21acc0e4fbd207cd/right.json"),
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/old-files/FastDateParser.java"),
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/new-files/FastDateParser.java"),
-                        null,
-                        "org.apache.commons.lang3.time.FastDateParserTest::testLang1380",
-                        "http://example.com",
-                        "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/4816441885916f66a16d8d2e21acc0e4fbd207cd.html",
-                        null);
     }
 }
