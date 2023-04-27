@@ -9,7 +9,6 @@ import io.github.chains_project.cs.preprocess.PomTransformer;
 import io.github.chains_project.mlf.MatchedLineFinder;
 import io.github.chains_project.tracediff.Constants;
 import io.github.chains_project.tracediff.ExecDiffMain;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;

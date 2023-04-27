@@ -202,35 +202,4 @@ public class StateDiffUIManipulator {
                 .replace("{{unique-state-version}}", occursInOriginal ? "original" : "patched");
         ExecDiffHelper.addLineInfoAfter(diffLine, stateDiffHtml, ghFullDiff, occursInOriginal, isHitDataIncluded);
     }
-
-    public static void main(String[] args) throws Exception {
-        //        String leftReportPath = args[0], rightReportPath = args[1], leftSrcPath = args[2], rightSrcPath =
-        // args[3],
-        //                diffHtmlPath = args[4], testName = args[5], testLink = args[6];
-        //        new StateDiffUIManipulator().addStateDiffToExecDiffUI(
-        //                new File(leftReportPath),
-        //                new File(rightReportPath),
-        //                new File(leftSrcPath),
-        //                new File(rightSrcPath),
-        //                new File(diffHtmlPath),
-        //                testName,
-        //                testLink);
-
-        new StateDiffUIManipulator()
-                .addStateDiffToExecDiffUI(
-                        "khaes-kth/commons-io",
-                        "db23cdbcf787165df0aec971107f0136d830fcc3",
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/output/sahab-reports/4816441885916f66a16d8d2e21acc0e4fbd207cd/left.json"),
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/output/sahab-reports/4816441885916f66a16d8d2e21acc0e4fbd207cd/right.json"),
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/old-files/FastDateParser.java"),
-                        new File(
-                                "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/new-files/FastDateParser.java"),
-                        null,
-                        "org.apache.commons.lang3.time.FastDateParserTest::testLang1380",
-                        "http://example.com",
-                        "/home/khaes/phd/projects/explanation/code/tmp/dspot-on-sorald/4816441885916f66a16d8d2e21acc0e4fbd207cd.html");
-    }
 }
