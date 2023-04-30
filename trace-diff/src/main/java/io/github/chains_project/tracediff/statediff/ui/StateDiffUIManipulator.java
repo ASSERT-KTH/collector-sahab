@@ -52,15 +52,16 @@ public class StateDiffUIManipulator {
         long processStartTime = new Date().getTime();
         boolean isHitDataIncluded = ghFullDiff != null;
 
-        Map<Integer, Integer> returnSrcToDstMappings = new HashMap<>(), returnDstToSrcMappings = new HashMap<>();
-
-        extractReturnMappings(srcFile, dstFile, returnSrcToDstMappings, returnDstToSrcMappings);
-
         SourceInfo srcInfo = new SourceInfo(srcFile), dstInfo = new SourceInfo(dstFile);
 
         if (ghFullDiff == null) {
             ghFullDiff = GHHelper.getGHDiff(slug, commit, srcInfo, dstInfo);
         }
+
+        Map<Integer, Integer> returnSrcToDstMappings = new HashMap<>(), returnDstToSrcMappings = new HashMap<>();
+
+        extractReturnMappings(srcFile, dstFile, returnSrcToDstMappings, returnDstToSrcMappings,
+                isHitDataIncluded, ghFullDiff);
 
         Pair<Map<Integer, Integer>, Map<Integer, Integer>> lineMappings =
                 ExecDiffHelper.getMappingFromExecDiff(ghFullDiff, isHitDataIncluded);
@@ -110,8 +111,10 @@ public class StateDiffUIManipulator {
             File srcFile,
             File dstFile,
             Map<Integer, Integer> returnSrcToDstMappings,
-            Map<Integer, Integer> returnDstToSrcMappings)
+            Map<Integer, Integer> returnDstToSrcMappings, boolean isHitDataIncluded, File ghFullDiff)
             throws Exception {
+        Pair<Set<Integer>, Set<Integer>> validLines = ExecDiffHelper.getValidLines(ghFullDiff, isHitDataIncluded);
+
         Diff diff = new AstComparator().compare(srcFile, dstFile);
         Iterator<Mapping> mappings = diff.getMappingsComp().iterator();
         while (mappings.hasNext()) {
@@ -122,6 +125,10 @@ public class StateDiffUIManipulator {
                         dstElem = (CtReturn) mapping.second.getMetadata("spoon_object");
                 int srcLine = srcElem.getPosition().getLine(),
                         dstLine = dstElem.getPosition().getLine();
+
+                if (!validLines.getLeft().contains(srcLine) || !validLines.getRight().contains(dstLine)) {
+                    continue;
+                }
 
                 returnSrcToDstMappings.put(srcLine, dstLine);
                 returnDstToSrcMappings.put(dstLine, srcLine);

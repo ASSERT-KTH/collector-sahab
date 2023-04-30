@@ -3,7 +3,10 @@ package io.github.chains_project.tracediff.statediff.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
@@ -32,6 +35,31 @@ public class ExecDiffHelper {
         });
 
         return Pair.of(leftRightMapping, rightLeftMapping);
+    }
+
+    public static Pair<Set<Integer>, Set<Integer>> getValidLines(File execDiffReport, boolean isHitDataIncluded)
+            throws IOException {
+        Set<Integer> leftValidLines = new HashSet<>(), rightValidLines = new HashSet<>();
+        Document doc = Jsoup.parse(execDiffReport, "UTF-8");
+        Elements srcRows = doc.selectFirst("tbody").children();
+
+        srcRows.forEach(tr -> {
+            Elements cols = tr.children();
+            int leftLineNumCol = isHitDataIncluded ? 1 : 0;
+            try {
+                int srcLine = Integer.parseInt(cols.get(leftLineNumCol).attr("data-line-number"));
+                leftValidLines.add(srcLine);
+            } catch (NumberFormatException e) {
+            }
+
+            try{
+                int dstLine = Integer.parseInt(cols.get(leftLineNumCol + 1).attr("data-line-number"));
+                rightValidLines.add(dstLine);
+            }catch (NumberFormatException e){
+            }
+        });
+
+        return Pair.of(leftValidLines, rightValidLines);
     }
 
     public static void addLineInfoAfter(
