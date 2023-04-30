@@ -60,8 +60,8 @@ public class StateDiffUIManipulator {
 
         Map<Integer, Integer> returnSrcToDstMappings = new HashMap<>(), returnDstToSrcMappings = new HashMap<>();
 
-        extractReturnMappings(srcFile, dstFile, returnSrcToDstMappings, returnDstToSrcMappings,
-                isHitDataIncluded, ghFullDiff);
+        extractReturnMappings(
+                srcFile, dstFile, returnSrcToDstMappings, returnDstToSrcMappings, isHitDataIncluded, ghFullDiff);
 
         Pair<Map<Integer, Integer>, Map<Integer, Integer>> lineMappings =
                 ExecDiffHelper.getMappingFromExecDiff(ghFullDiff, isHitDataIncluded);
@@ -111,7 +111,9 @@ public class StateDiffUIManipulator {
             File srcFile,
             File dstFile,
             Map<Integer, Integer> returnSrcToDstMappings,
-            Map<Integer, Integer> returnDstToSrcMappings, boolean isHitDataIncluded, File ghFullDiff)
+            Map<Integer, Integer> returnDstToSrcMappings,
+            boolean isHitDataIncluded,
+            File ghFullDiff)
             throws Exception {
         Pair<Set<Integer>, Set<Integer>> validLines = ExecDiffHelper.getValidLines(ghFullDiff, isHitDataIncluded);
 
@@ -126,7 +128,8 @@ public class StateDiffUIManipulator {
                 int srcLine = srcElem.getPosition().getLine(),
                         dstLine = dstElem.getPosition().getLine();
 
-                if (!validLines.getLeft().contains(srcLine) || !validLines.getRight().contains(dstLine)) {
+                if (!validLines.getLeft().contains(srcLine)
+                        || !validLines.getRight().contains(dstLine)) {
                     continue;
                 }
 

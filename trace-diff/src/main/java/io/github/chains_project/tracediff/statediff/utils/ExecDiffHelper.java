@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
@@ -52,10 +51,10 @@ public class ExecDiffHelper {
             } catch (NumberFormatException e) {
             }
 
-            try{
+            try {
                 int dstLine = Integer.parseInt(cols.get(leftLineNumCol + 1).attr("data-line-number"));
                 rightValidLines.add(dstLine);
-            }catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
             }
         });
 
