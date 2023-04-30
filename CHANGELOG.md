@@ -1,4 +1,28 @@
 
+# 0.4.1
+## Changelog
+
+## 🔀 Merge
+- 5d635ae Merge pull request #223 from ASSERT-KTH/fix/return-diff-on-unchanged
+
+## 🐛 Fixes
+- 55bf933 fix: return diff on unchanged methods ignored
+
+## 🧰 Tasks
+- de20591 chore: releasing version 0.4.1
+- 65db9be chore: removed unused file
+- 80172a0 chore: spotless applied
+- 49734d5 chore(deps): update dependency org.jsoup:jsoup to v1.16.1
+- 296c328 chore: setting SNAPSHOT version 0.4.1-SNAPSHOT
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- GitHub ()
+- Khashayar Etemadi ([@khaes-kth](https://github.com/khaes-kth))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.4.0
 ## Changelog
 
