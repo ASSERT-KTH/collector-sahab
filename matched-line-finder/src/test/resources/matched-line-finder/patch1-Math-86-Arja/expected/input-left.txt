@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "org/apache/commons/math/linear/CholeskyDecompositionImpl",
+        "breakpoints": [132, 134, 138, 139, 141, 142, 143, 144, 145, 99, 100, 101, 104, 105, 106, 107, 110, 112, 114, 115, 118, 119, 120, 121, 122, 123, 124, 125, 127]
+    }
+]
