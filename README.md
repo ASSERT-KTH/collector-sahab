@@ -7,6 +7,10 @@
 Collector Sahab is a tool to augment code diffs with runtime information. It works by instrumenting and running the versions before and after a commit, and then report the differences found in the runtime values.
 For more information, see our paper [Augmenting Diffs With Runtime Information](http://arxiv.org/pdf/2212.11077).
 
+## Example Diff
+
+![example-diff.png](readme_assets/example-diff.png)
+
 ## Releases
 
 Our releases are signed using `travis-gumtree-spoon`'s GPG key. The key is hosted
@@ -162,8 +166,3 @@ And finally, a maven project hosted on GitHub. :smile:
    ]
 }
 ```
-
-## Example Diff
-
-![example-diff.png](readme_assets/example-diff.png)
-
