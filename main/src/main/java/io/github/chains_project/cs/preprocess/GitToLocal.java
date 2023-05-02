@@ -9,13 +9,16 @@ import java.nio.file.Path;
 public class GitToLocal {
     public static Pair<Revision, Revision> getRevisions(Path project, String leftHash, String rightHash)
             throws IOException, InterruptedException {
-        String hashMix = leftHash.substring(0, 7) + "_" + rightHash.substring(0, 7) + "_";
-        String prefix = project.getFileName().toString() + "_" + hashMix;
-        Path tempDirectory = Files.createTempDirectory(prefix);
-
-        return new Pair<>(
-                copy(project, tempDirectory.resolve("left"), leftHash),
-                copy(project, tempDirectory.resolve("right"), rightHash));
+        try {
+            String hashMix = leftHash.substring(0, 7) + "_" + rightHash.substring(0, 7) + "_";
+            String prefix = project.getFileName().toString() + "_" + hashMix;
+            Path tempDirectory = Files.createTempDirectory(prefix);
+            return new Pair<>(
+                    copy(project, tempDirectory.resolve("left"), leftHash),
+                    copy(project, tempDirectory.resolve("right"), rightHash));
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new RuntimeException("Hash should be at least 7 characters long.");
+        }
     }
 
     private static int checkout(Path cwd, String commit) throws IOException, InterruptedException {
