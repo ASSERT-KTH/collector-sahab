@@ -921,6 +921,35 @@ class NewCollectorTest {
         assertThat(arrayElementsAsValue.size(), equalTo(20));
     }
 
+    @Test
+    void shouldRecordReturnValuesOfConstructor() throws MavenInvocationException, IOException {
+        // arrange
+        File pomFile = new File("src/test/resources/init/pom.xml");
+
+        // act
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of("methodsForExitEvent=src/test/resources/methods.json", "output=target/output.json"),
+                "-Dtest=MultipleConstructorTest#testMultipleConstructor");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/init/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getReturns().size(), equalTo(2));
+
+        RuntimeReturnedValue returnedValue0 = output.getReturns().get(0);
+        assertThat(returnedValue0.getType(), equalTo("void"));
+        assertThat(returnedValue0.getValue(), is(nullValue()));
+
+        RuntimeReturnedValue returnedValue1 = output.getReturns().get(1);
+        assertThat(returnedValue1.getType(), equalTo("void"));
+        assertThat(returnedValue1.getValue(), is(nullValue()));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException, IOException {
         // arrange
