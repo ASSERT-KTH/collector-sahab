@@ -243,9 +243,9 @@ public class MatchedLineFinder {
 
     /** Compare method equality based on name, parameters, and return type. */
     private static boolean isPlausibleMapping(CtTypeMember first, CtTypeMember second) {
-        if (first instanceof CtMethod && second instanceof CtMethod) {
-            CtMethod<?> firstMethod = (CtMethod<?>) first;
-            CtMethod<?> secondMethod = (CtMethod<?>) second;
+        if (first instanceof CtExecutable<?> && second instanceof CtExecutable<?>) {
+            CtExecutable<?> firstMethod = (CtExecutable<?>) first;
+            CtExecutable<?> secondMethod = (CtExecutable<?>) second;
 
             return firstMethod.getParameters().size()
                             == secondMethod.getParameters().size()
