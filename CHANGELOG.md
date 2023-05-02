@@ -1,4 +1,29 @@
 
+# 0.5.0
+## Changelog
+
+## 🚀 Features
+- 1b2bc12 feat: record matched lines inside constructor (#228)
+
+## 🔄️ Changes
+- 31bb9b5 refactor: throw exception when hash is not long enough (#227)
+
+## 🧰 Tasks
+- 0b44b01 chore: releasing version 0.5.0
+- 17a0fec chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-4
+- 8d42d6b chore: setting SNAPSHOT version 0.4.2-SNAPSHOT
+
+## 🛠  Build
+- 2f48d9a test: ensure value returned by constructor is recorded (#229)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.4.1
 ## Changelog
 
