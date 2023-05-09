@@ -950,6 +950,50 @@ class NewCollectorTest {
         assertThat(returnedValue1.getValue(), is(nullValue()));
     }
 
+    @Test
+    void shouldCollectStaticFieldsOfNullObjects() throws MavenInvocationException, IOException {
+        // arrange
+        File pomFile = new File("src/test/resources/volatile/pom.xml");
+
+        // act
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "classesAndBreakpoints=src/test/resources/input.txt",
+                        "output=target/output.json",
+                        "executionDepth=1"),
+                "-Dtest=VolatileTest#test");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/volatile/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(1));
+
+        RuntimeValue localVariable = output.getBreakpoint()
+                .get(0)
+                .getStackFrameContext()
+                .get(0)
+                .getRuntimeValueCollection()
+                .get(1);
+        assertThat(localVariable.getName(), equalTo("vNull"));
+        assertThat(localVariable.getValue(), is(nullValue()));
+
+        List<RuntimeValue> fields = localVariable.getFields();
+        assertThat(fields.size(), equalTo(2));
+
+        RuntimeValue nonVolatileField = fields.get(0);
+        assertThat(nonVolatileField.getName(), equalTo("x"));
+        assertThat(nonVolatileField.getValue(), equalTo(1));
+
+        RuntimeValue volatileField = fields.get(1);
+        assertThat(volatileField.getName(), equalTo("y"));
+        assertThat(volatileField.getValue(), equalTo(false));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException, IOException {
         // arrange
