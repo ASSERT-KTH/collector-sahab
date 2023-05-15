@@ -143,7 +143,8 @@ public class StateDiffUIManipulator {
             ProgramStateDiff stateDiff, File ghFullDiff, String testLink, boolean isHitDataIncluded) throws Exception {
         if (stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarVal() != null) {
             addStateDiffToExecDiffUI(
-                    stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarVal(),
+                    stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarVal() + " ("
+                            + stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarValType() + ")",
                     stateDiff.getFirstPatchedUniqueStateSummary().getFirstUniqueVarValLine(),
                     "state",
                     false,
@@ -154,7 +155,8 @@ public class StateDiffUIManipulator {
         }
         if (stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarVal() != null) {
             addStateDiffToExecDiffUI(
-                    stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarVal(),
+                    stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarVal() + " ("
+                            + stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarValType() + ")",
                     stateDiff.getFirstOriginalUniqueStateSummary().getFirstUniqueVarValLine(),
                     "state",
                     true,
@@ -166,7 +168,8 @@ public class StateDiffUIManipulator {
 
         if (stateDiff.getPatchedUniqueReturn().getFirstUniqueVarVal() != null) {
             addStateDiffToExecDiffUI(
-                    stateDiff.getPatchedUniqueReturn().getFirstUniqueVarVal(),
+                    stateDiff.getPatchedUniqueReturn().getFirstUniqueVarVal() + " ("
+                            + stateDiff.getPatchedUniqueReturn().getFirstUniqueVarValType() + ")",
                     stateDiff.getPatchedUniqueReturn().getFirstUniqueVarValLine(),
                     "return",
                     false,
@@ -177,7 +180,8 @@ public class StateDiffUIManipulator {
         }
         if (stateDiff.getOriginalUniqueReturn().getFirstUniqueVarVal() != null) {
             addStateDiffToExecDiffUI(
-                    stateDiff.getOriginalUniqueReturn().getFirstUniqueVarVal(),
+                    stateDiff.getOriginalUniqueReturn().getFirstUniqueVarVal() + " ("
+                            + stateDiff.getOriginalUniqueReturn().getFirstUniqueVarValType() + ")",
                     stateDiff.getOriginalUniqueReturn().getFirstUniqueVarValLine(),
                     "return",
                     true,

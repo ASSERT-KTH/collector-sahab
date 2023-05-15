@@ -114,6 +114,13 @@ public class StateDiffComputer {
                 firstUniqueReturnSummary.setDifferencingTest(executedTest);
                 firstUniqueReturnSummary.setFirstUniqueVarValLine(p.getLeft());
                 firstUniqueReturnSummary.setFirstUniqueVarVal(p.getRight());
+
+                RuntimeReturnedValue outerMostReturn = jsonStates.stream()
+                        .filter(rt -> Integer.parseInt(rt.getLocation().split(":")[1]) == p.getLeft())
+                        .findFirst()
+                        .get();
+                firstUniqueReturnSummary.setFirstUniqueVarValType(
+                        findType("{return-object}", p.getRight(), List.of(outerMostReturn)));
                 break;
             }
         }
@@ -215,11 +222,82 @@ public class StateDiffComputer {
                 firstUniqueStateSummary.setDifferencingTest(executedTest);
                 firstUniqueStateSummary.setFirstUniqueVarValLine(p.getLeft());
                 firstUniqueStateSummary.setFirstUniqueVarVal(p.getRight());
+
+                LineSnapshot outerMostLine = lineSnapshots.stream()
+                        .filter(lineSnapshot -> lineSnapshot.getLineNumber() == p.getLeft())
+                        .findFirst()
+                        .get();
+                List<RuntimeValue> candidateRuntimeValues =
+                        outerMostLine.getStackFrameContext().get(0).getRuntimeValueCollection();
+
+                firstUniqueStateSummary.setFirstUniqueVarValType(findType("", p.getRight(), candidateRuntimeValues));
                 break;
             }
         }
 
         return firstUniqueStateSummary;
+    }
+
+    private String findType(String prefix, String expectedHash, List<RuntimeValue> candidateRuntimeValues) {
+        for (RuntimeValue runtimeValue : candidateRuntimeValues) {
+
+            RuntimeValue runtimeValueFromHash = getRuntimeValueFromHash(prefix, runtimeValue, expectedHash);
+
+            if (runtimeValueFromHash != null) {
+                return runtimeValueFromHash.getType();
+            }
+        }
+        return null;
+    }
+
+    private RuntimeValue getRuntimeValueFromHash(String prefix, RuntimeValue valueJo, String expectedHash) {
+        if (Constants.FILE_RELATED_CLASSES.stream().anyMatch(valueJo.getType()::contains)) {
+            return valueJo;
+        }
+
+        if (valueJo.getFields() != null && !valueJo.getFields().isEmpty()) {
+            if (valueJo.getKind() == RuntimeValue.Kind.RETURN) {
+                prefix += ".";
+            } else {
+                prefix += (valueJo.getName() == null ? "" : valueJo.getName() + ".");
+            }
+            List<RuntimeValue> nestedTypes = valueJo.getFields();
+
+            for (RuntimeValue nestedObj : nestedTypes) {
+                RuntimeValue runtimeValue = getRuntimeValueFromHash(prefix, nestedObj, expectedHash);
+                if (runtimeValue != null) {
+                    return runtimeValue;
+                }
+            }
+        } else if (valueJo.getArrayElements() != null
+                && !valueJo.getArrayElements().isEmpty()) {
+            List<RuntimeValue> nestedTypes = valueJo.getArrayElements();
+
+            prefix += (valueJo.getName() == null ? "" : valueJo.getName());
+
+            for (int i = 0; i < nestedTypes.size(); i++) {
+                RuntimeValue nestedObj = nestedTypes.get(i);
+                String currentPrefix = prefix + "[" + i + "].";
+                RuntimeValue runtimeValue = getRuntimeValueFromHash(currentPrefix, nestedObj, expectedHash);
+                if (runtimeValue != null) {
+                    return runtimeValue;
+                }
+            }
+        } else {
+            // it's a leaf node
+            String currentPrefix;
+            if (valueJo.getKind() == RuntimeValue.Kind.RETURN) {
+                currentPrefix = prefix;
+            } else {
+                currentPrefix = prefix + (valueJo.getName() == null ? "" : valueJo.getName());
+            }
+            String value = String.valueOf(valueJo.getValue());
+            String actualHash = currentPrefix + "=" + value;
+            if (actualHash.equals(expectedHash)) {
+                return valueJo;
+            }
+        }
+        return null;
     }
 
     private int getVarValHash(int line, String varVal) {

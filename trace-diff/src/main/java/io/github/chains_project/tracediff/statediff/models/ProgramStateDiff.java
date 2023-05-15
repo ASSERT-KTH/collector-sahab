@@ -40,6 +40,8 @@ public class ProgramStateDiff {
         private Integer firstUniqueVarValLine;
         private String firstUniqueVarVal, differencingTest;
 
+        private String firstUniqueVarValType;
+
         public Integer getFirstUniqueVarValLine() {
             return firstUniqueVarValLine;
         }
@@ -71,11 +73,21 @@ public class ProgramStateDiff {
         public void setDifferencingTest(String differencingTest) {
             this.differencingTest = differencingTest;
         }
+
+        public String getFirstUniqueVarValType() {
+            return firstUniqueVarValType;
+        }
+
+        public void setFirstUniqueVarValType(String firstUniqueVarValType) {
+            this.firstUniqueVarValType = firstUniqueVarValType;
+        }
     }
 
     public static class UniqueStateSummary {
         private Integer firstUniqueVarValLine;
         private String firstUniqueVarVal, differencingTest;
+
+        private String firstUniqueVarValType;
 
         public Integer getFirstUniqueVarValLine() {
             return firstUniqueVarValLine;
@@ -107,6 +119,14 @@ public class ProgramStateDiff {
 
         public void setDifferencingTest(String differencingTest) {
             this.differencingTest = differencingTest;
+        }
+
+        public String getFirstUniqueVarValType() {
+            return firstUniqueVarValType;
+        }
+
+        public void setFirstUniqueVarValType(String firstUniqueVarValType) {
+            this.firstUniqueVarValType = firstUniqueVarValType;
         }
     }
 
