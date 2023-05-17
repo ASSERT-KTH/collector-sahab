@@ -14,4 +14,5 @@ scripts/config.json
 # JReleaser files
 out/
 jreleaser-cli.jar
+JRELEASER_VERSION
 
