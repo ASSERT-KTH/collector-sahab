@@ -31,7 +31,8 @@
         "contributors": {
           "format": "- {{contributorName}} ({{contributorUsernameAsLink}})"
         }
-      }
+      },
+      "sign": false
     }
   },
 
