@@ -995,7 +995,7 @@ class NewCollectorTest {
     }
 
     @Test
-    void test() throws MavenInvocationException, IOException {
+    void shouldBeAbleToRunMultiThreadedProgram() throws MavenInvocationException, IOException {
         // arrange
         File pomFile = new File("src/test/resources/multi-threading/pom.xml");
 
