@@ -1,4 +1,41 @@
 
+# 0.5.1
+## Changelog
+
+## 🐛 Fixes
+- fcea85a fix: avoid caching modules to prevent race-condition (#245)
+
+## 🧰 Tasks
+- 625a7eb chore: releasing version 0.5.1
+- d039302 chore(deps): update dependency commons-io:commons-io to v2.12.0
+- e045714 chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.15.1
+- 52d6ecf chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-6
+- 3aa4be3 chore(deps): update dependency org.apache.maven.plugins:maven-assembly-plugin to v3.6.0
+- 217248c chore(deps): update dependency org.apache.maven:maven-model to v3.9.2
+- 997f608 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-5
+- 317b782 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.61
+- 823c779 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.9.1
+- ba3be20 chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.1.0
+- 59ec5d5 chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.1.0
+- 8837463 chore: setting SNAPSHOT version 0.5.1-SNAPSHOT
+
+## 🛠  Build
+- 31ec3a5 ci: actually sign commits
+- abd235e ci: sign commits that are created by GitHub action bot while releasing
+- 5156ecf test: add test to verify collection of data for null objects (#236)
+- c7418b4 ci: use latest version for jreleaser
+
+## 📝 Documentation
+- 90062fb docs: add a better example diff
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.5.0
 ## Changelog
 
