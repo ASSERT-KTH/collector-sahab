@@ -32,7 +32,7 @@
           "format": "- {{contributorName}} ({{contributorUsernameAsLink}})"
         }
       },
-      "sign": false
+      "sign": true
     }
   },
 
