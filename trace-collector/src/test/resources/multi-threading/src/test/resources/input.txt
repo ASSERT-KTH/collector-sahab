@@ -1,0 +1,6 @@
+[
+    {
+        "fileName": "foo/OneThread",
+        "breakpoints": [25]
+    }
+]
