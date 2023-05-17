@@ -994,6 +994,30 @@ class NewCollectorTest {
         assertThat(volatileField.getValue(), equalTo(false));
     }
 
+    @Test
+    void shouldBeAbleToRunMultiThreadedProgram() throws MavenInvocationException, IOException {
+        // arrange
+        File pomFile = new File("src/test/resources/multi-threading/pom.xml");
+
+        // act
+        InvocationResult result = getInvocationResult(
+                pomFile,
+                List.of(
+                        "classesAndBreakpoints=src/test/resources/input.txt",
+                        "output=target/output.json",
+                        "executionDepth=0"),
+                "-Dtest=MultipleThreadTest#test");
+
+        // assert
+        assertThat(result.getExitCode(), equalTo(0));
+        File actualOutput = new File("src/test/resources/multi-threading/target/output.json");
+        assertThat(actualOutput.exists(), equalTo(true));
+
+        ObjectMapper mapper = new ObjectMapper();
+        SahabOutput output = mapper.readValue(actualOutput, new TypeReference<>() {});
+        assertThat(output.getBreakpoint().size(), equalTo(4));
+    }
+
     private InvocationResult getInvocationResult(File pomFile, List<String> agentOptions, String testArg)
             throws MavenInvocationException, IOException {
         // arrange
