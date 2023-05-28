@@ -1,4 +1,30 @@
 
+# 0.5.2
+## Changelog
+
+## 🐛 Fixes
+- 4a432a7 fix(trace-diff): prevent trailing dot in the last array element (#256)
+
+## 🧰 Tasks
+- d1365a9 chore: releasing version 0.5.2
+- 2d0160f chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.37.0 (#255)
+- 61430c3 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-7
+- 2c11c9f chore(deps): update dependency org.apache.maven.plugins:maven-dependency-plugin to v3.6.0
+- 4ef657b chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.62
+- df75869 chore(deps): update dependency org.apache.maven.plugins:maven-source-plugin to v3.3.0
+- e3fa78d chore: setting SNAPSHOT version 0.5.2-SNAPSHOT
+
+## 🛠  Build
+- a413f12 ci: remove JRELEASER_VERSION file
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.5.1
 ## Changelog
 
