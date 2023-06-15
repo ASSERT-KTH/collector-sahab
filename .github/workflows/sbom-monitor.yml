@@ -28,17 +28,22 @@ jobs:
         run: |
           git checkout ${{ github.head_ref }} --
           mvn clean install -DskipTests # Install SNAPSHOT files locally
-          cdxgen -t java -o bom.cdxgen.this.json
+          cdxgen -t java -o bom.cdxgen.head.json
+          echo "HEAD=$(realpath bom.cdxgen.head.json)" >> $GITHUB_ENV
 
       - name: Produce SBOM for head commit in base branch
         run: |
           git checkout ${{ github.event.pull_request.base.ref }} --
           mvn clean install -DskipTests # Install SNAPSHOT files locally
           cdxgen -t java -o bom.cdxgen.parent.json
+          echo "BASE=$(realpath bom.cdxgen.parent.json)" >> $GITHUB_ENV
 
       - name: Compare SBOMs
+        env:
+          HEAD: ${{ env.HEAD }}
+          BASE: ${{ env.BASE }}
         run: |
-          DIFF=$(diff -u bom.cdxgen.this.json bom.cdxgen.parent.json)
+          DIFF=$(diff -u $BASE HEAD)
           echo "$DIFF"
           echo "DIFF=$DIFF" >> $GITHUB_ENV
 
