@@ -43,9 +43,9 @@ jobs:
           HEAD: ${{ env.HEAD }}
           BASE: ${{ env.BASE }}
         run: |
-          DIFF=$(git diff --no-index $BASE $HEAD)
-          echo "$DIFF"
-          echo "DIFF=$DIFF" >> $GITHUB_ENV
+          git diff --no-index $BASE $HEAD > diff.txt
+          cat diff.txt
+          echo "DIFF=$(cat diff.txt)" >> $GITHUB_ENV
 
       - name: Post comment to PR
         env:
