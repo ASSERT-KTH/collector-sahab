@@ -52,15 +52,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DIFF: ${{ env.DIFF }}
         run: |
-          read -r -d '' FORMATTED_DIFF << EOL
-            \\\`\\\`\\\`diff
-            $(cat $DIFF)
-            \\\`\\\`\\\`
-          EOL
-  
           curl \
             -X POST \
             $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{ "body": "$FORMATTED_DIFF" }'
+            --data '{ "body": $(cat $DIFF) }'
