@@ -44,8 +44,7 @@ jobs:
           BASE: ${{ env.BASE }}
         run: |
           git diff --no-index $BASE $HEAD > diff.txt || true
-          cat diff.txt
-          echo "DIFF=$(cat diff.txt)" >> $GITHUB_ENV
+          echo "DIFF=$(realpath diff.txt)" >> $GITHUB_ENV
 
       - name: Post comment to PR
         env:
@@ -55,7 +54,7 @@ jobs:
         run: |
           read -r -d '' FORMATTED_DIFF << EOL
             ```diff
-            $DIFF
+            $(cat $DIFF)
             ```
           EOL
   
