@@ -52,8 +52,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DIFF: ${{ env.DIFF }}
         run: |
-          CONTENT="
-          { \"body\": \"## SBOM diff
+          CONTENT="{ \"body\": \"## SBOM diff
           
             \`\`\`diff
             $(cat $DIFF | sed 's/"/\\\"/g')
