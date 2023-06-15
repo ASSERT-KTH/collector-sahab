@@ -24,15 +24,15 @@ jobs:
       - name: Install dependencies
         run: npm install -g @cyclonedx/cdxgen@8.5.3
 
-      - name: Produce SBOM for this commit
+      - name: Produce SBOM for head commit in target branch
         run: |
           git checkout ${{ github.head_ref }} --
           mvn clean install -DskipTests # Install SNAPSHOT files locally
           cdxgen -t java -o bom.cdxgen.this.json
 
-      - name: Produce SBOM for parent commit
+      - name: Produce SBOM for head commit in base branch
         run: |
-          git checkout ${{ github.base_ref }} --
+          git checkout ${{ github.event.pull_request.base.ref }} --
           mvn clean install -DskipTests # Install SNAPSHOT files locally
           cdxgen -t java -o bom.cdxgen.parent.json
 
