@@ -13,7 +13,7 @@ jobs:
       matrix:
         maven: [ '3.6.3', '3.9.2' ]
 
-    name: Running integration tests on ${{ matrix.maven }}
+    name: maven ${{ matrix.maven }}
 
     steps:
       - uses: actions/checkout@v3

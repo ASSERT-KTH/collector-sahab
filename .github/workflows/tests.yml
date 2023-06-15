@@ -11,9 +11,9 @@ jobs:
 
     strategy:
       matrix:
-        maven: ['3.6.3', '3.9.2']
+        maven: [ '3.6.3', '3.9.2' ]
 
-    name: Running tests on ${{ matrix.maven }}
+    name: maven ${{ matrix.maven }}
 
     steps:
       - name: Set up JDK 11 and maven for running tests
