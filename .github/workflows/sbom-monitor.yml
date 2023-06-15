@@ -53,9 +53,9 @@ jobs:
           DIFF: ${{ env.DIFF }}
         run: |
           read -r -d '' FORMATTED_DIFF << EOL
-            ```diff
+            \\\`\\\`\\\`diff
             $(cat $DIFF)
-            ```
+            \\\`\\\`\\\`
           EOL
   
           curl \
