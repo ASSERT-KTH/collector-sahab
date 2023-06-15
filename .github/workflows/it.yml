@@ -9,16 +9,23 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        maven: [ '3.6.3', '3.9.2' ]
+
+    name: Running integration tests on ${{ matrix.maven }}
+
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           fetch-depth: 0
-      - name: Set up JDK 11 for running tests
-        uses: actions/setup-java@v3
+      - name: Set up JDK 11 and maven for running tests
+        uses: s4u/setup-maven-action@v1.8.0
         with:
           java-version: 11
           distribution: 'temurin'
+          maven-version: ${{ matrix.maven }}
       - name: Install chromium
         run: 'sudo apt-get install chromium-chromedriver -y'
       - name: Prepare all poms
