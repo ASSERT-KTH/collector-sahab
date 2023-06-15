@@ -1,0 +1,56 @@
+name: sbom-monitor
+
+on: pull_request
+
+jobs:
+  sbom-verification:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # npm install is required to run the sbom-monitor
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.5.2
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm install -g @cyclonedx/cdxgen@8.5.3
+
+      - name: Produce SBOM for this commit
+        run: |
+          git checkout ${{ github.head_ref }}
+          cdxgen -t java -o bom.cdxgen.this.json
+
+      - name: Produce SBOM for parent commit
+        run: |
+          git checkout ${{ github.base_ref }}
+          cdxgen -t java -o bom.cdxgen.parent.json
+
+      - name: Compare SBOMs
+        run: |
+          DIFF=$(diff -u bom.cdxgen.this.json bom.cdxgen.parent.json)
+          echo "$DIFF"
+          echo "DIFF=$DIFF" >> $GITHUB_ENV
+
+      - name: Post comment to PR
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIFF: ${{ env.DIFF }}
+        run: |
+          read -r -d '' FORMATTED_DIFF << EOL
+            ```diff
+            $DIFF
+            ```
+          EOL
+  
+          curl \
+            -X POST \
+            $URL \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            --data '{ "body": "$FORMATTED_DIFF" }'
