@@ -52,9 +52,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DIFF: ${{ env.DIFF }}
         run: |
+          CONTENT="### SBOM comparison
+            \`\`\`diff
+            $(cat $DIFF)
+            \`\`\`"
           curl \
             -X POST \
             $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{ "body": "$(cat $DIFF)" }'
+            --data '{ "body": "$CONTENT" }'
