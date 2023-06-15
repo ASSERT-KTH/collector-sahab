@@ -56,7 +56,7 @@ jobs:
           { \"body\": \"## SBOM diff
           
             \`\`\`diff
-            $(cat $DIFF)
+            $(cat $DIFF | sed 's/"/\\\"/g'')
             \`\`\`
           }"  
           echo $CONTENT
