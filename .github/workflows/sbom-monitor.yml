@@ -43,7 +43,7 @@ jobs:
           HEAD: ${{ env.HEAD }}
           BASE: ${{ env.BASE }}
         run: |
-          git diff --no-index $BASE $HEAD > diff.txt
+          git diff --no-index $BASE $HEAD > diff.txt || true
           cat diff.txt
           echo "DIFF=$(cat diff.txt)" >> $GITHUB_ENV
 
