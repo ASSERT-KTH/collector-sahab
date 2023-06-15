@@ -61,9 +61,4 @@ jobs:
             $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data @<(cat <<EOF
-              {
-                "body": "$CONTENT"
-              }
-            EOF
-            )
+            --data '{ "body": "'"$(cat $DIFF)"'" }'
