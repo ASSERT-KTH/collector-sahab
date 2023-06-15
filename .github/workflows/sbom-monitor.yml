@@ -53,13 +53,16 @@ jobs:
           DIFF: ${{ env.DIFF }}
         run: |
           CONTENT="
+          { \"body\": \"## SBOM diff
+          
             \`\`\`diff
             $(cat $DIFF)
-            \`\`\`"
+            \`\`\`
+          }"  
           echo $CONTENT
           curl \
             -X POST \
             $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{ "body": "'"$(echo $CONTENT)"'" }'
+            --data "$CONTENT"
