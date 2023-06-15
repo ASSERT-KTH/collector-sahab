@@ -43,7 +43,7 @@ jobs:
           HEAD: ${{ env.HEAD }}
           BASE: ${{ env.BASE }}
         run: |
-          DIFF=$(diff -u $BASE HEAD)
+          DIFF=$(diff -u $BASE $HEAD)
           echo "$DIFF"
           echo "DIFF=$DIFF" >> $GITHUB_ENV
 
