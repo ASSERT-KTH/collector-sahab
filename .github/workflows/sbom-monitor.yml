@@ -52,12 +52,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DIFF: ${{ env.DIFF }}
         run: |
-          CONTENT="{ \"body\": \"## SBOM diff
-          
-            \`\`\`diff
-            $(cat $DIFF | sed 's/"/\\\"/g')
-            \`\`\`\"
-          }"  
+          CONTENT="{ \"body\": \"## SBOM diff\n
+            \`\`\`diff\n
+            $(cat $DIFF | sed 's/"/\\\"/g')\n
+            \`\`\`\\n"
+          }"
           echo $CONTENT
           echo $URL
           curl \
