@@ -61,9 +61,8 @@ jobs:
           echo $URL
           curl \
             -v \
-            --trace-ascii \
-            -X POST \
-            $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data-binary "$CONTENT"
+            --data "$CONTENT" \
+            -X POST \
+            $URL
