@@ -55,7 +55,7 @@ jobs:
           CONTENT="{ \"body\": \"## SBOM diff\n
             \`\`\`diff\n
             $(cat $DIFF | sed 's/"/\\\"/g')\n
-            \`\`\`\\n"
+            \`\`\`\\n\"
           }"
           echo $CONTENT
           echo $URL
