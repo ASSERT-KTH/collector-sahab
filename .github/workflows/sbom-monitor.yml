@@ -60,6 +60,8 @@ jobs:
           echo $CONTENT
           echo $URL
           curl \
+            -v \
+            --trace-ascii \
             -X POST \
             $URL \
             -H "Content-Type: application/json" \
