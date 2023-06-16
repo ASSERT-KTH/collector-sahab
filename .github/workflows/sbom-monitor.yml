@@ -61,8 +61,7 @@ jobs:
           echo $URL
           curl \
             -v \
-            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.github+json" \
             -H "Authorization: token $GITHUB_TOKEN" \
             --data "$CONTENT" \
-            -X POST \
             $URL
