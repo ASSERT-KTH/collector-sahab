@@ -1,4 +1,49 @@
 
+# 0.5.3
+## Changelog
+
+## 🔄️ Changes
+- a09356e style: Refactor CollectorAgent.java for readability and performance (#275)
+- c2c1233 revert: remove sbom-monitor as it is being tested in #268
+
+## 🧰 Tasks
+- 7f74813 chore: releasing version 0.5.3
+- c406590 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-13
+- 9e8a21e chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-12
+- 0a7de8f chore(deps): update dependency org.apache.maven:maven-model to v3.9.3
+- a064656 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-11
+- 6115aa2 chore(deps): update dependency org.apache.maven.plugins:maven-shade-plugin to v3.5.0
+- bdd3ca6 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-10
+- 74c646a chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.10.0
+- 41d345d chore(deps): update dependency commons-io:commons-io to v2.13.0
+- 153b812 chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.1.2
+- c0ff91f chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.1.2
+- b98c21b chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-9
+- 4f2c650 chore(deps): update dependency info.picocli:picocli to v4.7.4
+- 376eae6 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.5
+- e84b94e chore(deps): update dependency org.kohsuke:github-api to v1.315
+- e22427a chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.15.2
+- 08d55a8 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0-beta-8
+- 3f89871 chore: setting SNAPSHOT version 0.5.3-SNAPSHOT
+
+## 🛠  Build
+- f0160f4 test: disable flaky test (#277)
+- 1c77671 ci: Update GitHub Actions workflows to test with multiple Maven versions (#276)
+- eda302d ci: use git diff to compute diff
+- 5a210ac ci: fix syntax
+- c15ac2c ci: provide absolute path to diff utility
+- 748ba5c ci: use the correct reference for base reference
+- 590806a ci: fix sbom monitor job
+- c1c941f ci: add a job for posting diff in SBOM as PR comments
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.5.2
 ## Changelog
 
