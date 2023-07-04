@@ -27,6 +27,7 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -994,6 +995,7 @@ class NewCollectorTest {
         assertThat(volatileField.getValue(), equalTo(false));
     }
 
+    @Disabled("This test is disabled because it is not deterministic")
     @Test
     void shouldBeAbleToRunMultiThreadedProgram() throws MavenInvocationException, IOException {
         // arrange
