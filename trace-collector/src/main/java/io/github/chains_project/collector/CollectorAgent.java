@@ -22,6 +22,7 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
@@ -96,13 +97,11 @@ public class CollectorAgent {
     private static List<String> getClassesAllowed() {
         List<FileAndBreakpoint> fileAndBreakpoints = options.getClassesAndBreakpoints();
         List<MethodForExitEvent> methodForExitEvents = options.getMethodsForExitEvent();
-        List<String> classesAllowed = new ArrayList<>();
-        classesAllowed.addAll(
-                fileAndBreakpoints.stream().map(FileAndBreakpoint::getFileName).collect(Collectors.toList()));
-        classesAllowed.addAll(methodForExitEvents.stream()
-                .map(MethodForExitEvent::getClassName)
-                .collect(Collectors.toList()));
-        return classesAllowed;
+
+        return Stream.concat(
+                        fileAndBreakpoints.stream().map(FileAndBreakpoint::getFileName),
+                        methodForExitEvents.stream().map(MethodForExitEvent::getClassName))
+                .collect(Collectors.toList());
     }
 
     private static List<Integer> getBreakpointsAllowed(String className) {
@@ -128,51 +127,109 @@ public class CollectorAgent {
         }
         List<Integer> breakpointsAllowed = getBreakpointsAllowed(className);
 
+        ClassNode classNode = generateClassNode(classfileBuffer);
+
+        processClassMethods(methodExits, classNode, breakpointsAllowed, className);
+
+        return getTransformedClass(classNode);
+    }
+
+    private static ClassNode generateClassNode(byte[] classfileBuffer) {
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(classfileBuffer);
         classReader.accept(classNode, 0);
+        return classNode;
+    }
 
+    private static void processClassMethods(
+            List<String> methodExits, ClassNode classNode, List<Integer> breakpointsAllowed, String className)
+            throws NoSuchMethodException {
         for (MethodNode method : classNode.methods) {
             List<LocalVariableNode> liveVariables = new ArrayList<>();
-            for (AbstractInsnNode instruction : method.instructions) {
-                AbstractInsnNode currentNode = instruction;
+            processInstructions(methodExits, classNode, breakpointsAllowed, className, method, liveVariables);
+        }
+    }
 
-                // Stores parameter values in an array
-                if (shouldMethodExitBeRecorded(method, methodExits) && instruction.getPrevious() == null) {
-                    StackManipulation callEntryLog = getCallToEntryLogMethod(method);
-                    currentNode = ByteBuddyHelper.applyStackManipulation(
-                            method, currentNode, callEntryLog, ByteBuddyHelper.InsertPosition.BEFORE);
-                }
-                if (instruction instanceof LabelNode) {
-                    for (LocalVariableNode localVariable : method.localVariables) {
-                        if (localVariable.start == currentNode) {
-                            liveVariables.add(localVariable);
-                        }
-                        if (localVariable.end == currentNode) {
-                            liveVariables.remove(localVariable);
-                        }
-                    }
-                }
-                if (instruction instanceof LineNumberNode) {
-                    if (breakpointsAllowed.contains(((LineNumberNode) instruction).line)) {
-                        StackManipulation callLineLog =
-                                getCallToLineLogMethod(className, method, liveVariables, (LineNumberNode) instruction);
-                        currentNode = ByteBuddyHelper.applyStackManipulation(
-                                method, currentNode, callLineLog, ByteBuddyHelper.InsertPosition.AFTER);
-                    }
-                }
+    private static void processInstructions(
+            List<String> methodExits,
+            ClassNode classNode,
+            List<Integer> breakpointsAllowed,
+            String className,
+            MethodNode method,
+            List<LocalVariableNode> liveVariables)
+            throws NoSuchMethodException {
+        for (AbstractInsnNode instruction : method.instructions) {
+            processInstruction(
+                    methodExits, classNode, breakpointsAllowed, className, method, liveVariables, instruction);
+        }
+    }
 
-                int opCode = instruction.getOpcode();
-                if (shouldMethodExitBeRecorded(method, methodExits) && isItExitInstruction(opCode)) {
-                    StackManipulation callReturnLog = getCallToReturnLogMethod(className, method);
-                    currentNode = ByteBuddyHelper.applyStackManipulation(
-                            method, currentNode, callReturnLog, ByteBuddyHelper.InsertPosition.BEFORE);
-                }
+    private static void processInstruction(
+            List<String> methodExits,
+            ClassNode classNode,
+            List<Integer> breakpointsAllowed,
+            String className,
+            MethodNode method,
+            List<LocalVariableNode> liveVariables,
+            AbstractInsnNode instruction)
+            throws NoSuchMethodException {
+        AbstractInsnNode currentNode = instruction;
+
+        if (shouldMethodExitBeRecorded(method, methodExits) && instruction.getPrevious() == null) {
+            currentNode = insertCallToEntryLog(method, currentNode);
+        }
+
+        if (instruction instanceof LabelNode) {
+            processLabelNode(method, liveVariables, currentNode);
+        }
+
+        if (instruction instanceof LineNumberNode && breakpointsAllowed.contains(((LineNumberNode) instruction).line)) {
+            currentNode = insertCallToLineLog(className, method, liveVariables, currentNode);
+        }
+
+        if (shouldMethodExitBeRecorded(method, methodExits) && isItExitInstruction(instruction.getOpcode())) {
+            currentNode = insertCallToReturnLog(className, method, currentNode);
+        }
+    }
+
+    private static void processLabelNode(
+            MethodNode method, List<LocalVariableNode> liveVariables, AbstractInsnNode currentNode) {
+        for (LocalVariableNode localVariable : method.localVariables) {
+            if (localVariable.start == currentNode) {
+                liveVariables.add(localVariable);
+            }
+            if (localVariable.end == currentNode) {
+                liveVariables.remove(localVariable);
             }
         }
+    }
+
+    private static AbstractInsnNode insertCallToEntryLog(MethodNode method, AbstractInsnNode currentNode)
+            throws NoSuchMethodException {
+        StackManipulation callEntryLog = getCallToEntryLogMethod(method);
+        return ByteBuddyHelper.applyStackManipulation(
+                method, currentNode, callEntryLog, ByteBuddyHelper.InsertPosition.BEFORE);
+    }
+
+    private static AbstractInsnNode insertCallToLineLog(
+            String className, MethodNode method, List<LocalVariableNode> liveVariables, AbstractInsnNode currentNode)
+            throws NoSuchMethodException {
+        StackManipulation callLineLog =
+                getCallToLineLogMethod(className, method, liveVariables, (LineNumberNode) currentNode);
+        return ByteBuddyHelper.applyStackManipulation(
+                method, currentNode, callLineLog, ByteBuddyHelper.InsertPosition.AFTER);
+    }
+
+    private static AbstractInsnNode insertCallToReturnLog(
+            String className, MethodNode method, AbstractInsnNode currentNode) throws NoSuchMethodException {
+        StackManipulation callReturnLog = getCallToReturnLogMethod(className, method);
+        return ByteBuddyHelper.applyStackManipulation(
+                method, currentNode, callReturnLog, ByteBuddyHelper.InsertPosition.BEFORE);
+    }
+
+    private static byte[] getTransformedClass(ClassNode classNode) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classNode.accept(new TraceClassVisitor(writer, null));
-
         return writer.toByteArray();
     }
 
