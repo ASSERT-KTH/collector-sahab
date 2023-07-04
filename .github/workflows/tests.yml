@@ -9,13 +9,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        maven: [ '3.6.3', '3.9.2' ]
+
+    name: maven ${{ matrix.maven }}
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11 for running tests
-        uses: actions/setup-java@v3
+      - name: Set up JDK 11 and maven for running tests
+        uses: s4u/setup-maven-action@v1.8.0
         with:
           java-version: 11
           distribution: 'temurin'
+          maven-version: ${{ matrix.maven }}
       - name: Style check using spotless
         run: 'mvn spotless:check'
       - name: Prepare all poms
