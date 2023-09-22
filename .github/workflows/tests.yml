@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Set up JDK 11 and maven for running tests
-        uses: s4u/setup-maven-action@v1.9.0
+        uses: s4u/setup-maven-action@v1.10.0
         with:
           java-version: 11
           distribution: 'temurin'
