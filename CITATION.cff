@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 preferred-citation:
   title: "Augmenting Diffs With Runtime Information"
-  doi: "https://doi.org/10.48550/arXiv.2212.11077"
-  year: "2022"
+  doi: "https://doi.org/10.1109/TSE.2023.3324258"
+  year: "2023"
   type: article
-  journal: "arXiv preprint"
+  journal: "IEEE Transactions on Software Engineering"
   authors:
     - family-names: Etemadi
       given-names: Khashayar
