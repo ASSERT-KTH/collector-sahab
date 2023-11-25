@@ -5,7 +5,7 @@
 [![maven central](https://maven-badges.herokuapp.com/maven-central/io.github.chains-project/collector-sahab/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.chains-project/collector-sahab)
 
 Collector Sahab is a tool to augment code diffs with runtime information. It works by instrumenting and running the versions before and after a commit, and then report the differences found in the runtime values.
-For more information, see our paper [Augmenting Diffs With Runtime Information](http://arxiv.org/pdf/2212.11077).
+For more information, see our paper [Augmenting Diffs With Runtime Information](http://arxiv.org/pdf/2212.11077) (IEEE Transactions on Software Engineering, 2023, doi:[10.1109/TSE.2023.3324258](https://doi.org/10.1109/TSE.2023.3324258)).
 
 ## Example Diff
 
