@@ -89,6 +89,10 @@
           </transformers>
           <relocations>
             <relocation>
+              <pattern>com.fasterxml.jackson</pattern>
+              <shadedPattern>rtf.com.fasterxml.jackson</shadedPattern>
+            </relocation>
+            <relocation>
               <pattern>net.bytebuddy</pattern>
               <shadedPattern>rtf.net.bytebuddy</shadedPattern>
             </relocation>
