@@ -1,4 +1,183 @@
 
+# 0.5.4
+## Changelog
+
+## 🐛 Fixes
+- 41e34e5 fix: shade fasterxml dependency (#431)
+
+## 🧰 Tasks
+- 00638ec chore: releasing version 0.5.4
+- 2811bf0 chore: releasing version 0.5.4
+- b50ff28 chore: releasing version 0.5.4
+- 68c6974 chore: releasing version 0.5.4
+- 5d89837 chore: releasing version 0.5.4
+- 362470f chore: releasing version 0.5.4
+- 0653f5d chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.15.1
+- 808fef7 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.24.0
+- d27ac3a chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.5.0
+- 8787fbd chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.10.0
+- 04e1be8 chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.5.0
+- a0a2aa2 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.15.0
+- 40519c4 chore(deps): update dependency org.apache.maven.plugins:maven-dependency-plugin to v3.8.0
+- dae2f60 chore(deps): update dependency org.apache.maven.plugins:maven-deploy-plugin to v3.1.3
+- 219656c chore(deps): update dependency org.kohsuke:github-api to v1.324
+- 5c29114 chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.4.0
+- 4493c9a chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.4.0
+- 78a5dfe chore(deps): update dependency org.apache.maven:maven-model to v3.9.9
+- 02a9182 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.19
+- 46e2233 chore(deps): update dependency org.junit.jupiter:junit-jupiter to v5.11.0
+- b7f6a4c chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.23.1
+- 2d504af chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.8.0
+- 940356c chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.23.0
+- 965dd22 chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.3.1
+- 0383f0d chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.3.1
+- c2724c0 chore(deps): update dependency org.jsoup:jsoup to v1.18.1
+- e088163 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.18
+- 25b5476 chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.17.2
+- 6012581 chore(deps): update dependency org.kohsuke:github-api to v1.323
+- 155e844 chore(deps): update s4u/setup-maven-action action to v1.14.0
+- 142634d chore(deps): update dependency org.junit.jupiter:junit-jupiter to v5.10.3
+- 741fec9 chore(deps): update dependency org.apache.maven.plugins:maven-dependency-plugin to v3.7.1
+- 81efd97 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.22.0
+- 27d51bc chore(deps): update dependency org.kohsuke:github-api to v1.322
+- b714ba3 chore(deps): update dependency org.apache.maven:maven-model to v3.9.8
+- c59ce4c chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.3.0
+- 690811d chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.3.0
+- 342fd2d chore(deps): update dependency org.apache.maven.plugins:maven-dependency-plugin to v3.7.0
+- 7ff96f3 chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.7.0
+- deb53ef chore(deps): update dependency org.apache.maven.plugins:maven-shade-plugin to v3.6.0
+- e184aee chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.17
+- 8e8df6f chore(deps): update dependency org.apache.maven:maven-model to v3.9.7
+- 7ecafb8 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.71
+- 3fc3998 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.16
+- a4e895c chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.21.0
+- 622688b chore(deps): update s4u/setup-maven-action action to v1.13.0
+- 67a95dd chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.15
+- 5a9de72 chore(deps): update dependency info.picocli:picocli to v4.7.6
+- c20b2cf chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.17.1
+- 11df050 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.70
+- a32b68b chore(deps): update dependency org.apache.maven.plugins:maven-deploy-plugin to v3.1.2
+- dac7ed9 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.20.0
+- d7fb5a0 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.14
+- 62ec8bb chore(deps): update dependency org.apache.maven.plugins:maven-shade-plugin to v3.5.3
+- 78c1e58 chore(deps): update dependency commons-io:commons-io to v2.16.1
+- ef50584 chore(deps): update dependency org.apache.maven.plugins:maven-source-plugin to v3.3.1
+- e1b1434 chore(deps): update dependency org.jacoco:jacoco-maven-plugin to v0.8.12
+- fa6a8f4 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.19.1
+- 0a7ec99 chore(deps): update dependency commons-io:commons-io to v2.16.0
+- 8472f08 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.13
+- ae2c653 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.19.0
+- 39da99b chore(deps): update dependency org.ow2.asm:asm-util to v9.7
+- 8eade5c chore(deps): update dependency org.ow2.asm:asm-tree to v9.7
+- 5a611d1 chore(deps): update dependency org.ow2.asm:asm to v9.7
+- e8b7f89 chore(deps): update dependency org.kohsuke:github-api to v1.321
+- 5105dff chore(deps): update dependency org.kohsuke:github-api to v1.320
+- fb4a2b0 chore(deps): update dependency org.apache.maven.plugins:maven-compiler-plugin to v3.13.0
+- ea494ab chore(deps): update dependency org.apache.maven.plugins:maven-assembly-plugin to v3.7.1
+- e2ae9bf chore(deps): update dependency org.apache.maven.plugins:maven-assembly-plugin to v3.7.0
+- aa73ca4 chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.16.2
+- 3bdc0cb chore(deps): update dependency org.kohsuke:github-api to v1.319
+- 3ab2ba8 chore(deps): update dependency org.apache.maven.plugins:maven-shade-plugin to v3.5.2
+- 979adc2 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.18.1
+- ac585e8 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.18.0
+- ea08486 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.12
+- 025b9df chore(deps): update s4u/setup-maven-action action to v1.12.0
+- ff23375 chore(deps): update dependency org.junit.jupiter:junit-jupiter to v5.10.2
+- 4ce25ab chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.43.0
+- fc67dbf chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.17.0
+- ab8390b chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.42.0
+- 9eba0dd chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.2.5
+- 6c2f68c chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.2.5
+- a5c002c chore(deps): update dependency org.jsoup:jsoup to v1.17.2
+- 0a62c28 chore(deps): update dependency org.apache.maven.plugins:maven-compiler-plugin to v3.12.1
+- 7c2fe2f chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.16.1
+- e87d6af chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.11
+- 964753f chore(deps): update dependency org.apache.maven.plugins:maven-compiler-plugin to v3.12.0
+- 1551d56 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.69
+- b0bf521 chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.2.3
+- 37dce23 chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.2.3
+- 8b9f5a0 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.16.1
+- 64f2207 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.16.0
+- 1e869e5 chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.41.1
+- a9ff8ca chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.6.3
+- 83bbc79 chore(deps): update dependency org.apache.maven:maven-model to v3.9.6
+- 9f141c9 chore(deps): update dependency commons-io:commons-io to v2.15.1
+- d6e4e62 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.68
+- 5dfb36a chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.41.0
+- 8f687af chore(deps): update dependency org.jsoup:jsoup to v1.17.1
+- cc917fb chore(deps): update s4u/setup-maven-action action to v1.11.0
+- 7d880ed chore(deps): update dependency org.kohsuke:github-api to v1.318
+- ad0c71f chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.10
+- 510bd0c chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.16.0
+- a15110f chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.2.2
+- 0026edf chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.6.2
+- 94af354 chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.2.2
+- 0e43f9a chore(deps): update dependency org.junit.jupiter:junit-jupiter to v5.10.1
+- 40e674d chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.15.0
+- 9da9d6c chore(deps): update dependency commons-io:commons-io to v2.15.0
+- b34875d chore(deps): update actions/checkout action to v4 (#293)
+- 1281ac0 chore(deps): update dependency org.apache.maven.plugins:maven-surefire-plugin to v3.2.1
+- 7f8ec11 chore(deps): update dependency org.apache.maven.plugins:maven-failsafe-plugin to v3.2.1
+- 03ff4ff chore(deps): update dependency org.apache.maven.plugins:maven-dependency-plugin to v3.6.1
+- 96595a0 chore(deps): update dependency org.jsoup:jsoup to v1.16.2
+- 89ed375 chore(deps): update dependency org.kohsuke:github-api to v1.317
+- aac2195 chore(deps): update dependency org.jacoco:jacoco-maven-plugin to v0.8.11
+- d25a7f0 chore(deps): update dependency com.fasterxml.jackson.core:jackson-databind to v2.15.3
+- f3d1254 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.14.1
+- 8c6c4f6 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.14.0
+- d8c8052 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.9
+- 757d743 chore(deps): update dependency org.apache.maven:maven-model to v3.9.5
+- ef2481b chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.2
+- 8b34302 chore(deps): update dependency org.ow2.asm:asm-util to v9.6
+- e65a90b chore(deps): update dependency org.ow2.asm:asm-tree to v9.6
+- dd05322 chore(deps): update dependency org.ow2.asm:asm to v9.6
+- a221b8a chore(deps): update dependency commons-io:commons-io to v2.14.0
+- b27df48 chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.40.0
+- 3d7d05c chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.13.0
+- 3d6db1d chore(deps): update dependency org.apache.maven.plugins:maven-shade-plugin to v3.5.1
+- 5f3f29d chore(deps): update s4u/setup-maven-action action to v1.10.0
+- cc099df chore(deps): update dependency org.apache.maven.plugins:maven-javadoc-plugin to v3.6.0
+- e5ab117 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.8
+- 15d217a chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.67
+- 7474e47 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.66
+- 03ce176 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.12.1
+- cefaeea chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.64
+- 7c5fd61 chore(deps): update dependency fr.inria.gforge.spoon.labs:gumtree-spoon-ast-diff to v1.63
+- 9590a1b chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.12.0
+- cbfe943 chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.1
+- c06e935 chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.39.0
+- 7d5c2f1 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.7
+- 879644c chore(deps): update dependency info.picocli:picocli to v4.7.5
+- a5c442f chore(deps): update s4u/setup-maven-action action to v1.9.0
+- 859f225 chore(deps): update dependency org.kohsuke:github-api to v1.316
+- c64caa4 chore(deps): update dependency net.bytebuddy:byte-buddy-dep to v1.14.6
+- b79a8fc chore(deps): update dependency org.apache.maven:maven-model to v3.9.4
+- 950d698 chore(deps): update dependency org.seleniumhq.selenium:selenium-java to v4.11.0
+- 27e00d2 chore(deps): update dependency org.junit.jupiter:junit-jupiter to v5.10.0
+- 891de67 chore(deps): update dependency com.diffplug.spotless:spotless-maven-plugin to v2.38.0
+- 507fe5f chore(deps): update dependency fr.inria.gforge.spoon:spoon-core to v10.4.0 (#278)
+- 2d4d64a chore: setting SNAPSHOT version 0.5.4-SNAPSHOT
+
+## 📝 Documentation
+- 05442a4 docs: update citation to TSE
+
+---
+- d141c94 Revert "chore: releasing version 0.5.4"
+- 623fad2 Revert "chore: releasing version 0.5.4"
+- 95ab625 Revert "chore: releasing version 0.5.4"
+- 4723543 Revert "chore: releasing version 0.5.4"
+- d0c887a Revert "chore: releasing version 0.5.4"
+- e76b75b add DOI
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+- Aman Sharma ([@algomaster99](https://github.com/algomaster99))
+- GitHub ()
+- Martin Monperrus ([@monperrus](https://github.com/monperrus))
+- github-actions[bot] ([@github-actions[bot]](https://github.com/apps/github-actions))
+- renovate[bot] ([@renovate[bot]](https://github.com/apps/renovate))
+
 # 0.5.3
 ## Changelog
 
