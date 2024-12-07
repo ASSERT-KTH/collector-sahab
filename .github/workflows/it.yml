@@ -21,7 +21,7 @@ jobs:
           submodules: true
           fetch-depth: 0
       - name: Set up JDK 11 and maven for running tests
-        uses: s4u/setup-maven-action@v1.16.0
+        uses: s4u/setup-maven-action@v1.17.0
         with:
           java-version: 11
           distribution: 'temurin'
