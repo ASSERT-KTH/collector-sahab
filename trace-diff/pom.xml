@@ -63,7 +63,7 @@
     <dependency>
       <groupId>fr.inria.gforge.spoon.labs</groupId>
       <artifactId>gumtree-spoon-ast-diff</artifactId>
-      <version>1.71</version>
+      <version>1.99</version>
     </dependency>
 
   </dependencies>
